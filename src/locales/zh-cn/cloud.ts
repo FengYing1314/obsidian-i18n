@@ -251,7 +251,8 @@ export default {
         SupportedVersions: "支持版本号",
         TotalTranslations: "全局总翻译数",
         TotalContributors: "全局总贡献者",
-        TotalStars: "星标总计"
+        TotalStars: "星标总计",
+        LocalResource: "本地已安装资源"
     },
     Placeholders: {
         RepoName: "例如: my-obsidian-i18n-resources",

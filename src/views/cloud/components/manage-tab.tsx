@@ -5,7 +5,7 @@
 import React, { useCallback, useState, useRef, useEffect, useMemo } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Tabs, TabsList, TabsTrigger, TabsContent, Textarea } from '@/src/shadcn';
-import { Trash2, FolderOpen, AlertCircle, Loader2, Edit3, Package, Clock, Tag, RefreshCcw, Search, Globe, Download, Star, FileText, Save, Users, History, Cloud, HardDrive, Upload, Palette, Plus, CheckCircle2, Cpu } from 'lucide-react';
+import { Trash2, FolderOpen, AlertCircle, Loader2, Edit3, Layers, Clock, Tag, RefreshCw, Search, Globe, Download, Star, Github, FileText, Save, Users, History, Cloud, HardDrive, Upload, Palette, Plus, CheckCircle2, Cpu, Zap, CircleCheckBig, MessageSquareWarning } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useCloudStore } from '../cloud-store';
@@ -34,6 +34,11 @@ function simpleHash(str: string): string {
     return hex.repeat(4); // 填充到 32 字符
 }
 
+interface InstalledItem {
+    id: string;
+    name: string;
+    type: 'plugin' | 'theme';
+}
 
 export const ManageTab: React.FC = () => {
     const i18n = useGlobalStoreInstance.getState().i18n;
@@ -59,13 +64,50 @@ export const ManageTab: React.FC = () => {
 
     // UI 状态控制
     const [deletingId, setDeletingId] = useState<string | null>(null);
-    const [filterLanguage, setFilterLanguage] = useState(i18n.settings.language || 'all');
+    const [filterLanguage, setFilterLanguage] = useState('all');
     const [filterQuery, setFilterQuery] = useState('');
+    const [installedItems, setInstalledItems] = useState<InstalledItem[]>([]);
     const [rightTab, setRightTab] = useState<'plugins' | 'readme'>('plugins');
     const [isEditingReadme, setIsEditingReadme] = useState(false);
     const [readmeDraft, setReadmeDraft] = useState('');
     const [isSavingReadme, setIsSavingReadme] = useState(false);
     const [isInitializing, setIsInitializing] = useState(false);
+
+    // 获取已安装的插件和主题
+    useEffect(() => {
+        const fetchInstalled = async () => {
+            const items: InstalledItem[] = [];
+            // 插件
+            // @ts-ignore
+            const manifests = i18n.app.plugins.manifests;
+            Object.values(manifests).forEach((m: any) => {
+                if (m.id !== i18n.manifest.id) {
+                    items.push({ id: m.id, name: m.name, type: 'plugin' });
+                }
+            });
+            // 主题
+            try {
+                // @ts-ignore
+                const basePath = i18n.app.vault.adapter.getBasePath();
+                // @ts-ignore
+                const exists = await i18n.app.vault.adapter.exists(`${i18n.app.vault.configDir}/themes`);
+                if (exists) {
+                    // @ts-ignore
+                    const themes = await i18n.app.vault.adapter.list(`${i18n.app.vault.configDir}/themes`);
+                    for (const folder of themes.folders) {
+                        const name = folder.split('/').pop();
+                        if (name) {
+                            items.push({ id: name, name: name, type: 'theme' });
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to fetch themes', e);
+            }
+            setInstalledItems(items.sort((a, b) => a.name.localeCompare(b.name)));
+        };
+        fetchInstalled();
+    }, [i18n]);
 
     const userRepo = i18n.settings.shareRepo;
 
@@ -643,127 +685,127 @@ export const ManageTab: React.FC = () => {
     return (
         <div className="flex h-full gap-0 overflow-hidden min-h-0 animate-in fade-in duration-500">
             {/* 左侧侧边栏 */}
-            <aside className="w-[280px] flex flex-col border-r border-border/30 pr-4 shrink-0 overflow-hidden min-h-0">
+            <aside className="w-[280px] flex flex-col border-r border-border/20 pr-5 shrink-0 overflow-hidden min-h-0">
                 <ScrollArea className="flex-1">
-                    <div className="space-y-6 pb-6 pt-1">
-                        <div className="flex items-center gap-2 text-sm font-semibold text-foreground/80 mb-4">
-                            <HardDrive className="w-4 h-4 text-primary" />
-                            <span>{t('Cloud.Labels.ManageCenter')}</span>
-                        </div>
+                    <div className="space-y-8 pb-8 pt-4">
 
                         {repoManifest.length > 0 && (
-                            <div className="p-4 bg-card border shadow-sm rounded-xl relative overflow-hidden group">
-                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-primary/30" />
-
+                            <div className="bg-card border border-border/60 shadow-[0_8px_30px_rgb(0,0,0,0.02)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.15)] rounded-lg overflow-hidden group transition-all duration-300 hover:border-primary/20">
                                 {/* GitHub 用户信息 */}
-                                <div className="flex items-center gap-3 mb-4 pb-3 border-b border-border/40">
-                                    {githubUser?.avatar_url ? (
-                                        <img src={githubUser.avatar_url} className="w-10 h-10 rounded-full border border-border/50 shadow-sm" alt="avatar" />
+                                <div className="p-5 pb-4 border-b border-border/40 bg-muted/5">
+                                    <div className="flex items-center gap-4 mb-4">
+                                        <div className="relative">
+                                            {githubUser?.avatar_url ? (
+                                                <img src={githubUser.avatar_url} className="w-12 h-12 rounded-full border-2 border-background shadow-md object-cover" alt="avatar" />
+                                            ) : (
+                                                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shadow-inner">
+                                                    <Users className="w-6 h-6" />
+                                                </div>
+                                            )}
+                                            <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-green-500 border-2 border-background" title="Connected" />
+                                        </div>
+                                        <div className="flex flex-col min-w-0">
+                                            <span className="text-[14px] font-extrabold text-foreground leading-none truncate mb-1" title={githubUser?.name || githubUser?.login}>
+                                                {githubUser?.name || githubUser?.login}
+                                            </span>
+                                            <div className="flex items-center gap-2 text-[10px] text-muted-foreground/70 font-medium">
+                                                <span className="flex items-center gap-1"><Users className="w-2.5 h-2.5" />{githubUser?.followers || 0}</span>
+                                                <span className="opacity-30">•</span>
+                                                <span className="flex items-center gap-1"><FolderOpen className="w-2.5 h-2.5" />{githubUser?.public_repos || 0}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* 仓库链接 */}
+                                    <div className="flex items-center gap-2 p-2 px-2.5 rounded-lg bg-background/50 border border-border/40 overflow-hidden">
+                                        <Github className="w-3.5 h-3.5 text-primary shrink-0 opacity-70" />
+                                        <a
+                                            href={`https://github.com/${githubUser?.login}/${userRepo}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="font-bold text-[11px] font-mono truncate hover:text-primary transition-colors text-muted-foreground/90"
+                                            title={t('Cloud.Labels.ViewOnGithubTitle', { repo: `${githubUser?.login}/${userRepo}` })}
+                                        >
+                                            {userRepo}
+                                        </a>
+                                    </div>
+                                </div>
+
+                                {/* 数据统计与操作 */}
+                                <div className="p-5 space-y-5">
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {[
+                                            { label: t('Cloud.Labels.StatAssets'), value: repoManifest.length, color: 'text-primary' },
+                                            { label: t('Cloud.Labels.StatStars'), value: myRepoInfo?.stargazers_count ?? '-', color: 'text-yellow-600' },
+                                            { label: t('Cloud.Labels.StatForks'), value: myRepoInfo?.forks_count ?? '-', color: 'text-blue-600' },
+                                            { label: t('Cloud.Labels.StatIssues'), value: myRepoInfo?.open_issues_count ?? '-', color: 'text-red-500/80' }
+                                        ].map((stat, i) => (
+                                            <div key={i} className="flex flex-col p-2.5 rounded-md bg-muted/20 border border-border/5 transition-all hover:bg-muted/40 hover:border-border/20 group/stat">
+                                                <span className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest mb-1 group-hover/stat:text-primary/70">{stat.label}</span>
+                                                <span className={cn("text-[13px] font-black tracking-tighter", stat.color)}>{stat.value}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {!isRegistered ? (
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="w-full h-9 text-[11px] font-bold tracking-tight gap-2 rounded-lg border-primary/20 bg-primary/5 text-primary hover:bg-primary hover:text-primary-foreground transition-all active:scale-[0.97]"
+                                            onClick={handleRegisterToCommunity}
+                                            disabled={isRegistering || hasPendingRegistration || isCheckingPending}
+                                        >
+                                            {isRegistering || isCheckingPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Users className="w-3.5 h-3.5" />}
+                                            {hasPendingRegistration ? t('Cloud.Status.Reviewing') : isCheckingPending ? t('Cloud.Status.Fetching') : t('Cloud.Actions.RegisterCommunity')}
+                                        </Button>
                                     ) : (
-                                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                                            <Users className="w-5 h-5" />
+                                        <div className="flex items-center justify-center gap-2 w-full h-9 rounded-lg bg-green-500/5 text-green-600 text-[11px] font-black tracking-tight border border-green-500/10 shadow-sm uppercase">
+                                            <CircleCheckBig className="w-3.5 h-3.5" />
+                                            {t('Cloud.Status.Registered')}
                                         </div>
                                     )}
-                                    <div className="flex flex-col min-w-0">
-                                        <span className="text-[13px] font-bold text-foreground truncate" title={githubUser?.name || githubUser?.login}>
-                                            {githubUser?.name || githubUser?.login}
-                                        </span>
-                                        <div className="flex items-center gap-2 text-[10px] text-muted-foreground mt-0.5">
-                                            <span title={t('Cloud.Labels.Followers')}><Users className="w-2.5 h-2.5 inline mr-0.5" />{githubUser?.followers || 0}</span>
-                                            <span className="opacity-50">•</span>
-                                            <span title={t('Cloud.Labels.PublicRepos')}><FolderOpen className="w-2.5 h-2.5 inline mr-0.5" />{githubUser?.public_repos || 0}</span>
-                                        </div>
-                                    </div>
                                 </div>
-
-                                {/* 仓库基础信息 */}
-                                <div className="flex items-center gap-2 mb-3">
-                                    <Globe className="w-4 h-4 text-primary shrink-0" />
-                                    <a
-                                        href={`https://github.com/${githubUser?.login}/${userRepo}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="font-bold text-[13px] truncate hover:text-primary hover:underline transition-colors"
-                                        title={t('Cloud.Labels.ViewOnGithubTitle', { repo: `${githubUser?.login}/${userRepo}` })}
-                                    >
-                                        {userRepo}
-                                    </a>
-                                </div>
-
-                                {/* 数据统计网格 */}
-                                <div className="grid grid-cols-2 gap-2 mb-4">
-                                    <div className="flex flex-col bg-muted/40 p-2 rounded-md border border-border/40 hover:bg-muted/60 transition-colors">
-                                        <span className="text-[10px] text-muted-foreground mb-0.5">{t('Cloud.Labels.StatAssets')}</span>
-                                        <span className="text-xs font-mono font-bold text-foreground/90">{repoManifest.length}</span>
-                                    </div>
-                                    <div className="flex flex-col bg-muted/40 p-2 rounded-md border border-border/40 hover:bg-muted/60 transition-colors">
-                                        <span className="text-[10px] text-muted-foreground mb-0.5">{t('Cloud.Labels.StatStars')}</span>
-                                        <span className="text-xs font-mono font-bold text-yellow-600">{myRepoInfo?.stargazers_count ?? '-'}</span>
-                                    </div>
-                                    <div className="flex flex-col bg-muted/40 p-2 rounded-md border border-border/40 hover:bg-muted/60 transition-colors">
-                                        <span className="text-[10px] text-muted-foreground mb-0.5">{t('Cloud.Labels.StatForks')}</span>
-                                        <span className="text-xs font-mono font-bold text-blue-600">{myRepoInfo?.forks_count ?? '-'}</span>
-                                    </div>
-                                    <div className="flex flex-col bg-muted/40 p-2 rounded-md border border-border/40 hover:bg-muted/60 transition-colors">
-                                        <span className="text-[10px] text-muted-foreground mb-0.5">{t('Cloud.Labels.StatIssues')}</span>
-                                        <span className="text-xs font-mono font-bold text-red-500/80">{myRepoInfo?.open_issues_count ?? '-'}</span>
-                                    </div>
-                                </div>
-
-
-                                {/* 社区注册状态 */}
-                                {!isRegistered ? (
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="w-full h-8 text-[11px] gap-1.5 border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground transition-all shadow-sm"
-                                        onClick={handleRegisterToCommunity}
-                                        disabled={isRegistering || hasPendingRegistration || isCheckingPending}
-                                    >
-                                        {isRegistering || isCheckingPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Users className="w-3.5 h-3.5" />}
-                                        {hasPendingRegistration ? t('Cloud.Status.Reviewing') : isCheckingPending ? t('Cloud.Status.Fetching') : t('Cloud.Actions.RegisterCommunity')}
-                                    </Button>
-                                ) : (
-                                    <div className="flex items-center justify-center gap-1.5 w-full h-8 rounded-md bg-green-500/10 text-green-600 text-[11px] font-bold border border-green-500/20 shadow-sm">
-                                        <Users className="w-3.5 h-3.5" />
-                                        {t('Cloud.Status.Registered')}
-                                    </div>
-                                )}
                             </div>
                         )}
 
-                        <div className="space-y-2">
-                            <div className="flex items-center gap-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-3">
-                                <Cloud className="w-3 h-3 text-primary/60" />
+                        <div className="space-y-3 px-1">
+                            <div className="flex items-center gap-2 text-[9px] font-black text-muted-foreground/50 uppercase tracking-[0.2em] mb-4">
+                                <Cloud className="w-3 h-3 opacity-60" />
                                 <span>{t('Cloud.Labels.CloudActions')}</span>
                             </div>
                             <Button
                                 variant="outline"
-                                className="w-full justify-start h-9 px-3 gap-2 border-border/60 hover:border-primary/50 hover:bg-primary/5 transition-all group shadow-sm bg-card"
+                                className="w-full justify-between h-10 px-4 group bg-card border-border/60 hover:border-primary/40 hover:bg-primary/5 transition-all active:scale-[0.97]"
                                 onClick={() => { setSelectedPluginId(''); setCurrentTab('upload'); }}
                             >
-                                <Upload className="w-4 h-4 text-primary opacity-80 group-hover:scale-110 transition-transform" />
-                                <span className="text-xs font-semibold">{t('Cloud.Actions.PublishNew')}</span>
+                                <div className="flex items-center gap-3">
+                                    <Upload className="w-4 h-4 text-primary opacity-70 group-hover:scale-110 transition-transform" />
+                                    <span className="text-[12px] font-extrabold tracking-tight">{t('Cloud.Actions.PublishNew')}</span>
+                                </div>
+                                <Plus className="w-3.5 h-3.5 text-muted-foreground/30" />
                             </Button>
                             <Button
                                 variant="outline"
-                                className="w-full justify-start h-9 px-3 gap-2 border-border/60 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all group shadow-sm bg-card"
+                                className="w-full justify-between h-10 px-4 group bg-card border-border/60 hover:border-blue-500/40 hover:bg-blue-500/5 transition-all active:scale-[0.97]"
                                 onClick={() => setCurrentTab('backup')}
                             >
-                                <Cloud className="w-4 h-4 text-blue-500 opacity-80 group-hover:scale-110 transition-transform" />
-                                <span className="text-xs font-semibold">{t('Cloud.Labels.BackupRestore')}</span>
+                                <div className="flex items-center gap-3">
+                                    <Cloud className="w-4 h-4 text-blue-500 opacity-70 group-hover:scale-110 transition-transform" />
+                                    <span className="text-[12px] font-extrabold tracking-tight">{t('Cloud.Labels.BackupRestore')}</span>
+                                </div>
+                                <Zap className="w-3.5 h-3.5 text-muted-foreground/30" />
                             </Button>
-                        </div>
 
-                        <div className="pt-2 border-t border-border/20">
-                            <Button
-                                variant="ghost"
-                                className="w-full justify-start h-8 px-3 gap-2 text-muted-foreground hover:text-primary hover:bg-muted/40 transition-colors"
-                                onClick={() => setRepoDataLoaded(false)}
-                            >
-                                <RefreshCcw className="w-3.5 h-3.5" />
-                                <span className="text-[11px]">{t('Cloud.Actions.ForceRefresh')}</span>
-                            </Button>
+                            <div className="pt-4 border-t border-border/10 mt-2">
+                                <Button
+                                    variant="ghost"
+                                    className="w-full justify-start h-9 px-3 gap-3 text-muted-foreground/60 hover:text-primary hover:bg-primary/5 transition-all rounded-lg group"
+                                    onClick={() => setRepoDataLoaded(false)}
+                                >
+                                    <RefreshCw className="w-4 h-4 opacity-50 group-hover:rotate-180 group-hover:opacity-100 transition-all duration-500" />
+                                    <span className="text-[11px] font-bold">{t('Cloud.Actions.ForceRefresh')}</span>
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </ScrollArea>
@@ -778,7 +820,7 @@ export const ManageTab: React.FC = () => {
                             <div className="flex items-center justify-between pb-3 border-b border-border/30">
                                 <TabsList className="h-9 p-1 bg-muted/50 border border-border/40 rounded-lg shadow-inner">
                                     <TabsTrigger value="plugins" className="text-xs px-4 h-7 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md transition-all">
-                                        <Package className="w-3.5 h-3.5 mr-1.5 text-muted-foreground" />
+                                        <Layers className="w-3.5 h-3.5 mr-1.5 text-muted-foreground" />
                                         {t('Cloud.Tabs.Resources')}
                                     </TabsTrigger>
                                     <TabsTrigger value="readme" className="text-xs px-4 h-7 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md transition-all">
@@ -808,7 +850,7 @@ export const ManageTab: React.FC = () => {
                                 </div>
 
                                 <div className={cn("flex items-center gap-3 shrink-0 transition-opacity", rightTab === 'readme' ? 'opacity-30 pointer-events-none' : 'opacity-100')}>
-                                    <div className="relative group w-56 shadow-sm">
+                                    <div className="relative group w-52 shadow-sm">
                                         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                                         <Input
                                             placeholder={t('Cloud.Placeholders.SearchPublished')}
@@ -817,11 +859,33 @@ export const ManageTab: React.FC = () => {
                                             className="pl-8 h-8 text-xs bg-background border-border/60 focus:border-primary/50 transition-all rounded-md"
                                         />
                                     </div>
+                                    <Select onValueChange={(val) => {
+                                        if (val === 'all') setFilterQuery('');
+                                        else setFilterQuery(val);
+                                    }}>
+                                        <SelectTrigger size="sm" className="w-44 text-xs bg-background border-border/60 rounded-md shadow-sm h-8">
+                                            <SelectValue placeholder={t('Common.Filters.All')} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <ScrollArea className="h-72">
+                                                <SelectItem value="all" className="text-[11px]">{t('Common.Filters.All')}</SelectItem>
+                                                {installedItems.map((item) => (
+                                                    <SelectItem key={item.id} value={item.name} className="text-[11px]">
+                                                        <div className="flex items-center gap-2">
+                                                            {item.type === 'plugin' ? <Layers className="w-3 h-3 text-muted-foreground/50" /> : <Palette className="w-3 h-3 text-muted-foreground/50" />}
+                                                            <span>{item.name}</span>
+                                                        </div>
+                                                    </SelectItem>
+                                                ))}
+                                            </ScrollArea>
+                                        </SelectContent>
+                                    </Select>
                                     <Select value={filterLanguage} onValueChange={setFilterLanguage}>
-                                        <SelectTrigger size="sm" className="w-32 text-xs bg-background border-border/60 rounded-md shadow-sm">
+                                        <SelectTrigger size="sm" className="w-32 text-xs bg-background border-border/60 rounded-md shadow-sm h-8">
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
+                                            <SelectItem value="all" className="text-[11px]">{t('Common.Filters.All')}</SelectItem>
                                             {SUPPORTED_LANGUAGES.map((lang) => (
                                                 <SelectItem key={lang.value} value={lang.value} className="text-[11px]">
                                                     {lang.label}
@@ -924,140 +988,132 @@ interface MyTranslationCardProps {
 const MyTranslationCard: React.FC<MyTranslationCardProps> = ({ entry, onEdit, onDelete, onDownload, onHistory, isDeleting, isDownloading, updateStatus }) => {
     return (
         <div className={cn(
-            "group flex flex-col overflow-hidden bg-card text-card-foreground rounded-xl border shadow-sm transition-all duration-200 animate-in fade-in h-full relative",
-            "hover:shadow-md",
-            updateStatus === 'update_available'
-                ? "border-amber-400/60 hover:border-amber-500/80 ring-1 ring-amber-400/20"
-                : updateStatus === 'not_downloaded'
-                    ? "border-blue-400/60 hover:border-blue-500/80 ring-1 ring-blue-400/20"
-                    : updateStatus === 'up_to_date'
-                        ? "border-green-400/40 hover:border-green-500/50 ring-1 ring-green-400/5 hover:ring-green-400/10"
-                        : "border-border/50 hover:border-primary/30"
+            "group flex flex-col overflow-hidden bg-card text-card-foreground rounded-lg border border-border/60 transition-all duration-300 animate-in fade-in h-[188px] relative select-none",
+            "hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:border-primary/40",
+            updateStatus === 'update_available' && "border-amber-500/20 hover:border-amber-500/40 hover:shadow-amber-500/5",
+            updateStatus === 'not_downloaded' && "border-blue-500/20 hover:border-blue-500/40 hover:shadow-blue-500/5",
+            updateStatus === 'up_to_date' && "border-green-500/20 hover:border-green-500/40 hover:shadow-green-500/5"
         )}>
-            {/* 内容区 */}
-            <div className="flex flex-col flex-1 p-3.5 pb-2.5 min-h-0 relative z-10">
-                {/* 第一行：标题 + 版本 Badge */}
-                <div className="flex items-start justify-between gap-2 mb-1.5">
-                    <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                        {/* 标题前缀图标：动态着色区分插件与主题 */}
+            {/* 内容主干 */}
+            <div className="flex flex-col flex-1 p-4 pb-3 min-h-0 space-y-3">
+                {/* 标题 & 核心状态 */}
+                <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
                         <div className={cn(
-                            "flex items-center justify-center w-6 h-6 rounded-md shrink-0 shadow-sm ring-1",
-                            entry.type === 'theme'
-                                ? "bg-sky-500/10 text-sky-600 ring-sky-500/20"
-                                : "bg-emerald-500/10 text-emerald-600 ring-emerald-500/20"
+                            "flex items-center justify-center w-9 h-9 rounded-md shrink-0 shadow-sm border border-border/10 transition-colors",
+                            "bg-muted/50 group-hover:bg-muted"
                         )}>
                             {entry.type === 'theme' ? (
-                                <Palette className="w-3.5 h-3.5" />
+                                <Palette className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
                             ) : (
-                                <Package className="w-3.5 h-3.5" />
+                                <Layers className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
                             )}
                         </div>
-                        <h3 className="text-[13.5px] font-bold text-foreground leading-tight truncate pr-1" title={entry.title || entry.plugin}>
-                            {entry.title || entry.plugin}
-                        </h3>
+                        <div className="min-w-0 flex-1">
+                            <h3 className="text-[13px] font-semibold text-foreground tracking-tight leading-snug truncate" title={entry.title || entry.plugin}>
+                                {entry.title || entry.plugin}
+                            </h3>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                                <span className="text-[10px] text-muted-foreground/60 font-mono tracking-tighter">v{entry.version}</span>
+                                {entry.supported_versions && (
+                                    <span className="text-[9px] text-muted-foreground/30 font-mono italic">[{entry.supported_versions}]</span>
+                                )}
+                            </div>
+                        </div>
                     </div>
-                    {/* 右侧徽章 (移除冗余的类型 Badge) */}
-                    <div className="flex items-center shrink-0 gap-1.5">
+
+                    <div className="flex items-center shrink-0 pt-0.5">
                         {updateStatus === 'up_to_date' && (
-                            <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-[18px] bg-green-500/10 border-green-500/30 text-green-600">
+                            <div className="p-1 px-2 rounded-sm bg-green-500/5 border border-green-500/10 text-green-600/80 text-[9px] font-bold tracking-tight uppercase flex items-center gap-1">
+                                <CircleCheckBig className="w-3 h-3 opacity-70" />
                                 {t('Cloud.Status.Uploaded')}
-                            </Badge>
+                            </div>
                         )}
                         {updateStatus === 'update_available' && (
-                            <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-[18px] bg-amber-500/10 border-amber-500/30 text-amber-600 animate-pulse">
+                            <div className="p-1 px-2 rounded-sm bg-amber-500/5 border border-amber-500/10 text-amber-600/80 text-[9px] font-bold tracking-tight uppercase animate-pulse flex items-center gap-1">
+                                <Zap className="w-3 h-3 opacity-70" />
                                 {t('Cloud.Status.Modified')}
-                            </Badge>
+                            </div>
                         )}
                         {updateStatus === 'not_downloaded' && (
-                            <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-[18px] bg-blue-500/10 border-blue-500/30 text-blue-600 animate-pulse">
+                            <div className="p-1 px-2 rounded-sm bg-blue-500/5 border border-blue-500/10 text-blue-600/80 text-[9px] font-bold tracking-tight uppercase flex items-center gap-1">
+                                <Download className="w-3 h-3 opacity-70" />
                                 {t('Cloud.Status.NotDownloaded')}
-                            </Badge>
+                            </div>
                         )}
-                        <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-[18px] font-mono bg-primary/5 border-primary/20 text-primary/80">
-                            v{entry.version}
-                        </Badge>
                     </div>
                 </div>
 
-                {/* 描述区域：固定高度占位 */}
-                <div className="min-h-[44px] max-h-[44px] mt-1.5 mb-1.5 overflow-hidden">
-                    {entry.description ? (
-                        <p className="text-[11px] text-muted-foreground/70 line-clamp-2 leading-relaxed" title={entry.description}>
-                            {entry.description}
-                        </p>
-                    ) : (
-                        <p className="text-[11px] text-muted-foreground/30 italic">
-                            {t('Cloud.Labels.UnnamedTranslation')}...
-                        </p>
-                    )}
+                {/* 精简描述 */}
+                <div className="min-h-[34px] max-h-[34px] overflow-hidden">
+                    <p className="text-[11px] text-muted-foreground/90 leading-relaxed line-clamp-2" title={entry.description || t('Cloud.Labels.UnnamedTranslation')}>
+                        {entry.description || t('Cloud.Labels.UnnamedTranslation')}
+                    </p>
                 </div>
 
-                {/* 元数据标签：推到底部 */}
-                <div className="mt-auto pt-1.5">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className={cn(
-                            "inline-flex items-center gap-1 text-[10px] bg-muted/50 px-1.5 py-0.5 rounded font-mono truncate max-w-[140px]",
-                            entry.type === 'theme' ? "text-sky-600/80" : "text-emerald-600/80"
-                        )} title={`${entry.type === 'theme' ? t('Common.Labels.Themes') : t('Common.Labels.Plugins')}: ${entry.plugin}`}>
-                            {entry.type === 'theme' ? (
-                                <Palette className="w-3 h-3 shrink-0 opacity-70" />
-                            ) : (
-                                <Package className="w-3 h-3 shrink-0 opacity-70" />
-                            )}
-                            {entry.plugin}
-                        </span>
-                        {entry.language && (
-                            <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground/60 bg-muted/50 px-1.5 py-0.5 rounded uppercase">
-                                <Globe className="w-3 h-3 shrink-0 opacity-50" />
-                                {entry.language}
-                            </span>
-                        )}
-                        {entry.updated_at && (
-                            <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground/60 bg-muted/50 px-1.5 py-0.5 rounded cursor-default">
-                                <Clock className="w-3 h-3 shrink-0 opacity-50" />
-                                {new Date(entry.updated_at).toLocaleDateString(undefined, { month: '2-digit', day: '2-digit' })}
-                            </span>
-                        )}
-                        {entry.supported_versions && (
-                            <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground/60 bg-muted/50 px-1.5 py-0.5 rounded cursor-default border border-primary/10">
-                                <Cpu className="w-3 h-3 shrink-0 opacity-50" />
-                                {t('Cloud.Labels.SupportedVersions')}: {entry.supported_versions}
-                            </span>
-                        )}
+                {/* 元数据区域 */}
+                <div className="mt-auto flex items-center justify-between px-2.5 py-1.5 rounded bg-muted/20 border border-border/5">
+                    <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/70 font-semibold">
+                            <Globe className="w-3 h-3 opacity-50" />
+                            {entry.language}
+                        </div>
+                        <div className="w-[1px] h-2 bg-border/20" />
+                        <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/70 font-semibold">
+                            <Clock className="w-3 h-3 opacity-50" />
+                            {entry.updated_at ? new Date(entry.updated_at).toLocaleDateString(undefined, { month: '2-digit', day: '2-digit' }) : '-'}
+                        </div>
                     </div>
+
+                    <span className="text-[9px] text-muted-foreground/50 font-mono tracking-tight truncate max-w-[80px]">
+                        {entry.plugin}
+                    </span>
                 </div>
             </div>
 
-            {/* 底部操作栏 */}
-            <div className="flex border-t border-border/30 mt-auto shrink-0 relative z-10">
+            {/* 操作栏 */}
+            <div className="flex border-t border-border/30 h-10 shrink-0 bg-muted/5 group-hover:bg-muted/10 transition-colors">
                 <button
                     onClick={() => updateStatus === 'not_downloaded' ? onDownload() : updateStatus === 'update_available' ? onEdit() : undefined}
                     disabled={updateStatus === 'up_to_date' || isDownloading}
                     className={cn(
-                        "flex-1 flex items-center justify-center gap-1.5 py-2 text-[11px] font-medium transition-colors border-r border-border/30 disabled:opacity-70",
-                        updateStatus === 'up_to_date' ? "text-green-600/70 cursor-not-allowed bg-green-500/5 hover:bg-green-500/5" : updateStatus === 'not_downloaded' ? "text-blue-600 hover:bg-blue-500/10 hover:text-blue-700"
-                            : "text-amber-600 hover:bg-amber-500/10 hover:text-amber-700"
+                        "flex-1 flex items-center justify-center gap-2 text-[11px] font-bold transition-all active:scale-95 disabled:active:scale-100",
+                        updateStatus === 'up_to_date'
+                            ? "text-green-600/50 cursor-default"
+                            : updateStatus === 'not_downloaded'
+                                ? "text-blue-600 hover:text-blue-700 hover:bg-blue-500/5"
+                                : "text-amber-600 hover:text-amber-700 hover:bg-amber-500/5"
                     )}
                 >
-                    {isDownloading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : updateStatus === 'not_downloaded' ? <Download className="w-3.5 h-3.5" /> : <Edit3 className="w-3.5 h-3.5" />}
-                    {isDownloading ? t('Common.Status.Loading') : updateStatus === 'up_to_date' ? t('Cloud.Status.Latest') : updateStatus === 'not_downloaded' ? t('Cloud.Actions.Download') : t('Cloud.Actions.PublishNew')}
+                    {isDownloading ? (
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    ) : updateStatus === 'up_to_date' ? (
+                        <CircleCheckBig className="w-3.5 h-3.5" />
+                    ) : updateStatus === 'not_downloaded' ? (
+                        <Download className="w-3.5 h-3.5" />
+                    ) : (
+                        <Edit3 className="w-3.5 h-3.5" />
+                    )}
+                    <span className="uppercase tracking-tight">
+                        {isDownloading ? t('Common.Status.Loading') : updateStatus === 'up_to_date' ? t('Cloud.Status.Latest') : updateStatus === 'not_downloaded' ? t('Cloud.Actions.Download') : t('Cloud.Actions.PublishNew')}
+                    </span>
                 </button>
+                <div className="w-[1px] bg-border/20 my-2" />
                 <button
                     onClick={onHistory}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2 text-[11px] font-medium text-muted-foreground hover:bg-muted/40 hover:text-primary transition-colors border-r border-border/30"
+                    className="px-3 flex items-center justify-center text-muted-foreground/60 hover:text-primary hover:bg-muted/20 transition-all active:scale-90"
                     title={t('Cloud.Labels.ViewHistory')}
                 >
-                    <History className="w-3.5 h-3.5" />
-                    {t('Cloud.Tabs.History')}
+                    <History className="w-4 h-4" />
                 </button>
+                <div className="w-[1px] bg-border/20 my-2" />
                 <button
                     onClick={onDelete}
                     disabled={isDeleting}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2 text-[11px] font-medium text-destructive/80 hover:bg-destructive/10 hover:text-destructive transition-colors disabled:opacity-50"
+                    className="px-4 flex items-center justify-center text-muted-foreground/60 hover:text-destructive hover:bg-destructive/5 transition-all active:scale-90 disabled:opacity-50"
                     title={t('Cloud.Labels.DeleteCloudPkg')}
                 >
-                    {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                    {t('Cloud.Actions.Delete')}
+                    {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                 </button>
             </div>
         </div>
@@ -1132,7 +1188,7 @@ const MyTranslationsList: React.FC<MyTranslationsListProps> = ({
     const rowVirtualizer = useVirtualizer({
         count: rowCount,
         getScrollElement: () => parentRef.current,
-        estimateSize: useCallback(() => 180, []),
+        estimateSize: useCallback(() => 204, []),
         overscan: 5,
     });
 
@@ -1143,7 +1199,7 @@ const MyTranslationsList: React.FC<MyTranslationsListProps> = ({
             {repoManifest.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 gap-3 text-muted-foreground animate-in fade-in duration-700">
                     <div className="p-4 rounded-full bg-primary/5 mb-1">
-                        <Package className="w-12 h-12 opacity-30 text-primary" />
+                        <Layers className="w-12 h-12 opacity-30 text-primary" />
                     </div>
                     <h3 className="text-base font-semibold text-foreground/80">{t('Cloud.Hints.NoPublished')}</h3>
                     <p className="text-xs max-w-xs text-center leading-relaxed px-6 opacity-70">
@@ -1165,7 +1221,7 @@ const MyTranslationsList: React.FC<MyTranslationsListProps> = ({
                 </div>
             ) : containerWidth === 0 ? (
                 <div className="flex items-center justify-center pt-24 text-muted-foreground animate-in fade-in duration-300">
-                    <RefreshCcw className="w-8 h-8 animate-spin text-primary/30" />
+                    <RefreshCw className="w-8 h-8 animate-spin text-primary/30" />
                 </div>
             ) : (
                 <div

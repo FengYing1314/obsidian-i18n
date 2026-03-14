@@ -5,7 +5,7 @@
 import React, { useCallback, useState, useRef, useEffect, useMemo } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { Input, Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Tabs, TabsList, TabsTrigger, TabsContent } from '@/src/shadcn';
-import { Search, RefreshCw, Download, ExternalLink, User, Package, Globe, Tag, Info, History, X, Clock, Plus, Bookmark, ChevronRight, Star, FileText, MessageSquareWarning, TrendingUp, Palette, ArrowRight, Cpu } from 'lucide-react';
+import { Search, RefreshCw, Download, ExternalLink, Package, Globe, Github, X, Clock, Bookmark, ChevronRight, Star, FileText, MessageSquareWarning, TrendingUp, Palette, ArrowRight, Zap, CircleCheckBig, Layers, Code } from 'lucide-react';
 import { Notice } from 'obsidian';
 import { useTranslation } from 'react-i18next';
 import { useCloudStore } from '../cloud-store';
@@ -22,6 +22,12 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 type UpdateStatus = 'not_downloaded' | 'up_to_date' | 'update_available' | 'fork_available';
+
+interface InstalledItem {
+    id: string;
+    name: string;
+    type: 'plugin' | 'theme';
+}
 
 export const ExploreTab: React.FC = () => {
     const { t: t_i18n } = useTranslation();
@@ -42,7 +48,7 @@ export const ExploreTab: React.FC = () => {
     const addSavedRepo = useCloudStore.use.addSavedRepo();
     const removeSavedRepo = useCloudStore.use.removeSavedRepo();
 
-    const [filterLanguage, setFilterLanguage] = useState(i18n.settings.language || 'zh-cn');
+    const [filterLanguage, setFilterLanguage] = useState('all');
     const [filterQuery, setFilterQuery] = useState('');
     const [isFetching, setIsFetching] = useState(false);
     const [downloadingId, setDownloadingId] = useState<string | null>(null);
@@ -54,6 +60,48 @@ export const ExploreTab: React.FC = () => {
     const setOutdatedSources = useCloudStore.use.setOutdatedSources();
     const isCheckingUpdates = useCloudStore.use.isCheckingUpdates();
     const setIsCheckingUpdates = useCloudStore.use.setIsCheckingUpdates();
+
+    const [installedItems, setInstalledItems] = useState<InstalledItem[]>([]);
+
+    // 获取已安装的插件和主题
+    useEffect(() => {
+        const fetchInstalled = async () => {
+            const items: InstalledItem[] = [];
+
+            // 插件
+            // @ts-ignore
+            const manifests = i18n.app.plugins.manifests;
+            Object.values(manifests).forEach((m: any) => {
+                if (m.id !== i18n.manifest.id) {
+                    items.push({ id: m.id, name: m.name, type: 'plugin' });
+                }
+            });
+
+            // 主题
+            try {
+                // @ts-ignore
+                const basePath = i18n.app.vault.adapter.getBasePath();
+                const themesDir = `${basePath}/.obsidian/themes`;
+                // @ts-ignore
+                const exists = await i18n.app.vault.adapter.exists(`${i18n.app.vault.configDir}/themes`);
+                if (exists) {
+                    // @ts-ignore
+                    const themes = await i18n.app.vault.adapter.list(`${i18n.app.vault.configDir}/themes`);
+                    for (const folder of themes.folders) {
+                        const name = folder.split('/').pop();
+                        if (name) {
+                            items.push({ id: name, name: name, type: 'theme' });
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to fetch themes', e);
+            }
+
+            setInstalledItems(items.sort((a, b) => a.name.localeCompare(b.name)));
+        };
+        fetchInstalled();
+    }, [i18n]);
 
     /**
      * 核心逻辑：检查所有已订阅仓库的更新
@@ -326,7 +374,7 @@ export const ExploreTab: React.FC = () => {
 
     // 过滤 manifest 条目
     const filteredEntries = targetManifest.filter((entry) => {
-        if (filterLanguage && entry.language !== filterLanguage) return false;
+        if (filterLanguage && filterLanguage !== 'all' && entry.language !== filterLanguage) return false;
         if (filterQuery && !entry.plugin.toLowerCase().includes(filterQuery.toLowerCase()) &&
             !entry.title.toLowerCase().includes(filterQuery.toLowerCase())) return false;
         return true;
@@ -604,7 +652,7 @@ export const ExploreTab: React.FC = () => {
                                 ) : targetManifest.length > 0 ? (
                                     <div className="flex items-center gap-2.5">
                                         <div className="flex items-center justify-center w-6 h-6 rounded bg-primary/10 text-primary shrink-0">
-                                            <Globe className="w-3.5 h-3.5" />
+                                            <Github className="w-3.5 h-3.5" />
                                         </div>
                                         <a
                                             href={`https://github.com/${targetRepoAddress}`}
@@ -642,11 +690,33 @@ export const ExploreTab: React.FC = () => {
                                         className="pl-8 h-8 text-xs bg-background border-border/60 focus:border-primary/50 transition-all rounded-md"
                                     />
                                 </div>
+                                <Select onValueChange={(val) => {
+                                    if (val === 'all') setFilterQuery('');
+                                    else if (val) setFilterQuery(val);
+                                }} disabled={targetManifest.length === 0}>
+                                    <SelectTrigger size="sm" className="w-40 text-xs bg-background border-border/60 rounded-md shadow-sm h-8">
+                                        <SelectValue placeholder={t('Common.Filters.All')} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <ScrollArea className="h-72">
+                                            <SelectItem value="all" className="text-[11px]">{t('Common.Filters.All')}</SelectItem>
+                                            {installedItems.map((item) => (
+                                                <SelectItem key={item.id} value={item.name} className="text-[11px]">
+                                                    <div className="flex items-center gap-2">
+                                                        {item.type === 'plugin' ? <Layers className="w-3 h-3" /> : <Palette className="w-3 h-3" />}
+                                                        <span>{item.name}</span>
+                                                    </div>
+                                                </SelectItem>
+                                            ))}
+                                        </ScrollArea>
+                                    </SelectContent>
+                                </Select>
                                 <Select value={filterLanguage} onValueChange={setFilterLanguage} disabled={targetManifest.length === 0}>
-                                    <SelectTrigger size="sm" className="w-32 text-xs bg-background border-border/60 rounded-md shadow-sm">
+                                    <SelectTrigger size="sm" className="w-32 text-xs bg-background border-border/60 rounded-md shadow-sm h-8">
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
+                                        <SelectItem value="all" className="text-[11px]">{t('Common.Filters.All')}</SelectItem>
                                         {SUPPORTED_LANGUAGES.map((lang) => (
                                             <SelectItem key={lang.value} value={lang.value} className="text-[11px]">
                                                 {lang.label}
@@ -833,6 +903,7 @@ interface ManifestEntryCardProps {
 
 const ManifestEntryCard: React.FC<ManifestEntryCardProps> = ({ entry, onDownload, isDownloading, updateStatus, repoAddress }) => {
     const { t: t_i18n } = useTranslation();
+
     /** 构造 GitHub Issue 反馈链接 */
     const handleReportIssue = useCallback(() => {
         const title = encodeURIComponent(t_i18n('Cloud.Labels.ReportIssue') + `: ${entry.title} (${entry.plugin})`);
@@ -846,142 +917,120 @@ const ManifestEntryCard: React.FC<ManifestEntryCardProps> = ({ entry, onDownload
         );
         const url = `https://github.com/${repoAddress}/issues/new?title=${title}&body=${body}`;
         window.open(url);
+    }, [entry, repoAddress, t_i18n]);
+
+    /** 查看源码 */
+    const handleBrowseSource = useCallback(() => {
+        const filePath = getCloudFilePath(entry.id, entry.type);
+        const url = `https://github.com/${repoAddress}/blob/main/${filePath}`;
+        window.open(url);
     }, [entry, repoAddress]);
 
     return (
         <div className={cn(
-            "group flex flex-col overflow-hidden bg-card text-card-foreground rounded-xl border shadow-sm transition-all duration-200 animate-in fade-in h-full relative",
-            "hover:shadow-md",
-            updateStatus === 'update_available'
-                ? "border-amber-400/60 hover:border-amber-500/80 ring-1 ring-amber-400/20"
-                : updateStatus === 'fork_available'
-                    ? "border-purple-400/50 hover:border-purple-500/80 ring-1 ring-purple-400/20"
-                    : updateStatus === 'up_to_date'
-                        ? "border-green-400/40 hover:border-green-500/50 ring-1 ring-green-400/5 hover:ring-green-400/10"
-                        : "border-border/50 hover:border-primary/30",
+            "group flex flex-col overflow-hidden bg-card text-card-foreground rounded-lg border border-border/60 transition-all duration-300 animate-in fade-in h-[188px] relative select-none",
+            "hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:border-primary/40",
+            updateStatus === 'update_available' && "border-amber-500/20 hover:border-amber-500/40 hover:shadow-amber-500/5",
+            updateStatus === 'fork_available' && "border-purple-500/20 hover:border-purple-500/40 hover:shadow-purple-500/5",
+            updateStatus === 'up_to_date' && "border-green-500/20 hover:border-green-500/40 hover:shadow-green-500/5"
         )}>
-            {/* 内容区：我们自己控制精确的 Padding */}
-            <div className="flex flex-col flex-1 p-3.5 pb-2.5 min-h-0 relative z-10">
-                {/* 第一行：标题 + 版本 Badge */}
-                <div className="flex items-start justify-between gap-2 mb-1.5">
-                    <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                        {/* 标题前缀图标：动态着色区分插件与主题 */}
+            {/* 内容主干 */}
+            <div className="flex flex-col flex-1 p-4 pb-3 min-h-0 space-y-3">
+                {/* 标题 & 核心状态 */}
+                <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
                         <div className={cn(
-                            "flex items-center justify-center w-6 h-6 rounded-md shrink-0 shadow-sm ring-1",
-                            entry.type === 'theme'
-                                ? "bg-sky-500/10 text-sky-600 ring-sky-500/20"
-                                : "bg-emerald-500/10 text-emerald-600 ring-emerald-500/20"
+                            "flex items-center justify-center w-9 h-9 rounded-md shrink-0 shadow-sm border border-border/10 transition-colors",
+                            "bg-muted/50 group-hover:bg-muted"
                         )}>
                             {entry.type === 'theme' ? (
-                                <Palette className="w-3.5 h-3.5" />
+                                <Palette className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
                             ) : (
-                                <Package className="w-3.5 h-3.5" />
+                                <Layers className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
                             )}
                         </div>
-                        <h3 className="text-[13.5px] font-bold text-foreground leading-tight truncate pr-1" title={entry.title}>
-                            {entry.title}
-                        </h3>
-                    </div>
-                    {/* 右侧状态标签组 (移除冗余的类型 Badge) */}
-                    <div className="flex items-center gap-1.5 shrink-0">
-                        {updateStatus === 'up_to_date' && (
-                            <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-[18px] bg-green-500/10 border-green-500/30 text-green-600">
-                                {t_i18n('Cloud.Status.UpToDate')}
-                            </Badge>
-                        )}
-                        {updateStatus === 'fork_available' && (
-                            <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-[18px] bg-purple-500/10 border-purple-500/30 text-purple-600 animate-pulse">
-                                {t_i18n('Cloud.Status.ForkAvailable')}
-                            </Badge>
-                        )}
-                        {updateStatus === 'update_available' && (
-                            <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-[18px] bg-amber-500/10 border-amber-500/30 text-amber-600 animate-pulse">
-                                {t_i18n('Cloud.Status.UpdateAvailable')}
-                            </Badge>
-                        )}
-                        <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-[18px] font-mono bg-primary/5 border-primary/20 text-primary/80">
-                            v{entry.version}
-                        </Badge>
+                        <div className="min-w-0 flex-1">
+                            <h3 className="text-[13px] font-semibold text-foreground tracking-tight leading-snug truncate" title={entry.title}>
+                                {entry.title}
+                            </h3>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                                <span className="text-[10px] text-muted-foreground/60 font-mono tracking-tighter">v{entry.version}</span>
+                                {entry.supported_versions && (
+                                    <span className="text-[9px] text-muted-foreground/30 font-mono italic">[{entry.supported_versions}]</span>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                {/* 描述区域：固定高度占位，不管是否有内容都占据相同空间 */}
-                <div className="min-h-[44px] max-h-[44px] mt-1.5 mb-1.5 overflow-hidden">
-                    {entry.description ? (
-                        <p className="text-[11px] text-muted-foreground/70 line-clamp-2 leading-relaxed" title={entry.description}>
-                            {entry.description}
-                        </p>
-                    ) : (
-                        <p className="text-[11px] text-muted-foreground/30 italic">
-                            {t_i18n('Common.Status.Unknown')}
-                        </p>
-                    )}
+                {/* 精简描述 */}
+                <div className="min-h-[34px] max-h-[34px] overflow-hidden">
+                    <p className="text-[11px] text-muted-foreground/90 leading-relaxed line-clamp-2" title={entry.description || t_i18n('Common.Status.Unknown')}>
+                        {entry.description || t_i18n('Common.Status.Unknown')}
+                    </p>
                 </div>
 
-                {/* 元数据标签：推到底部，紧贴操作栏上面 */}
-                <div className="mt-auto pt-1.5 border-t border-border/10">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className={cn(
-                            "inline-flex items-center gap-1 text-[10px] bg-muted/50 px-1.5 py-0.5 rounded font-mono truncate max-w-[140px]",
-                            entry.type === 'theme' ? "text-sky-600/80" : "text-emerald-600/80"
-                        )} title={`${entry.type === 'theme' ? t_i18n('Common.Labels.Themes') : t_i18n('Common.Labels.Plugins')}: ${entry.plugin}`}>
-                            {entry.type === 'theme' ? (
-                                <Palette className="w-3 h-3 shrink-0 opacity-70" />
-                            ) : (
-                                <Package className="w-3 h-3 shrink-0 opacity-70" />
-                            )}
-                            {entry.plugin}
-                        </span>
-                        <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground/60 bg-muted/50 px-1.5 py-0.5 rounded uppercase">
-                            <Globe className="w-3 h-3 shrink-0 opacity-50" />
+                {/* 元数据区域：结构化块状设计 */}
+                <div className="mt-auto flex items-center justify-between px-2.5 py-1.5 rounded bg-muted/20 border border-border/5">
+                    <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/70 font-semibold">
                             {entry.language}
-                        </span>
-                        {entry.updated_at && (
-                            <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground/60 bg-muted/50 px-1.5 py-0.5 rounded cursor-default" title={`${t_i18n('Common.Labels.UpdatePrefix')} ${new Date(entry.updated_at).toLocaleString()}`}>
-                                <Clock className="w-3 h-3 shrink-0 opacity-50" />
-                                {new Date(entry.updated_at).toLocaleDateString(undefined, { month: '2-digit', day: '2-digit' })}
-                            </span>
-                        )}
-                        {entry.supported_versions && (
-                            <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground/60 bg-muted/50 px-1.5 py-0.5 rounded cursor-default border border-primary/10">
-                                <Cpu className="w-3 h-3 shrink-0 opacity-50" />
-                                {t_i18n('Cloud.Labels.SupportedVersions')}: {entry.supported_versions}
-                            </span>
-                        )}
+                        </div>
+                        <div className="w-[1px] h-2 bg-border/20" />
+                        <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/70 font-semibold">
+                            <Clock className="w-3 h-3 opacity-50" />
+                            {entry.updated_at ? new Date(entry.updated_at).toLocaleDateString(undefined, { month: '2-digit', day: '2-digit' }) : '-'}
+                        </div>
                     </div>
+
+                    <span className="text-[9px] text-muted-foreground/50 font-mono tracking-tight truncate max-w-[80px]">
+                        {entry.plugin}
+                    </span>
                 </div>
             </div>
 
-            {/* 底部操作栏：下载 + 反馈 */}
-            <div className="flex border-t border-border/30 mt-auto shrink-0 relative z-10">
+            {/* 操作栏：无边框感交互 */}
+            <div className="flex border-t border-border/30 h-10 shrink-0 bg-muted/5 group-hover:bg-muted/10 transition-colors">
                 <button
                     onClick={onDownload}
                     disabled={isDownloading || updateStatus === 'up_to_date'}
                     className={cn(
-                        "flex-1 flex items-center justify-center gap-1.5 py-2 text-[11px] font-medium transition-colors disabled:opacity-70",
+                        "flex-1 flex items-center justify-center gap-2 text-[11px] font-bold transition-all active:scale-95 disabled:active:scale-100",
                         updateStatus === 'up_to_date'
-                            ? "text-green-600/70 cursor-not-allowed bg-green-500/5 hover:bg-green-500/5"
+                            ? "text-green-600/50 cursor-default"
                             : updateStatus === 'update_available'
-                                ? "text-amber-600 hover:bg-amber-500/10 hover:text-amber-700"
+                                ? "text-amber-600 hover:text-amber-700 hover:bg-amber-500/5"
                                 : updateStatus === 'fork_available'
-                                    ? "text-purple-600 hover:bg-purple-500/10 hover:text-purple-700"
-                                    : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
+                                    ? "text-purple-600 hover:text-purple-700 hover:bg-purple-500/5"
+                                    : "text-primary hover:text-primary/80 hover:bg-primary/5"
                     )}
                 >
-                    {isDownloading
-                        ? <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                        : <Download className="w-3.5 h-3.5" />
-                    }
-                    {updateStatus === 'up_to_date' ? t_i18n('Cloud.Status.UpToDate') : updateStatus === 'update_available' ? t_i18n('Cloud.Actions.Update') : updateStatus === 'fork_available' ? t_i18n('Cloud.Actions.Overwrite') : t_i18n('Cloud.Actions.Download')}
+                    {isDownloading ? (
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    ) : updateStatus === 'up_to_date' ? (
+                        <CircleCheckBig className="w-3.5 h-3.5" />
+                    ) : (
+                        <Download className="w-3.5 h-3.5" />
+                    )}
+                    <span className="uppercase tracking-tight">
+                        {updateStatus === 'up_to_date' ? t_i18n('Cloud.Status.UpToDate') : updateStatus === 'update_available' ? t_i18n('Cloud.Actions.Update') : updateStatus === 'fork_available' ? t_i18n('Cloud.Actions.Overwrite') : t_i18n('Cloud.Actions.Download')}
+                    </span>
                 </button>
-                <div className="w-[1px] bg-border/30" />
+                <div className="w-[1px] bg-border/20 my-2" />
+                <button
+                    onClick={handleBrowseSource}
+                    className="px-3 flex items-center justify-center text-muted-foreground/60 hover:text-foreground hover:bg-muted/20 transition-all active:scale-90"
+                    title={t_i18n('Cloud.Labels.Source')}
+                >
+                    <Code className="w-4 h-4" />
+                </button>
+                <div className="w-[1px] bg-border/20 my-2" />
                 <button
                     onClick={handleReportIssue}
-                    className="flex items-center justify-center gap-1.5 px-4 py-2 text-[11px] font-medium text-muted-foreground hover:bg-orange-500/5 hover:text-orange-600 transition-colors"
-                    title={t('Cloud.Labels.ReportIssue')}
+                    className="px-4 flex items-center justify-center text-muted-foreground/60 hover:text-foreground hover:bg-muted/20 transition-all active:scale-90"
+                    title={t_i18n('Cloud.Labels.ReportIssue')}
                 >
-                    <MessageSquareWarning className="w-3.5 h-3.5" />
-                    {t('Cloud.Labels.Feedback')}
+                    <MessageSquareWarning className="w-4 h-4" />
                 </button>
             </div>
         </div>
@@ -1041,7 +1090,7 @@ const ManifestEntriesList: React.FC<ManifestEntriesListProps> = ({
     const rowVirtualizer = useVirtualizer({
         count: rowCount,
         getScrollElement: () => parentRef.current,
-        estimateSize: useCallback(() => 180, []),
+        estimateSize: useCallback(() => 192, []), // 176px card + 16px gap
         overscan: 5,
     });
 

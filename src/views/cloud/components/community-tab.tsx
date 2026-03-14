@@ -5,7 +5,7 @@
 import React, { useCallback, useState, useMemo, useRef, useEffect } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { Input, Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/src/shadcn';
-import { Search, RefreshCw, Globe, Star, Package, ExternalLink, Users, ArrowRight, Trophy, ChevronDown, TrendingUp, Palette, Library } from 'lucide-react';
+import { Search, RefreshCw, Globe, Star, Layers, Github, ExternalLink, Users, ArrowRight, Trophy, ChevronDown, TrendingUp, Palette, Library, Plus, Zap, CircleCheckBig, FileText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useCloudStore } from '../cloud-store';
 import { useGlobalStoreInstance } from '~/utils';
@@ -233,6 +233,19 @@ export const CommunityTab: React.FC = () => {
         return communityStats?.leaderboard?.topAuthors || [];
     }, [communityStats]);
 
+    const totalContributors = useMemo(() => {
+        if (!communityStats?.repos) return 0;
+        // 统计唯一作者
+        const authors = new Set<string>();
+        Object.entries(communityStats.repos).forEach(([address, stats]: [string, any]) => {
+            const authorName = stats.authorName || address.split('/')[0];
+            if (authorName) authors.add(authorName);
+        });
+        // 优先使用接口返回的总数，如果为0或不合理则使用计算值
+        const apiTotal = communityStats.summary?.totalContributors || 0;
+        return apiTotal > authors.size ? apiTotal : authors.size;
+    }, [communityStats]);
+
     const hasLeaderboardData = communityLoaded && (topRepos.length > 0 || topActiveRepos.length > 0 || topPluginRepos.length > 0 || topAuthors.length > 0);
 
     // ========== 全局加载 / 失败 / 空态 ==========
@@ -312,21 +325,16 @@ export const CommunityTab: React.FC = () => {
                 <aside className="w-[300px] flex flex-col border-r border-border/30 pr-2 shrink-0 overflow-hidden min-h-0">
                     <ScrollArea className="flex-1 pr-2.5">
                         <div className="space-y-4 pb-6 pt-1">
-                            {/* 侧边栏标题 */}
-                            <div className="flex items-center gap-2 text-sm font-semibold text-foreground/80">
-                                <TrendingUp className="w-4 h-4 text-primary" />
-                                <span>{t('Cloud.Labels.Leaderboard')}</span>
-                            </div>
                             {/* 活跃仓库榜 (最近高频更新) - 可折叠 */}
                             {topActiveRepos.length > 0 && (
                                 <Collapsible open={activeReposOpen} onOpenChange={setActiveReposOpen}>
-                                    <div className="rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm shadow-sm overflow-hidden">
-                                        <CollapsibleTrigger className="w-full flex items-center gap-2 px-4 py-2.5 border-b border-border/30 bg-gradient-to-r from-orange-500/5 to-transparent hover:from-orange-500/10 transition-colors cursor-pointer select-none">
+                                    <div className="rounded-lg border border-border/40 bg-card/60 backdrop-blur-sm shadow-[0_4px_20px_rgb(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgb(0,0,0,0.1)] overflow-hidden transition-all duration-300 hover:border-orange-500/20">
+                                        <CollapsibleTrigger className="w-full flex items-center gap-2.5 px-4 py-3 border-b border-border/20 bg-gradient-to-r from-orange-500/5 to-transparent hover:from-orange-500/10 transition-all cursor-pointer select-none">
                                             <div className="p-1 rounded-md bg-orange-500/10">
                                                 <TrendingUp className="w-3.5 h-3.5 text-orange-500" />
                                             </div>
-                                            <h3 className="text-[13px] font-bold text-foreground tracking-tight flex-1 text-left min-w-0 truncate">{t('Cloud.Labels.TopActive')}</h3>
-                                            <Badge variant="secondary" className="text-[9px] h-[18px] px-1.5 bg-orange-500/10 text-orange-600 border-orange-500/20">
+                                            <h3 className="text-[12px] font-extrabold text-foreground tracking-tight flex-1 text-left min-w-0 truncate">{t('Cloud.Labels.TopActive')}</h3>
+                                            <Badge variant="secondary" className="text-[9px] h-[18px] px-2 bg-orange-500/10 text-orange-600 border-orange-500/20 font-black">
                                                 TOP {topActiveRepos.length}
                                             </Badge>
                                             <ChevronDown className={cn(
@@ -387,13 +395,13 @@ export const CommunityTab: React.FC = () => {
                             {/* 活跃译者榜单 - 可折叠 */}
                             {topAuthors.length > 0 && (
                                 <Collapsible open={authorsOpen} onOpenChange={setAuthorsOpen}>
-                                    <div className="rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm shadow-sm overflow-hidden">
-                                        <CollapsibleTrigger className="w-full flex items-center gap-2 px-4 py-2.5 border-b border-border/30 bg-gradient-to-r from-green-500/5 to-transparent hover:from-green-500/10 transition-colors cursor-pointer select-none">
+                                    <div className="rounded-lg border border-border/40 bg-card/60 backdrop-blur-sm shadow-[0_4px_20px_rgb(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgb(0,0,0,0.1)] overflow-hidden transition-all duration-300 hover:border-green-500/20">
+                                        <CollapsibleTrigger className="w-full flex items-center gap-2.5 px-4 py-3 border-b border-border/20 bg-gradient-to-r from-green-500/5 to-transparent hover:from-green-500/10 transition-all cursor-pointer select-none">
                                             <div className="p-1 rounded-md bg-green-500/10">
                                                 <Users className="w-3.5 h-3.5 text-green-500" />
                                             </div>
-                                            <h3 className="text-[13px] font-bold text-foreground tracking-tight flex-1 text-left min-w-0 truncate">{t('Cloud.Labels.TopAuthors')}</h3>
-                                            <Badge variant="secondary" className="text-[9px] h-[18px] px-1.5 bg-green-500/10 text-green-600 border-green-500/20">
+                                            <h3 className="text-[12px] font-extrabold text-foreground tracking-tight flex-1 text-left min-w-0 truncate">{t('Cloud.Labels.TopAuthors')}</h3>
+                                            <Badge variant="secondary" className="text-[9px] h-[18px] px-2 bg-green-500/10 text-green-600 border-green-500/20 font-black">
                                                 TOP {topAuthors.length}
                                             </Badge>
                                             <ChevronDown className={cn(
@@ -460,13 +468,13 @@ export const CommunityTab: React.FC = () => {
                             {/* 高赞仓库榜 - 可折叠 */}
                             {topRepos.length > 0 && (
                                 <Collapsible open={reposOpen} onOpenChange={setReposOpen}>
-                                    <div className="rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm shadow-sm overflow-hidden">
-                                        <CollapsibleTrigger className="w-full flex items-center gap-2 px-4 py-2.5 border-b border-border/30 bg-gradient-to-r from-yellow-500/5 to-transparent hover:from-yellow-500/10 transition-colors cursor-pointer select-none">
+                                    <div className="rounded-lg border border-border/40 bg-card/60 backdrop-blur-sm shadow-[0_4px_20px_rgb(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgb(0,0,0,0.1)] overflow-hidden transition-all duration-300 hover:border-yellow-500/20">
+                                        <CollapsibleTrigger className="w-full flex items-center gap-2.5 px-4 py-3 border-b border-border/20 bg-gradient-to-r from-yellow-500/5 to-transparent hover:from-yellow-500/10 transition-all cursor-pointer select-none">
                                             <div className="p-1 rounded-md bg-yellow-500/10">
                                                 <Star className="w-3.5 h-3.5 text-yellow-500" />
                                             </div>
-                                            <h3 className="text-[13px] font-bold text-foreground tracking-tight flex-1 text-left min-w-0 truncate">{t('Cloud.Labels.TopStars')}</h3>
-                                            <Badge variant="secondary" className="text-[9px] h-[18px] px-1.5 bg-yellow-500/10 text-yellow-600 border-yellow-500/20">
+                                            <h3 className="text-[12px] font-extrabold text-foreground tracking-tight flex-1 text-left min-w-0 truncate">{t('Cloud.Labels.TopStars')}</h3>
+                                            <Badge variant="secondary" className="text-[9px] h-[18px] px-2 bg-yellow-500/10 text-yellow-600 border-yellow-500/20 font-black">
                                                 TOP {topRepos.length}
                                             </Badge>
                                             <ChevronDown className={cn(
@@ -527,13 +535,13 @@ export const CommunityTab: React.FC = () => {
                             {/* 高产仓库榜 (包含插件最多) - 可折叠 */}
                             {topPluginRepos.length > 0 && (
                                 <Collapsible open={pluginReposOpen} onOpenChange={setPluginReposOpen}>
-                                    <div className="rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm shadow-sm overflow-hidden">
-                                        <CollapsibleTrigger className="w-full flex items-center gap-2 px-4 py-2.5 border-b border-border/30 bg-gradient-to-r from-blue-500/5 to-transparent hover:from-blue-500/10 transition-colors cursor-pointer select-none">
+                                    <div className="rounded-lg border border-border/40 bg-card/60 backdrop-blur-sm shadow-[0_4px_20px_rgb(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgb(0,0,0,0.1)] overflow-hidden transition-all duration-300 hover:border-blue-500/20">
+                                        <CollapsibleTrigger className="w-full flex items-center gap-2.5 px-4 py-3 border-b border-border/20 bg-gradient-to-r from-blue-500/5 to-transparent hover:from-blue-500/10 transition-all cursor-pointer select-none">
                                             <div className="p-1 rounded-md bg-blue-500/10">
-                                                <Package className="w-3.5 h-3.5 text-blue-500" />
+                                                <Layers className="w-3.5 h-3.5 text-blue-500" />
                                             </div>
-                                            <h3 className="text-[13px] font-bold text-foreground tracking-tight flex-1 text-left min-w-0 truncate">{t('Cloud.Labels.TopPlugins')}</h3>
-                                            <Badge variant="secondary" className="text-[9px] h-[18px] px-1.5 bg-blue-500/10 text-blue-600 border-blue-500/20">
+                                            <h3 className="text-[12px] font-extrabold text-foreground tracking-tight flex-1 text-left min-w-0 truncate">{t('Cloud.Labels.TopPlugins')}</h3>
+                                            <Badge variant="secondary" className="text-[9px] h-[18px] px-2 bg-blue-500/10 text-blue-600 border-blue-500/20 font-black">
                                                 TOP {topPluginRepos.length}
                                             </Badge>
                                             <ChevronDown className={cn(
@@ -580,7 +588,7 @@ export const CommunityTab: React.FC = () => {
                                                         </div>
                                                         {/* Plugins */}
                                                         <div className="flex items-center gap-1 text-[10px] font-mono font-bold text-blue-600 shrink-0">
-                                                            <Package className="w-2.5 h-2.5 text-blue-500" />
+                                                            <Layers className="w-2.5 h-2.5 text-blue-500" />
                                                             {item.stats.pluginCount || 0}
                                                         </div>
                                                     </div>
@@ -608,9 +616,9 @@ export const CommunityTab: React.FC = () => {
                 <div className="flex items-center justify-between mb-5 shrink-0 pt-2 border-b border-border/10 pb-3">
                     {/* 左侧：标题与统计徽章 */}
                     <div className="flex items-center gap-3">
-                        <h2 className="text-[15px] font-bold text-foreground tracking-tight">{t('Cloud.Labels.DiscoverTranslations')}</h2>
-                        <Badge variant="secondary" className="px-2 py-0.5 text-[10px] font-medium bg-primary/10 text-primary border-primary/20 shadow-sm gap-1">
-                            <span className="font-bold">{communityRegistry.length}</span> {t('Cloud.Labels.SubscriptionRepo')}
+                        <h2 className="text-[17px] font-extrabold text-foreground tracking-tight">{t('Cloud.Labels.DiscoverTranslations')}</h2>
+                        <Badge variant="secondary" className="px-2.5 py-0.5 text-[10px] font-black bg-primary/10 text-primary border-primary/20 shadow-sm gap-1.5 rounded-full uppercase tracking-tighter">
+                            <span className="opacity-70">{communityRegistry.length}</span> {t('Cloud.Labels.SubscriptionRepo')}
                         </Badge>
                     </div>
 
@@ -618,18 +626,18 @@ export const CommunityTab: React.FC = () => {
                     {communityStats?.summary && (
                         <div className="hidden md:flex items-center gap-4 text-[11px] text-muted-foreground ml-auto mr-4 px-4 py-1.5 rounded-full bg-muted/20 border border-border/40 shadow-sm">
                             <div className="flex items-center gap-1.5" title={t_i18n('Cloud.Labels.TotalTranslations')}>
-                                <Package className="w-3.5 h-3.5 text-blue-500/70" />
-                                <span className="font-semibold text-foreground/80">{communityStats.summary.totalTranslations}</span> 份翻译
+                                <Layers className="w-3.5 h-3.5 text-blue-500/70" />
+                                <span className="font-bold text-foreground/80">{communityStats.summary.totalTranslations}</span> 份翻译
                             </div>
                             <div className="w-[1px] h-3 bg-border/50" />
                             <div className="flex items-center gap-1.5" title={t_i18n('Cloud.Labels.TotalContributors')}>
                                 <Users className="w-3.5 h-3.5 text-green-500/70" />
-                                <span className="font-semibold text-foreground/80">{communityStats.summary.totalContributors}</span> 位贡献者
+                                <span className="font-bold text-foreground/80">{totalContributors}</span> 位贡献者
                             </div>
                             <div className="w-[1px] h-3 bg-border/50" />
                             <div className="flex items-center gap-1.5" title={t_i18n('Cloud.Labels.TotalStars')}>
                                 <Star className="w-3.5 h-3.5 text-yellow-500/70" />
-                                <span className="font-semibold text-foreground/80">{communityStats.summary.totalStars}</span> 个星标
+                                <span className="font-bold text-foreground/80">{communityStats.summary.totalStars}</span> 个星标
                             </div>
                         </div>
                     )}
@@ -643,7 +651,7 @@ export const CommunityTab: React.FC = () => {
                                 placeholder={t_i18n('Cloud.Placeholders.SearchRepo')}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-8 h-8 text-[11px] bg-muted/20 border-border/40 focus:border-primary/30 shadow-sm"
+                                className="pl-8 h-8 text-[11px] bg-muted/20 border-border/40 focus:border-primary/40 focus:ring-1 focus:ring-primary/20 shadow-sm transition-all"
                             />
                         </div>
 
@@ -700,107 +708,112 @@ interface CommunityRepoCardProps {
 }
 
 const CommunityRepoCard: React.FC<CommunityRepoCardProps> = ({ item, stats, onView }) => {
-    const { t: t_i18n } = useTranslation(); // Renamed to avoid conflict with direct 't' import
+    const { t: t_i18n } = useTranslation();
     const [owner, repo] = item.repoAddress.split('/');
 
     return (
         <div className={cn(
-            "group flex flex-col overflow-hidden bg-card text-card-foreground rounded-xl border border-border/50 shadow-sm transition-all duration-200 animate-in fade-in h-full relative",
-            "hover:shadow-md hover:border-primary/30",
+            "group flex flex-col overflow-hidden bg-card text-card-foreground rounded-lg border border-border/60 transition-all duration-300 animate-in fade-in h-[188px] relative select-none",
+            "hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:border-primary/40",
         )}>
-            {/* 内容区 */}
-            <div className="flex flex-col flex-1 p-4 pb-3 min-h-0 relative z-10">
+            {/* 内容主干 */}
+            <div className="flex flex-col flex-1 p-4 pb-3 min-h-0 space-y-3">
                 {/* 头部：头像 + 仓库名 */}
-                <div className="flex items-start gap-3 mb-2.5">
-                    {stats?.avatarUrl ? (
-                        <img
-                            src={stats.avatarUrl}
-                            className="w-10 h-10 rounded-lg ring-1 ring-border shadow-sm object-cover shrink-0 group-hover:scale-105 transition-transform"
-                            alt={owner}
-                        />
-                    ) : (
-                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary ring-1 ring-primary/20 shrink-0">
-                            {stats?.description?.toLowerCase().includes('theme') || stats?.repoName?.toLowerCase().includes('theme') ? (
-                                <Palette className="w-5 h-5" />
+                <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className={cn(
+                            "flex items-center justify-center w-9 h-9 rounded-md shrink-0 shadow-sm border border-border/10 transition-colors overflow-hidden",
+                            "bg-muted/50 group-hover:bg-muted"
+                        )}>
+                            {stats?.avatarUrl ? (
+                                <img
+                                    src={stats.avatarUrl}
+                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                    alt={owner}
+                                />
                             ) : (
-                                <Package className="w-5 h-5" />
+                                stats?.description?.toLowerCase().includes('theme') || stats?.repoName?.toLowerCase().includes('theme') ? (
+                                    <Palette className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                                ) : (
+                                    <Layers className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                                )
                             )}
                         </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                        <div className="text-[10px] text-muted-foreground/60 uppercase font-bold tracking-tight truncate">
-                            {stats?.authorName || owner}
+                        <div className="min-w-0 flex-1">
+                            <h3 className="text-[13px] font-semibold text-foreground tracking-tight leading-snug truncate" title={item.repoAddress}>
+                                {repo}
+                            </h3>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                                <span className="text-[10px] text-muted-foreground/60 font-medium tracking-tight truncate">{stats?.authorName || owner}</span>
+                            </div>
                         </div>
-                        <h3 className="text-sm font-bold text-foreground leading-tight truncate -mt-0.5" title={item.repoAddress}>
-                            {repo}
-                        </h3>
                     </div>
-                    {/* Star */}
-                    {stats?.stars !== undefined && (
-                        <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-[18px] bg-yellow-500/10 border-yellow-500/30 text-yellow-600 gap-1 font-mono shrink-0">
-                            <Star className="w-2.5 h-2.5 fill-current" />
-                            {stats.stars}
-                        </Badge>
-                    )}
-                </div>
 
-                {/* 描述 */}
-                <div className="min-h-[40px] max-h-[40px] mb-2 overflow-hidden">
-                    {stats?.description ? (
-                        <p className="text-[11px] text-muted-foreground/80 line-clamp-2 leading-relaxed h-[34px]" title={stats.description || ""}>
-                            {stats.description || t('Cloud.Labels.NoDesc')}
-                        </p>
-                    ) : (
-                        <p className="text-[11px] text-muted-foreground/30 italic">
-                            {t('Cloud.Labels.NoDesc')}
-                        </p>
-                    )}
-                </div>
-
-                {/* 标签 */}
-                <div className="mt-auto pt-1.5">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                        {/* 语言标签 */}
-                        {stats?.languages?.map((lang) => (
-                            <span key={lang} className="inline-flex items-center gap-1 text-[10px] text-muted-foreground/60 bg-muted/50 px-1.5 py-0.5 rounded uppercase font-medium">
-                                <Globe className="w-2.5 h-2.5 shrink-0 opacity-50" />
-                                {lang}
-                            </span>
-                        ))}
-                        {/* 翻译数量 */}
-                        {stats?.pluginCount !== undefined && (
-                            <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground/60 bg-muted/50 px-1.5 py-0.5 rounded font-mono">
-                                <Package className="w-2.5 h-2.5 shrink-0 opacity-50" />
-                                {stats.pluginCount} {t('Cloud.Labels.UnitPlugins')}
-                            </span>
+                    <div className="flex items-center shrink-0 pt-0.5">
+                        {stats?.stars !== undefined && (
+                            <div className="p-1 px-2 rounded-sm bg-yellow-500/5 border border-yellow-500/10 text-yellow-600/80 text-[10px] font-bold tracking-tight uppercase flex items-center gap-1">
+                                <Star className="w-3 h-3 fill-current opacity-70" />
+                                {stats.stars}
+                            </div>
                         )}
                     </div>
                 </div>
+
+                {/* 描述 */}
+                <div className="min-h-[34px] max-h-[34px] overflow-hidden">
+                    <p className="text-[11px] text-muted-foreground/90 leading-relaxed line-clamp-2" title={stats?.description || ""}>
+                        {stats?.description || t('Cloud.Labels.NoDesc')}
+                    </p>
+                </div>
+
+                {/* 元数据区域 */}
+                <div className="mt-auto flex items-center justify-between px-2.5 py-1.5 rounded bg-muted/20 border border-border/5">
+                    <div className="flex items-center gap-3">
+                        {stats?.languages?.slice(0, 1).map((lang) => (
+                            <div key={lang} className="flex items-center gap-1.5 text-[10px] text-muted-foreground/70 font-semibold">
+                                <Globe className="w-3 h-3 opacity-50" />
+                                {lang}
+                            </div>
+                        ))}
+                        {stats?.languages && stats.languages.length > 1 && <div className="w-[1px] h-2 bg-border/20" />}
+                        {stats?.pluginCount !== undefined && (
+                            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/70 font-semibold">
+                                <Layers className="w-3 h-3 opacity-50" />
+                                {stats.pluginCount} {t('Cloud.Labels.UnitPlugins')}
+                            </div>
+                        )}
+                    </div>
+
+                    <span className="text-[9px] text-muted-foreground/50 font-mono tracking-tight truncate max-w-[80px]">
+                        {owner}
+                    </span>
+                </div>
             </div>
 
-            {/* 底部操作栏 */}
-            <div className="flex border-t border-border/30 mt-auto shrink-0 relative z-10">
+            {/* 操作栏 */}
+            <div className="flex border-t border-border/30 h-10 shrink-0 bg-muted/5 group-hover:bg-muted/10 transition-colors">
                 <button
                     onClick={onView}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2 text-[11px] font-medium text-muted-foreground hover:bg-primary/5 hover:text-primary transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 text-[11px] font-bold text-primary transition-all active:scale-95 hover:bg-primary/5"
                 >
                     <ArrowRight className="w-3.5 h-3.5" />
-                    {t('Cloud.Labels.ExploreThisRepo')}
+                    <span className="uppercase tracking-tight">{t('Cloud.Labels.ExploreThisRepo')}</span>
                 </button>
-                <div className="w-[1px] bg-border/30" />
+                <div className="w-[1px] bg-border/20 my-2" />
                 <a
                     href={`https://github.com/${item.repoAddress}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-1.5 px-4 py-2 text-[11px] font-medium text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors"
+                    className="px-4 flex items-center justify-center text-muted-foreground/60 hover:text-foreground hover:bg-muted/20 transition-all active:scale-90"
+                    title="GitHub"
                 >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    GitHub
+                    <Github className="w-4 h-4" />
                 </a>
             </div>
         </div>
     );
 };
+
 // ========== 社区仓库列表组件 (独立封装以确保状态重置) ==========
 interface CommunityReposListProps {
     filteredItems: RegistryItem[];
@@ -845,7 +858,7 @@ const CommunityReposList: React.FC<CommunityReposListProps> = ({
     const rowVirtualizer = useVirtualizer({
         count: rowCount,
         getScrollElement: () => parentRef.current,
-        estimateSize: useCallback(() => 210, []),
+        estimateSize: useCallback(() => 204, []),
         overscan: 5,
     });
 
@@ -856,7 +869,7 @@ const CommunityReposList: React.FC<CommunityReposListProps> = ({
             <div className="pb-6 pr-4">
                 {filteredItems.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 text-muted-foreground bg-muted/10 rounded-xl border border-dashed border-border/40">
-                        <Package className="w-12 h-12 mb-4 opacity-10" />
+                        <Layers className="w-12 h-12 mb-4 opacity-10" />
                         <p className="text-sm font-medium">{t('Cloud.Hints.NoMatchingRepos')}</p>
                     </div>
                 ) : (
