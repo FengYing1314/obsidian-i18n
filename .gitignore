@@ -9,8 +9,8 @@
 node_modules
 
 # obsidian
-main.js
-styles.css
+/main.js
+/styles.css
 data.json
 main.js.map
 states.json
