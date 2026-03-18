@@ -2,7 +2,7 @@
  * 云端翻译管理状态管理
  */
 import { create } from 'zustand';
-import { CloudTabType, SearchParams, UploadFormData, LocalTranslationFile, ManifestEntry, RegistryItem, CommunityStatsData, OutdatedSource, BackupProgress, GithubUserInfo, GithubRepoInfo } from './types';
+import { CloudTabType, SearchParams, UploadFormData, LocalTranslationFile, ManifestEntry, RegistryItem, CommunityStatsData, OutdatedSource, BackupProgress, GithubUserInfo, GithubRepoInfo, ContributorEntry } from './types';
 import { createSelectors } from '@/src/utils';
 
 // Store 状态接口
@@ -17,6 +17,10 @@ interface CloudState {
     communityStats: CommunityStatsData | null;
     communityLoaded: boolean;
     communityLoading: boolean;
+
+    // ===== 贡献者鸣谢状态 =====
+    contributors: ContributorEntry[];
+    contributorsLoaded: boolean;
 
     // ===== 个人仓库状态 =====
     repoDataLoaded: boolean;
@@ -144,6 +148,15 @@ interface CloudActions {
     fetchCommunityRegistry: (i18n: any) => Promise<void>;
     pushRegistryToCloud: (i18n: any) => Promise<boolean>;
 
+    // 贡献者鸣谢
+    setContributors: (contributors: ContributorEntry[]) => void;
+    setContributorsLoaded: (loaded: boolean) => void;
+    fetchContributors: (i18n: any) => Promise<void>;
+    pushContributorsToCloud: (i18n: any) => Promise<boolean>;
+    addContributor: (entry: ContributorEntry) => void;
+    removeContributor: (name: string, category: string) => void;
+    updateContributor: (name: string, category: string, data: Partial<ContributorEntry>) => void;
+
     // 注册表管理 (管理员功能)
     updateRegistryItem: (repoAddress: string, data: Partial<RegistryItem>) => void;
 
@@ -161,6 +174,9 @@ const initialState: CloudState = {
     communityStats: null,
     communityLoaded: false,
     communityLoading: false,
+
+    contributors: [],
+    contributorsLoaded: false,
 
     repoDataLoaded: false,
     repoInitialized: false,
@@ -413,6 +429,62 @@ const useCloudStoreBase = create<CloudState & CloudActions>()((set, get) => ({
         )
     })),
 
+    // 贡献者鸣谢
+    setContributors: (contributors) => set({ contributors }),
+    setContributorsLoaded: (contributorsLoaded) => set({ contributorsLoaded }),
+    addContributor: (entry) => set((state) => ({ contributors: [...state.contributors, entry] })),
+    removeContributor: (name, category) => set((state) => ({
+        contributors: state.contributors.filter(c => !(c.name === name && c.category === category))
+    })),
+    updateContributor: (name, category, data) => set((state) => ({
+        contributors: state.contributors.map(c =>
+            c.name === name && c.category === category ? { ...c, ...data } : c
+        )
+    })),
+    fetchContributors: async (i18n) => {
+        const { contributorsLoaded, setContributors, setContributorsLoaded } = get();
+        if (contributorsLoaded) return;
+        try {
+            const owner = i18n.api.github.owner;
+            const repo = i18n.api.github.repo;
+            const res = await i18n.api.github.getFileContentWithFallback(owner, repo, 'contributors.json');
+            if (res.state && res.data) {
+                const data = res.data;
+                if (data.contributors && Array.isArray(data.contributors)) {
+                    setContributors(data.contributors);
+                }
+            }
+            setContributorsLoaded(true);
+        } catch (error) {
+            console.error('Failed to fetch contributors.json', error);
+            setContributorsLoaded(true);
+        }
+    },
+    pushContributorsToCloud: async (i18n) => {
+        const { contributors, isPushing } = get();
+        if (isPushing) return false;
+        set({ isPushing: true });
+        try {
+            const owner = i18n.api.github.owner;
+            const repo = i18n.api.github.repo;
+            const path = 'contributors.json';
+            const contentJson = JSON.stringify({ contributors }, null, 2);
+            const contentBase64 = Buffer.from(contentJson, 'utf-8').toString('base64');
+            const res = await i18n.api.github.uploadFile(
+                owner, repo, path, contentBase64,
+                `Update contributors.json from Admin Panel (${new Date().toLocaleString()})`
+            );
+            if (res.state) return true;
+            console.error('Push contributors failed:', res.data);
+            return false;
+        } catch (error) {
+            console.error('Push contributors error:', error);
+            return false;
+        } finally {
+            set({ isPushing: false });
+        }
+    },
+
     // 重置 (保留下载页地址簿和当前目标状态)
     reset: () => set((state) => ({
         ...initialState,
@@ -425,6 +497,8 @@ const useCloudStoreBase = create<CloudState & CloudActions>()((set, get) => ({
         communityStats: state.communityStats,
         communityLoaded: state.communityLoaded,
         outdatedSources: state.outdatedSources,
+        contributors: state.contributors,
+        contributorsLoaded: state.contributorsLoaded,
     })),
 }));
 

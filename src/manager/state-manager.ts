@@ -72,7 +72,11 @@ export class StateManager {
     }
 
     public getAllPluginStates(): Record<string, IState> {
-        return this.data.plugins;
+        return this.data.plugins || {};
+    }
+
+    public getAllThemeStates(): Record<string, IState> {
+        return this.data.themes || {};
     }
 
     // --- Theme State Operations (Reserved/Future) ---
@@ -126,6 +130,43 @@ export class StateManager {
                     }
                 }
             }
+        }
+
+        // Check themes
+        try {
+            // @ts-ignore
+            const basePath = app.vault.adapter.getBasePath ? path.normalize(app.vault.adapter.getBasePath()) : '';
+            if (basePath) {
+                const themesDir = path.join(basePath, app.vault.configDir, 'themes');
+                if (fs.existsSync(themesDir)) {
+                    const entries = fs.readdirSync(themesDir, { withFileTypes: true });
+                    for (const entry of entries) {
+                        if (!entry.isDirectory()) continue;
+                        const themeId = entry.name;
+                        const manifestPath = path.join(themesDir, themeId, 'manifest.json');
+                        let currentVersion = '0.0.0';
+                        if (fs.existsSync(manifestPath)) {
+                            try {
+                                const themeManifest = fs.readJsonSync(manifestPath);
+                                if (themeManifest && themeManifest.version) {
+                                    currentVersion = themeManifest.version;
+                                }
+                            } catch (e) { }
+                        }
+                        
+                        const state = this.getThemeState(themeId);
+                        if (state) {
+                            if (state.pluginVersion !== currentVersion) {
+                                state.isApplied = false;
+                                state.pluginVersion = currentVersion;
+                                hasChanges = true;
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('[i18n] Failed to validate theme versions', error);
         }
 
         if (hasChanges) {

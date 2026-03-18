@@ -5,7 +5,11 @@ import { t } from "src/locales";
 
 export default class I18nBasis extends BaseSetting {
     main(): void {
-        // 1. 检查更新设置
+        const headerClass = 'mt-6 mb-3 text-emerald-600 font-bold border-b border-emerald-600/10 pb-1.5 px-1';
+
+        // 1. 检查更新 (Section 1)
+        this.containerEl.createEl('h3', { text: t('Settings.Basis.HeaderUpdate'), cls: headerClass });
+
         new Setting(this.containerEl)
             .setName(t('Settings.Basis.UpdateTitle'))
             .setDesc(t('Settings.Basis.UpdateDesc'))
@@ -33,7 +37,22 @@ export default class I18nBasis extends BaseSetting {
                     this.settingTab.basisDisplay();
                 })
             );
-        // 2. 目标语言设置
+
+        new Setting(this.containerEl)
+            .setName(t('Settings.Basis.SmartUpdateTitle'))
+            .setDesc(t('Settings.Basis.SmartUpdateDesc'))
+            .addToggle((cb) =>
+                cb
+                    .setValue(this.settings.automaticUpdate)
+                    .onChange(async (value) => {
+                        this.settings.automaticUpdate = value;
+                        await this.i18n.saveSettings();
+                    })
+            );
+
+        // 2. 基础配置 (Section 2)
+        this.containerEl.createEl('h3', { text: t('Settings.Basis.HeaderBasis'), cls: headerClass });
+
         new Setting(this.containerEl)
             .setName(t('Settings.Basis.LangTitle'))
             .setDesc(t('Settings.Basis.LangDesc'))
@@ -48,22 +67,6 @@ export default class I18nBasis extends BaseSetting {
                 })
             );
 
-
-
-        // 3. 自动迁移旧版本译文 (智能更新)
-        new Setting(this.containerEl)
-            .setName(t('Settings.Basis.SmartUpdateTitle'))
-            .setDesc(t('Settings.Basis.SmartUpdateDesc'))
-            .addToggle((cb) =>
-                cb
-                    .setValue(this.settings.automaticUpdate)
-                    .onChange(async (value) => {
-                        this.settings.automaticUpdate = value;
-                        await this.i18n.saveSettings();
-                    })
-            );
-
-        // 4. 编辑器自动保存
         new Setting(this.containerEl)
             .setName(t('Settings.Basis.AutoSaveTitle'))
             .setDesc(t('Settings.Basis.AutoSaveDesc'))
@@ -76,7 +79,6 @@ export default class I18nBasis extends BaseSetting {
                     })
             );
 
-        // 5. 默认作者署名
         new Setting(this.containerEl)
             .setName(t('Settings.Basis.AuthorTitle'))
             .setDesc(t('Settings.Basis.AuthorDesc'))
@@ -89,38 +91,16 @@ export default class I18nBasis extends BaseSetting {
                 })
             );
 
-        // 6. 插件管理器外部链接
-        new Setting(this.containerEl)
-            .setName(t('Settings.Basis.ManagerTitle'))
-            .setDesc(t('Settings.Basis.ManagerDesc'))
-            .addButton((cb) => {
-                cb.setButtonText(t('Settings.Basis.ManagerBtn'))
-                    .onClick(() => {
-                        window.open('https://github.com/eondrcode/obsidian-manager');
-                    });
-            });
-
-        // 7. 自动化管理
-        this.containerEl.createEl('h3', { text: t('Settings.Basis.AutoHeader'), cls: 'mt-6 mb-2 text-emerald-600 font-semibold' });
+        // 3. 自动化任务 (Section 3 - Merged from i18n-auto.ts)
+        this.containerEl.createEl('h3', { text: t('Settings.Basis.HeaderAuto'), cls: headerClass });
 
         new Setting(this.containerEl)
-            .setName(t('Settings.Basis.AutoMonitorTitle'))
-            .setDesc(t('Settings.Basis.AutoMonitorDesc'))
+            .setName(t('Settings.Basis.AutoApplyTitle'))
+            .setDesc(t('Settings.Basis.AutoApplyDesc'))
             .addToggle(cb => cb
-                .setValue(this.settings.autoMonitor)
+                .setValue(this.settings.autoApply)
                 .onChange(async (value) => {
-                    this.settings.autoMonitor = value;
-                    await this.i18n.saveSettings();
-                })
-            );
-
-        new Setting(this.containerEl)
-            .setName(t('Settings.Basis.AutoStartupTitle'))
-            .setDesc(t('Settings.Basis.AutoStartupDesc'))
-            .addToggle(cb => cb
-                .setValue(this.settings.autoCheckOnStartup)
-                .onChange(async (value) => {
-                    this.settings.autoCheckOnStartup = value;
+                    this.settings.autoApply = value;
                     await this.i18n.saveSettings();
                 })
             );
@@ -135,5 +115,31 @@ export default class I18nBasis extends BaseSetting {
                     await this.i18n.saveSettings();
                 })
             );
+
+        new Setting(this.containerEl)
+            .setName(t('Settings.Basis.AutoTrustedReposTitle'))
+            .setDesc(t('Settings.Basis.AutoTrustedReposDesc'))
+            .addTextArea(cb => cb
+                .setPlaceholder(t('Settings.Basis.AutoTrustedReposPlaceholder'))
+                .setValue(this.settings.autoTrustedRepos.join('\n'))
+                .onChange(async (value) => {
+                    this.settings.autoTrustedRepos = value.split('\n').map(v => v.trim()).filter(v => v.length > 0);
+                    await this.i18n.saveSettings();
+                })
+            );
+
+        // 4. 外部链接 (Section 4)
+        this.containerEl.createEl('h3', { text: t('Settings.Basis.HeaderExternal'), cls: headerClass });
+
+        new Setting(this.containerEl)
+            .setName(t('Settings.Basis.ManagerTitle'))
+            .setDesc(t('Settings.Basis.ManagerDesc'))
+            .addButton((cb) => {
+                cb.setButtonText(t('Settings.Basis.ManagerBtn'))
+                    .onClick(() => {
+                        window.open('https://github.com/eondrcode/obsidian-manager');
+                    });
+            });
+
     }
 }

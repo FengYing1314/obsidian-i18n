@@ -20,7 +20,8 @@ export default {
         Loading: "加载中...",
         Reloading: "重载中...",
         Unknown: "未知",
-        Error: "错误"
+        Error: "错误",
+        Ready: "就绪"
     },
     Labels: {
         I18n: "I18N",

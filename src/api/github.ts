@@ -11,7 +11,21 @@
 
 import I18N from "main";
 import { I18nSettings } from "src/settings/data";
-import { RequestUrlParam, requestUrl } from "obsidian";
+import { RequestUrlParam, requestUrl, RequestUrlResponse } from "obsidian";
+
+/**
+ * 包装并扩展 requestUrl 功能：加入了本地的 Promise.race 强硬超时设计。
+ * @param params Obsidian的 requestUrl 参数
+ * @param timeoutMs 超时时间，默认 10000 毫秒（10秒）
+ */
+async function requestWithTimeout(params: RequestUrlParam, timeoutMs: number = 10000): Promise<RequestUrlResponse> {
+    return Promise.race([
+        requestUrl(params),
+        new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error(`请求超时 (>${timeoutMs}ms)`)), timeoutMs)
+        )
+    ]);
+}
 
 export class GitHubAPI {
     i18n: I18N;
@@ -66,7 +80,7 @@ export class GitHubAPI {
                 method: 'GET',
                 headers: this.authHeaders(),
             };
-            const response = await requestUrl(params);
+            const response = await requestWithTimeout(params);
             // 从响应头解析权限范围
             const scopesStr = response.headers['x-oauth-scopes'] || '';
             const scopes = scopesStr.split(',').map((s: string) => s.trim()).filter(Boolean);
@@ -93,7 +107,7 @@ export class GitHubAPI {
                 method: 'GET',
                 headers: this.authHeaders(),
             };
-            const response = await requestUrl(params);
+            const response = await requestWithTimeout(params);
             return { state: true, data: response.json };
         } catch (error) {
             // 404 = 不存在
@@ -111,7 +125,7 @@ export class GitHubAPI {
                 method: 'GET',
                 headers: this.authHeaders(),
             };
-            const response = await requestUrl(params);
+            const response = await requestWithTimeout(params);
             return { state: true, data: response.json };
         } catch (error) {
             return { state: false, data: error };
@@ -128,7 +142,7 @@ export class GitHubAPI {
                 method: 'GET',
                 headers: this.authHeaders(),
             };
-            const response = await requestUrl(params);
+            const response = await requestWithTimeout(params);
             return { state: true, data: response.json };
         } catch (error) {
             return { state: false, data: error };
@@ -155,7 +169,7 @@ export class GitHubAPI {
                     auto_init: true,
                 }),
             };
-            const response = await requestUrl(params);
+            const response = await requestWithTimeout(params);
             return { state: true, data: response.json };
         } catch (error) {
             return { state: false, data: error };
@@ -208,7 +222,7 @@ export class GitHubAPI {
                 method: 'GET',
                 headers: this.authHeaders(),
             };
-            const response = await requestUrl(params);
+            const response = await requestWithTimeout(params);
             return { state: true, data: response.json };
         } catch (error) {
             return { state: false, data: error };
@@ -239,7 +253,7 @@ export class GitHubAPI {
                 }
                 // 大文件场景：虽然 Contents API 成功，但没有 content 字段（通常会有 download_url）
                 if (res.data.download_url) {
-                    const rawRes = await requestUrl({ url: res.data.download_url, method: 'GET' });
+                    const rawRes = await requestWithTimeout({ url: res.data.download_url, method: 'GET' });
                     return { state: true, data: rawRes.json || rawRes.text };
                 }
             } else if (res.data?.status === 403) {
@@ -304,7 +318,7 @@ export class GitHubAPI {
                         headers: this.authHeaders(),
                         throw: false,
                     };
-                    const checkRes = await requestUrl(checkParams);
+                    const checkRes = await requestWithTimeout(checkParams);
                     if (checkRes.status === 200) {
                         sha = checkRes.json.sha;
                     }
@@ -333,7 +347,7 @@ export class GitHubAPI {
                 throw: false,
             };
 
-            const response = await requestUrl(params);
+            const response = await requestWithTimeout(params);
 
             if (response.status >= 400) {
                 const errorMsg = response.json?.message || response.text || `HTTP ${response.status}`;
@@ -376,7 +390,7 @@ export class GitHubAPI {
                     headers: this.authHeaders(),
                     throw: false,
                 };
-                const checkRes = await requestUrl(checkParams);
+                const checkRes = await requestWithTimeout(checkParams);
                 if (checkRes.status === 200) {
                     sha = checkRes.json.sha;
                 } else {
@@ -402,7 +416,7 @@ export class GitHubAPI {
                 throw: false,
             };
 
-            const response = await requestUrl(params);
+            const response = await requestWithTimeout(params);
 
             if (response.status >= 400) {
                 const errorMsg = response.json?.message || response.text || `HTTP ${response.status}`;
@@ -425,7 +439,7 @@ export class GitHubAPI {
                 url: `https://raw.githubusercontent.com/${this.owner}/${this.repo}/master/translation/dict/${id}/zh-cn/${version}.json`,
                 method: 'GET',
             };
-            const response = await requestUrl(params);
+            const response = await requestWithTimeout(params);
             return { state: true, data: response.json };
         } catch (error) {
             return { state: false, data: '' };
@@ -439,7 +453,7 @@ export class GitHubAPI {
                 url: `https://raw.githubusercontent.com/${this.owner}/${this.repo}/master/translation/directory/zh-cn.json`,
                 method: 'GET',
             };
-            const response = await requestUrl(params);
+            const response = await requestWithTimeout(params);
             return { state: true, data: response.json };
         } catch (error) {
             return { state: false, data: error };
@@ -457,7 +471,7 @@ export class GitHubAPI {
                 url: `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}?t=${Date.now()}`,
                 method: 'GET',
             };
-            const response = await requestUrl(params);
+            const response = await requestWithTimeout(params);
             return { state: true, data: response.json };
         } catch (error) {
             return { state: false, data: error };
@@ -473,7 +487,7 @@ export class GitHubAPI {
                 url: url,
                 method: 'GET',
             };
-            const response = await requestUrl(params);
+            const response = await requestWithTimeout(params);
             // 这里根据实际需要返回 arraybuffer 还是 text
             return { state: true, data: response.arrayBuffer || response.text };
         } catch (error) {
@@ -491,7 +505,7 @@ export class GitHubAPI {
             // 移除 labels 过滤，因为普通用户提交 Issue 时无权限直接打标签（这需要仓库管理员或 Action 操作），会导致检测不到延迟添加的标签
             const issueUrl = `https://api.github.com/repos/${targetOwner}/${targetRepo}/issues?state=open&creator=${encodeURIComponent(creator)}&t=${Date.now()}`;
             const params: RequestUrlParam = { url: issueUrl, method: 'GET', headers: this.authHeaders(), };
-            const response = await requestUrl(params);
+            const response = await requestWithTimeout(params);
             const issues = response.json;
             const hasOpenIssue = Array.isArray(issues) && issues.some((issue: any) =>
                 issue.title.includes(repoAddress) || (issue.body && issue.body.includes(repoAddress))
@@ -524,7 +538,7 @@ export class GitHubAPI {
                     labels: label ? [label] : [],
                 }),
             };
-            const response = await requestUrl(params);
+            const response = await requestWithTimeout(params);
             return { state: true, data: response.json };
         } catch (error) {
             console.error('GitHub postIssue error:', error);
@@ -555,7 +569,7 @@ export class GitHubAPI {
                 method: 'GET',
                 headers: this.authHeaders(),
             };
-            const response = await requestUrl(params);
+            const response = await requestWithTimeout(params);
             return { state: true, data: response.json };
         } catch (error) {
             console.error('GitHub getFileCommits error:', error);
@@ -582,7 +596,7 @@ export class GitHubAPI {
                 method: 'GET',
                 headers: this.authHeaders(),
             };
-            const response = await requestUrl(params);
+            const response = await requestWithTimeout(params);
             return { state: true, data: response.json };
         } catch (error) {
             console.error('GitHub getFileAtCommit error:', error);
@@ -609,7 +623,7 @@ export class GitHubAPI {
                 method: 'GET',
                 headers: this.authHeaders(),
             };
-            const response = await requestUrl(params);
+            const response = await requestWithTimeout(params);
             return { state: true, data: response.json };
         } catch (error) {
             console.error('GitHub getRepoTree error:', error);
@@ -627,7 +641,7 @@ export class GitHubAPI {
                 method: 'GET',
                 headers: this.authHeaders(),
             };
-            const response = await requestUrl(params);
+            const response = await requestWithTimeout(params);
             return { state: true, data: response.json };
         } catch (error) {
             return { state: false, data: error };
@@ -660,7 +674,7 @@ export class GitHubAPI {
                     tree: treeData
                 }),
             };
-            const response = await requestUrl(params);
+            const response = await requestWithTimeout(params);
             return { state: true, data: response.json };
         } catch (error) {
             return { state: false, data: error };
@@ -685,7 +699,7 @@ export class GitHubAPI {
                     parents
                 }),
             };
-            const response = await requestUrl(params);
+            const response = await requestWithTimeout(params);
             return { state: true, data: response.json };
         } catch (error) {
             return { state: false, data: error };
@@ -709,7 +723,7 @@ export class GitHubAPI {
                     force: false // 默认不强制，保证安全
                 }),
             };
-            const response = await requestUrl(params);
+            const response = await requestWithTimeout(params);
             return { state: true, data: response.json };
         } catch (error) {
             return { state: false, data: error };
@@ -742,7 +756,7 @@ export class GitHubAPI {
                 method: 'GET',
                 headers: this.authHeaders(),
             };
-            const commitDetailRes = await requestUrl(commitDetailParams);
+            const commitDetailRes = await requestWithTimeout(commitDetailParams);
             const baseTreeSha = commitDetailRes.json.tree.sha;
 
             // 3. 创建新的 Tree

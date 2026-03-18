@@ -242,6 +242,7 @@ export const PluginManager: React.FC<PluginManagerProps> = ({ i18n, close }) => 
         count: rowCount,
         getScrollElement: () => parentRef.current,
         estimateSize: useCallback(() => viewMode === 'list' ? 44 + 6 : 200 + 12, [viewMode]), // 列表项约44px+6px间距，网格约200px+12px间距总和
+        getItemKey: useCallback((index: number) => `${viewMode}-${index}`, [viewMode]),
         overscan: 5,
     });
 

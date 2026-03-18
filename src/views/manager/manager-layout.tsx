@@ -6,22 +6,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger, Button, Tooltip, TooltipConte
 import { useCloudStore } from '../cloud/cloud-store';
 import { PluginManager } from './plugin-manager';
 import { ThemeManager } from './theme-manager';
-import {
-    LayoutGrid, Palette, Settings, Cloud, CircleHelp, RefreshCw,
-    Loader2, Coffee, Zap, ShieldAlert, AlertTriangle
-} from 'lucide-react';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '~/shadcn';
+import { AutoManagerPanel } from './components/auto-manager-panel';
+import { CreditsPanel } from './components/credits-panel';
+import { LayoutGrid, Palette, Settings, Cloud, CircleHelp, Loader2, Coffee, ShieldAlert, MonitorPlay, Heart } from 'lucide-react';
 import Url from 'src/constants/url';
 import { WIZARD_VIEW_TYPE } from '../../views';
 import { CLOUD_VIEW_TYPE } from '../cloud';
-import { DevDebugCard } from './dev-debug-card';
 import { AdminPanel } from './components/admin-panel';
 
 interface ManagerLayoutProps {
@@ -32,8 +22,6 @@ interface ManagerLayoutProps {
 export const ManagerLayout: React.FC<ManagerLayoutProps> = ({ i18n, close }) => {
     const { t } = useTranslation();
     const app = i18n.app;
-    const [isAutoRunning, setIsAutoRunning] = useState(false);
-    const [showAutoConfirm, setShowAutoConfirm] = useState(false);
 
     // 管理员状态
     const isAdmin = useCloudStore.use.isAdmin();
@@ -47,15 +35,6 @@ export const ManagerLayout: React.FC<ManagerLayoutProps> = ({ i18n, close }) => 
         }
     }, [i18n.settings.shareToken, githubUser, fetchGithubUser, i18n]);
 
-    const handleSmartAuto = useCallback(async () => {
-        setShowAutoConfirm(false);
-        setIsAutoRunning(true);
-        try {
-            await i18n.autoManager.runSmartAuto();
-        } finally {
-            setIsAutoRunning(false);
-        }
-    }, [i18n.autoManager]);
 
     return (
         <div className="flex flex-col h-full bg-background overflow-hidden">
@@ -72,6 +51,14 @@ export const ManagerLayout: React.FC<ManagerLayoutProps> = ({ i18n, close }) => 
                             <Palette className="w-3.5 h-3.5" />
                             {t('Manager.Labels.Themes')}
                         </TabsTrigger>
+                        <TabsTrigger className="h-7 text-xs data-[state=active]:shadow-sm gap-1.5 px-3 rounded-none" value="auto">
+                            <MonitorPlay className="w-3.5 h-3.5" />
+                            {t('Manager.Tabs.AutoManagerTitle', '自动化')}
+                        </TabsTrigger>
+                        <TabsTrigger className="h-7 text-xs data-[state=active]:shadow-sm gap-1.5 px-3 rounded-none" value="credits">
+                            <Heart className="w-3.5 h-3.5" />
+                            {t('Manager.Tabs.Credits', '鸣谢')}
+                        </TabsTrigger>
                         {isAdmin && (
                             <TabsTrigger className="h-7 text-xs data-[state=active]:shadow-sm gap-1.5 px-3 rounded-none" value="admin">
                                 <ShieldAlert className="w-3.5 h-3.5" />
@@ -79,61 +66,7 @@ export const ManagerLayout: React.FC<ManagerLayoutProps> = ({ i18n, close }) => 
                             </TabsTrigger>
                         )}
                     </TabsList>
-
-                    {/* 右侧：功能按钮组 */}
                     <div className="flex items-center border rounded-none divide-x bg-background shadow-sm overflow-hidden">
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        variant="ghost"
-                                        className="rounded-none h-9 px-3 hover:bg-muted gap-2 text-xs text-yellow-600 dark:text-yellow-500 font-bold"
-                                        onClick={() => setShowAutoConfirm(true)}
-                                        disabled={isAutoRunning}
-                                    >
-                                        {isAutoRunning ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4 fill-current" />}
-                                        <span>{isAutoRunning ? t('Manager.Status.Running') : t('Manager.Actions.Apply')}</span>
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>一键自动化处理全部翻译</TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-
-                        {/* 自动化确认弹窗 */}
-                        <Dialog open={showAutoConfirm} onOpenChange={setShowAutoConfirm}>
-                            <DialogContent className="sm:max-w-[420px] border-amber-500/20 shadow-2xl shadow-amber-500/10">
-                                <DialogHeader>
-                                    <div className="flex items-center gap-2 text-amber-500 mb-2">
-                                        <AlertTriangle className="w-5 h-5" />
-                                        <DialogTitle className="text-base font-black uppercase tracking-tight">
-                                            {t('Manager.Dialogs.AutoWarningTitle')}
-                                        </DialogTitle>
-                                    </div>
-                                    <DialogDescription className="text-xs leading-relaxed font-medium">
-                                        {t('Manager.Dialogs.AutoWarningDesc')}
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <DialogFooter className="gap-2 sm:gap-0 mt-4">
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="h-9 px-4 text-[10px] font-black uppercase tracking-wider opacity-60 hover:opacity-100"
-                                        onClick={() => setShowAutoConfirm(false)}
-                                    >
-                                        {t('Common.Actions.Cancel')}
-                                    </Button>
-                                    <Button
-                                        variant="default"
-                                        size="sm"
-                                        className="h-9 px-6 bg-amber-500 hover:bg-amber-600 text-white border-none shadow-lg shadow-amber-500/20 text-[10px] font-black uppercase tracking-wider"
-                                        onClick={handleSmartAuto}
-                                    >
-                                        {t('Common.Actions.Confirm')}
-                                    </Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
-
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger asChild>
@@ -200,8 +133,16 @@ export const ManagerLayout: React.FC<ManagerLayoutProps> = ({ i18n, close }) => 
                     <ThemeManager i18n={i18n} />
                 </TabsContent>
 
+                <TabsContent value="auto" className="flex-1 min-h-0 m-0 focus-visible:ring-0 overflow-y-auto w-full">
+                    <AutoManagerPanel i18n={i18n} />
+                </TabsContent>
+
+                <TabsContent value="credits" className="flex-1 min-h-0 m-0 focus-visible:ring-0 overflow-hidden flex flex-col">
+                    <CreditsPanel i18n={i18n} />
+                </TabsContent>
+
                 {isAdmin && (
-                    <TabsContent value="admin" className="flex-1 min-h-0 m-0 focus-visible:ring-0 overflow-hidden">
+                    <TabsContent value="admin" className="flex-1 min-h-0 m-0 focus-visible:ring-0 overflow-hidden flex flex-col">
                         <AdminPanel i18n={i18n} />
                     </TabsContent>
                 )}

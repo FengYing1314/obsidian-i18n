@@ -9,6 +9,16 @@ const commands = (app: App, i18n: I18N) => {
         name: t('command.open_panel'),
         callback: () => { i18n.view.activateView(MANAGER_VIEW_TYPE) }
     });
+
+    i18n.addCommand({
+        id: 'i18n-auto-manager',
+        name: t('Manager.Tabs.AutoManagerTitle'),
+        callback: () => {
+            i18n.settings.managerTab = 'auto';
+            i18n.saveSettings();
+            i18n.view.activateView(MANAGER_VIEW_TYPE);
+        }
+    });
 }
 
 export default commands

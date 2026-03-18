@@ -5,91 +5,83 @@ import * as fs from 'fs-extra';
 import { t } from '../locales';
 import { RegistryItem, CommunityStatsData, ManifestEntry, getCloudFilePath } from '../views/cloud/types';
 import { calculateChecksum } from '../utils/translator/translation';
-import { TranslationSource } from '../types';
+import { TranslationSource, IState } from '../types';
+import { RegistryCacheManager, REGISTRY_REPO } from './registry-cache';
+import { useAutoStore } from '../views/manager/auto-store';
 
 export class AutoManager {
     private i18n: I18N;
     private isRunning = false;
+    private registryCache: RegistryCacheManager;
 
     constructor(i18n: I18N) {
         this.i18n = i18n;
+        this.registryCache = new RegistryCacheManager(i18n);
     }
+
 
     /**
      * 自动模式启动入口
      */
     public async initialize() {
-        // 1. 注册监听器
-        this.setupEventListeners();
-
-        // 2. 检查是否开启启动自检
-        if (this.i18n.settings.autoCheckOnStartup) {
-            // 延迟运行，确保 Obsidian 完全加载
-            setTimeout(() => this.runSmartAuto({ silent: true }), 3000);
-        }
+        // 1. 同步 Store 初始值
+        this.syncStore();
     }
 
     /**
-     * 监听插件安装和布局变化
+     * 同步设置到 Store
      */
-    private setupEventListeners() {
-        // 监听插件启用事件（安装并启用时触发）
-        // 注意：Obsidian 官方 API 可能不直接暴露所有内部事件，通常监听 layout-change 比较稳健
-        // 但也可以尝试 Hook 插件管理器的内部事件
-        this.i18n.registerEvent(
-            this.i18n.app.workspace.on('layout-change', () => {
-                if (!this.i18n.settings.autoMonitor) return;
-                this.handleLayoutChange();
-            })
-        );
+    private syncStore() {
+        const store = useAutoStore.getState();
 
-        // 每隔 24 小时自动更新一次注册表缓存（待实现缓存逻辑后增强）
-    }
+        // 计算已应用翻译的插件/主题总数
+        const plugins = this.i18n.stateManager.getAllPluginStates();
+        const themes = this.i18n.stateManager.getAllThemeStates();
+        const appliedCount = [...Object.values(plugins), ...Object.values(themes)].filter((s: IState) => s.isApplied).length;
 
-    private lastScanTime = 0;
-    private handleLayoutChange() {
-        if (this.isRunning) return;
-        const now = Date.now();
-        // 频率限制：5 分钟内不重复扫描
-        if (now - this.lastScanTime < 5 * 60 * 1000) return;
-
-        this.lastScanTime = now;
-        this.runSmartAuto({ silent: true, isIncremental: true });
+        store.hydrate(this.i18n.settings, { appliedCount });
     }
 
     /**
      * 一键智能自动化处理
      */
     public async runSmartAuto(options: { silent?: boolean, isIncremental?: boolean } = {}) {
+        const store = useAutoStore.getState();
+
         if (this.isRunning) {
-            if (!options.silent) new Notice(t('Manager.Status.Running'));
+            if (!options.silent) {
+                new Notice(t('Manager.Status.Running'));
+            }
             return;
         }
 
         const isSilent = options.silent || this.i18n.settings.autoSilentMode;
 
         this.isRunning = true;
+        store.setStatus('running');
+        store.clearAll();
+
         if (!isSilent) this.i18n.notice.info(t('Manager.Status.AutoStarting'));
 
         try {
             // 0. 验证版本状态（检测是否有插件已更新导致翻译失效）
             await this.i18n.stateManager.validateVersions(this.i18n.app);
 
-            // 1. 获取社区注册表和统计数据
-            const registryAddr = 'eondrcode/obsidian-i18n-resources';
-            const [owner, repo] = registryAddr.split('/');
-
-            const [registryRes, statsRes] = await Promise.all([
-                this.i18n.api.github.getFileContentWithFallback(owner, repo, 'registry.json'),
-                this.i18n.api.github.getFileContentWithFallback(owner, repo, 'stats.json'),
-            ]);
-
-            if (!registryRes.state || !statsRes.state) {
-                throw new Error(t('Manager.Errors.FetchCommunityDataFailed'));
+            // 1. 安全检查：验证是否配置了受信任的翻译仓库源
+            const trustedRepos = this.i18n.settings.autoTrustedRepos;
+            if (!trustedRepos || trustedRepos.length === 0) {
+                store.setStatus('error');
+                if (!isSilent) {
+                    this.i18n.notice.warning(t('Manager.Errors.NoTrustedRepos'));
+                }
+                return;
             }
 
-            const registry: RegistryItem[] = registryRes.data;
-            const stats: CommunityStatsData = statsRes.data;
+            // 2. 获取社区注册表和统计数据（使用缓存管理器）
+            const [registry, stats] = await Promise.all([
+                this.registryCache.getRegistry(),
+                this.registryCache.getStats(),
+            ]);
 
             // 调试：显示获取到的总库数
             console.log('[AutoManager] Registry count:', registry.length);
@@ -102,7 +94,10 @@ export class AutoManager {
             // 增量更新逻辑：关注没被激活过的插件，或者版本号发生变动的插件
             if (options.isIncremental) {
                 allInstalled = allInstalled.filter(item => {
-                    const state = this.i18n.stateManager.getPluginState(item.id);
+                    const state = item.type === 'theme'
+                        ? this.i18n.stateManager.getThemeState(item.id)
+                        : this.i18n.stateManager.getPluginState(item.id);
+
                     // 情况1：从未应用过翻译
                     if (!state || !state.isApplied) return true;
                     // 情况2：已应用过翻译，但本地 manifest 版本与 state 记录的版本不一致（说明插件刚更新过）
@@ -112,41 +107,67 @@ export class AutoManager {
                 });
 
                 if (allInstalled.length === 0) {
+                    store.setStatus('success');
                     this.isRunning = false;
                     return;
                 }
             }
 
+            store.initTasks(allInstalled.map(item => ({
+                id: item.id,
+                type: item.type,
+                name: item.id
+            })));
             if (!isSilent) this.i18n.notice.info(t('Manager.Status.ScanningInstalled', { count: allInstalled.length }));
 
             // 3. 批量获取所有受信任仓库的元数据
-            // 优化过滤逻辑：如果 stats 为空或不包含 pluginIds，则不进行严格过滤，尝试加载所有 registry 中的库
-            let relevantRepos = registry.filter(item => {
+            // 安全过滤：仅信任位于 autoTrustedRepos 列表内的仓库
+            const trustedSet = new Set(trustedRepos);
+            let relevantRepos = registry.filter(item => trustedSet.has(item.repoAddress));
+
+            // 如果该阶段过滤后已为空，说明虽然用户配置了源，但该源在最新注册表中不存在或已下架
+            if (relevantRepos.length === 0) {
+                store.setStatus('error');
+                if (!isSilent) this.i18n.notice.warning(t('Manager.Errors.TrustedRepoNotInRegistry'));
+                return;
+            }
+
+            // 优化过滤逻辑：只针对关注的已安装插件进一步筛选
+            relevantRepos = relevantRepos.filter(item => {
                 const repoStats = stats.repos?.[item.repoAddress];
                 if (!repoStats || !repoStats.pluginIds) return true; // 降级处理：如果没有统计数据，认为可能相关
                 return allInstalled.some(installed => repoStats.pluginIds?.includes(installed.id));
             });
 
-            // 如果过滤后为空且 registry 不为空，则至少尝试加载第一个（作为基准）或全部
-            if (relevantRepos.length === 0 && registry.length > 0) {
-                relevantRepos = registry;
+            // 如果基于插件过滤后为空，则代表至少尝试加载所有位于信任列表里的项
+            if (relevantRepos.length === 0) {
+                relevantRepos = registry.filter(item => trustedSet.has(item.repoAddress));
             }
-
             console.log('[AutoManager] Relevant repos count:', relevantRepos.length);
 
             const allManifests: { repoAddress: string; entry: ManifestEntry }[] = [];
-            await Promise.all(relevantRepos.map(async (item) => {
-                const [rOwner, rRepo] = item.repoAddress.split('/');
-                const manifestRes = await this.i18n.api.github.getFileContentWithFallback(rOwner, rRepo, 'metadata.json');
-                if (manifestRes.state && Array.isArray(manifestRes.data)) {
-                    manifestRes.data.forEach((entry: ManifestEntry) => {
-                        allManifests.push({ repoAddress: item.repoAddress, entry });
-                    });
+            const BATCH_SIZE = 5;
+
+            for (let i = 0; i < relevantRepos.length; i += BATCH_SIZE) {
+                const batch = relevantRepos.slice(i, i + BATCH_SIZE);
+                await Promise.all(batch.map(async (item) => {
+                    const [rOwner, rRepo] = item.repoAddress.split('/');
+                    const manifestRes = await this.i18n.api.github.getFileContentWithFallback(rOwner, rRepo, 'metadata.json');
+                    if (manifestRes.state && Array.isArray(manifestRes.data)) {
+                        manifestRes.data.forEach((entry: ManifestEntry) => {
+                            allManifests.push({ repoAddress: item.repoAddress, entry });
+                        });
+                    }
+                }));
+
+                // Add a small delay between batches to avoid rate limits
+                if (i + BATCH_SIZE < relevantRepos.length) {
+                    await new Promise(res => setTimeout(res, 500));
                 }
-            }));
+            }
 
             console.log('[AutoManager] Total manifests fetched:', allManifests.length);
-            if (!isSilent) this.i18n.notice.info(`正在解析 ${allManifests.length} 个云端翻译条目...`);
+            if (!isSilent) this.i18n.notice.info(t('Manager.Status.ParsingEntries', { count: allManifests.length }));
 
             // 4. 为每个已安装项寻找最佳翻译
             let successCount = 0;
@@ -154,66 +175,245 @@ export class AutoManager {
             let upToDateCount = 0;
             let errorCount = 0;
 
-            for (const installed of allInstalled) {
-                const matches = allManifests.filter(m => m.entry.plugin === installed.id);
-                if (matches.length === 0) {
-                    skipCount++;
-                    continue;
-                }
+            store.setProgress(0, allInstalled.length);
+            let processedIndex = 0;
 
-                // 智能优选逻辑
-                const bestMatch = this.selectBestTranslation(matches, stats, installed.version);
-                if (bestMatch) {
-                    // 优化：下载前先检查本地是否已有相同 Hash 的翻译
-                    const existing = this.i18n.sourceManager.getSource(bestMatch.entry.id);
-                    if (existing && existing.cloud?.hash === bestMatch.entry.hash) {
-                        // 即使 Hash 一致，如果尚未应用，也需要尝试应用
-                        const state = this.i18n.stateManager.getPluginState(installed.id);
-                        if (state?.isApplied &&
-                            state?.translationVersion === bestMatch.entry.version &&
-                            state?.pluginVersion === installed.version) {
-                            upToDateCount++;
-                            continue;
-                        }
-                        // 如果 Hash 一致但没应用，则直接进入应用阶段（跳过下载）
-                        this.i18n.notice.info(`检测到 ${installed.id} 已有缓存，正在直接应用...`, 1000);
-                        // 必须先激活，injector 才能找到路径
-                        this.i18n.sourceManager.setActive(bestMatch.entry.id, true);
-                        const result = await this.i18n.injectorManager.applyToPlugin(installed.id);
-                        if (result) successCount++;
-                        else errorCount++;
+            for (const installed of allInstalled) {
+                processedIndex++;
+                store.setProgress(processedIndex, allInstalled.length);
+
+                try {
+                    store.updateTaskStatus(installed.id, 'processing');
+
+                    const matches = allManifests.filter(m => m.entry.plugin === installed.id);
+                    if (matches.length === 0) {
+                        skipCount++;
+                        store.updateTaskStatus(installed.id, 'skipped');
                         continue;
                     }
 
-                    this.i18n.notice.info(`正在为 ${installed.id} 下载最佳翻译...`, 2000);
-                    const result = await this.applyTranslation(bestMatch, installed.type);
-                    if (result === true) {
-                        successCount++;
-                        this.i18n.notice.success(`${installed.id} 翻译应用成功`, 3000);
-                    } else if (result === null) {
-                        upToDateCount++;
+                    // 智能优选逻辑
+                    const bestMatch = this.selectBestTranslation(
+                        matches,
+                        stats,
+                        installed.version,
+                        this.i18n.settings.language,
+                        installed.type === 'theme'
+                    );
+                    if (bestMatch) {
+                        // 如果关闭了自动应用，则仅标记为已找到并结束任务
+                        if (!this.i18n.settings.autoApply) {
+                            successCount++; // 统计为成功发现
+                            store.updateTaskStatus(installed.id, 'found', undefined, bestMatch.repoAddress, String(bestMatch.entry.version));
+                            continue;
+                        }
+
+                        // 优化：下载前先检查本地是否已有相同 Hash 的翻译
+                        const existing = this.i18n.sourceManager.getSource(bestMatch.entry.id);
+                        if (existing && existing.cloud?.hash === bestMatch.entry.hash) {
+                            // 即使 Hash 一致，如果尚未应用，也需要尝试应用
+                            const state = installed.type === 'theme' ? this.i18n.stateManager.getThemeState(installed.id) : this.i18n.stateManager.getPluginState(installed.id);
+                            if (state?.isApplied &&
+                                String(state?.translationVersion) === String(bestMatch.entry.version) &&
+                                state?.pluginVersion === installed.version) {
+                                store.updateTaskStatus(installed.id, 'success', undefined, bestMatch.repoAddress, String(bestMatch.entry.version));
+                                upToDateCount++;
+                                continue;
+                            }
+                            // 如果 Hash 一致但没应用，则直接进入应用阶段（跳过下载）
+                            if (!isSilent) this.i18n.notice.info(t('Manager.Status.CacheHitApplying', { id: installed.id }), 1000);
+                            // 必须先激活，injector 才能找到路径
+                            this.i18n.sourceManager.setActive(bestMatch.entry.id, true);
+                            const result = installed.type === 'theme'
+                                ? await this.i18n.injectorManager.applyToTheme(installed.id)
+                                : await this.i18n.injectorManager.applyToPlugin(installed.id);
+                            if (result) {
+                                successCount++;
+                                store.updateTaskStatus(installed.id, 'success', undefined, bestMatch.repoAddress, String(bestMatch.entry.version));
+                            } else {
+                                errorCount++;
+                                store.updateTaskStatus(installed.id, 'error', 'Cache apply failed');
+                            }
+                            continue;
+                        }
+
+                        if (!isSilent) this.i18n.notice.info(t('Manager.Status.DownloadingBest', { id: installed.id }), 2000);
+                        const result = await this.applyTranslation(bestMatch, installed.type);
+                        if (result) {
+                            successCount++;
+                            store.updateTaskStatus(installed.id, 'success', undefined, bestMatch.repoAddress, String(bestMatch.entry.version));
+                            if (!isSilent) this.i18n.notice.success(t('Manager.Notices.ApplyPluginSuccess', { id: installed.id }), 3000);
+                        } else {
+                            errorCount++;
+                            store.updateTaskStatus(installed.id, 'error', 'Download or injection failed');
+                        }
                     } else {
-                        errorCount++;
+                        skipCount++;
+                        store.updateTaskStatus(installed.id, 'skipped');
                     }
+                } catch (pluginError) {
+                    if (pluginError.message === 'ROLLBACK_TRIGGERED') {
+                        store.updateTaskStatus(installed.id, 'error', t('Manager.Status.AutoRollbacked'));
+                        errorCount++;
+                        continue;
+                    }
+                    console.error(`[autoManager] Failed to process ${installed.id}:`, pluginError);
+                    store.updateTaskStatus(installed.id, 'error', pluginError.message || 'Unknown Error');
+                    errorCount++;
                 }
             }
 
             if (successCount === 0 && upToDateCount === 0 && errorCount === 0) {
-                if (!isSilent) this.i18n.notice.warning(`未在社区库中找到匹配的翻译 (跳过: ${skipCount})`);
-            } else if (!isSilent) {
-                this.i18n.notice.success(`一键处理完成！统计：成功 ${successCount}，已最新 ${upToDateCount}，失败 ${errorCount}，未找到 ${skipCount}`);
-            } else if (successCount > 0) {
-                this.i18n.notice.success(`自动已为 ${successCount} 个新插件应用翻译`);
+                store.setStatus('success');
+                if (!isSilent) this.i18n.notice.warning(t('Manager.Notices.NoMatchFound', { skip: skipCount }));
+            } else {
+                store.setStatus(errorCount > 0 ? 'error' : 'success');
+
+                if (!isSilent) {
+                    if (successCount > 0) {
+                        this.i18n.notice.success(t('Manager.Notices.AutoApplied', { count: successCount }));
+                    } else {
+                        this.i18n.notice.success(t('Manager.Notices.AutoComplete', { success: successCount, upToDate: upToDateCount, error: errorCount, skip: skipCount }));
+                    }
+                }
             }
 
             // 更新最后检查时间
             this.i18n.settings.lastAutoCheckTime = Date.now();
             await this.i18n.saveSettings();
+
+            // 完成后再次同步统计数据
+            this.syncStore();
         } catch (error) {
             console.error('[AutoManager] Smart Auto failed:', error);
-            this.i18n.notice.error(`${t('Manager.Errors.AutoFailed')}: ${error.message || error}`);
+            store.setStatus('error');
+            if (!isSilent) this.i18n.notice.error(`${t('Manager.Errors.AutoFailed')}: ${error.message || error}`);
         } finally {
             this.isRunning = false;
+        }
+    }
+
+    /**
+     * 单个任务重试
+     */
+    public async retryTask(id: string, type: 'plugin' | 'theme') {
+        const store = useAutoStore.getState();
+        store.updateTaskStatus(id, 'processing');
+
+        try {
+            // 获取已安装版本
+            let installedVersion = '0.0.0';
+            let installedName = id;
+            if (type === 'plugin') {
+                const manifest = this.i18n.app.plugins.manifests[id];
+                if (manifest) {
+                    installedVersion = manifest.version;
+                    installedName = manifest.name;
+                }
+            } else {
+                const themes = await this.getInstalledThemes();
+                const theme = themes.find(t => t.id === id);
+                if (theme) {
+                    installedVersion = theme.version;
+                }
+            }
+
+            const [registry, stats] = await Promise.all([
+                this.registryCache.getRegistry(),
+                this.registryCache.getStats(),
+            ]);
+
+            const trustedRepos = this.i18n.settings.autoTrustedRepos;
+            const trustedSet = new Set(trustedRepos || []);
+            const relevantRepos = registry.filter(item => trustedSet.has(item.repoAddress));
+
+            if (relevantRepos.length === 0) {
+                store.updateTaskStatus(id, 'error', t('Manager.Errors.TrustedRepoNotInRegistry'));
+                return;
+            }
+
+            const allManifests: { repoAddress: string; entry: ManifestEntry }[] = [];
+            for (const item of relevantRepos) {
+                const [rOwner, rRepo] = item.repoAddress.split('/');
+                try {
+                    const manifestRes = await this.i18n.api.github.getFileContentWithFallback(rOwner, rRepo, 'metadata.json');
+                    if (manifestRes.state && Array.isArray(manifestRes.data)) {
+                        manifestRes.data.forEach((entry: ManifestEntry) => {
+                            allManifests.push({ repoAddress: item.repoAddress, entry });
+                        });
+                    }
+                } catch (e) {
+                    console.error('[AutoManager] Failed to fetch manifest for retry:', item.repoAddress);
+                }
+            }
+
+            const matches = allManifests.filter(m => m.entry.plugin === id);
+            if (matches.length === 0) {
+                store.updateTaskStatus(id, 'skipped', 'No translation found');
+                return;
+            }
+
+            const bestMatch = this.selectBestTranslation(
+                matches,
+                stats,
+                installedVersion,
+                this.i18n.settings.language,
+                type === 'theme'
+            );
+
+            if (!bestMatch) {
+                store.updateTaskStatus(id, 'skipped', 'No matching translation');
+                return;
+            }
+
+            const existing = this.i18n.sourceManager.getSource(bestMatch.entry.id);
+            if (existing && existing.cloud?.hash === bestMatch.entry.hash) {
+                this.i18n.sourceManager.setActive(bestMatch.entry.id, true);
+                const result = type === 'theme'
+                    ? await this.i18n.injectorManager.applyToTheme(id)
+                    : await this.i18n.injectorManager.applyToPlugin(id);
+                if (result) {
+                    store.updateTaskStatus(id, 'success', undefined, bestMatch.repoAddress, String(bestMatch.entry.version));
+                } else {
+                    store.updateTaskStatus(id, 'error', 'Injection failed from cache');
+                }
+                return;
+            }
+
+            const result = await this.applyTranslation(bestMatch, type);
+            if (result) {
+                store.updateTaskStatus(id, 'success', undefined, bestMatch.repoAddress, String(bestMatch.entry.version));
+            } else {
+                store.updateTaskStatus(id, 'error', 'Download or injection failed');
+            }
+
+        } catch (err: any) {
+            console.error('[AutoManager] Retry failed for', id, err);
+            store.updateTaskStatus(id, 'error', err.message === 'ROLLBACK_TRIGGERED' ? t('Manager.Status.AutoRollbacked') : (err.message || 'Unknown error'));
+        }
+    }
+
+    /**
+     * 手动清理注册表缓存
+     */
+    public invalidateCache() {
+        this.registryCache.invalidate();
+    }
+
+    /**
+     * 验证仓库是否有在云端注册或包含元数据
+     */
+    public async verifyRepo(repoStr: string): Promise<boolean> {
+        try {
+            const registry = await this.registryCache.getRegistry();
+            const existsInRegistry = registry.some(item => item.repoAddress === repoStr);
+            if (existsInRegistry) return true;
+
+            const [owner, repo] = repoStr.split('/');
+            const res = await this.i18n.api.github.getFileContentWithFallback(owner, repo, 'metadata.json');
+            return res.state === true;
+        } catch (e) {
+            return false;
         }
     }
 
@@ -221,7 +421,6 @@ export class AutoManager {
      * 获取已安装插件
      */
     private getInstalledPlugins() {
-        // @ts-ignore
         const manifests = this.i18n.app.plugins.manifests;
         return Object.values(manifests)
             .filter((m: any) => m.id !== this.i18n.manifest.id)
@@ -234,17 +433,24 @@ export class AutoManager {
     private async getInstalledThemes() {
         const themes: { id: string; version: string; type: 'theme' }[] = [];
         try {
-            // @ts-ignore
             const exists = await this.i18n.app.vault.adapter.exists(`${this.i18n.app.vault.configDir}/themes`);
             if (exists) {
-                // @ts-ignore
                 const folders = await this.i18n.app.vault.adapter.list(`${this.i18n.app.vault.configDir}/themes`);
                 for (const folder of folders.folders) {
                     const themeId = folder.split('/').pop();
                     if (themeId) {
-                        // 主题通常没有 manifest.json 暴露版本，或者需要读取里面的内容
-                        // 简化处理：版本设为 0.0.0
-                        themes.push({ id: themeId, version: '0.0.0', type: 'theme' });
+                        let version = '0.0.0';
+                        try {
+                            const manifestPath = `${folder}/manifest.json`;
+                            if (await this.i18n.app.vault.adapter.exists(manifestPath)) {
+                                const manifestStr = await this.i18n.app.vault.adapter.read(manifestPath);
+                                const manifest = JSON.parse(manifestStr);
+                                if (manifest && manifest.version) {
+                                    version = manifest.version;
+                                }
+                            }
+                        } catch (e) { }
+                        themes.push({ id: themeId, version, type: 'theme' });
                     }
                 }
             }
@@ -255,30 +461,59 @@ export class AutoManager {
     }
 
     /**
+     * 简单的语义化版本兼容性检查
+     * 格式示例: 1.2.3
+     */
+    private isVersionCompatible(cloudVersion: string, localVersion: string): number {
+        if (cloudVersion === localVersion) return 100; // 完全匹配
+
+        const cParts = cloudVersion.split('.').map(Number);
+        const lParts = localVersion.split('.').map(Number);
+
+        // 如果大版本相同，次版本兼容，给一定加分 (假定云端支持版本高于本地即可向下兼容，或者同等大版本通用)
+        if (cParts[0] === lParts[0]) {
+            return 50;
+        }
+
+        return 0;
+    }
+
+    /**
      * 智能优选算法
      */
     private selectBestTranslation(
         matches: { repoAddress: string; entry: ManifestEntry }[],
         stats: CommunityStatsData,
-        targetVersion: string
+        targetVersion: string,
+        targetLanguage: string,
+        isTheme: boolean
     ) {
-        // 评分逻辑
-        const scored = matches.map(m => {
+        // 1. 语言过滤 (优先完全匹配，找不到则放宽)
+        let langMatches = matches.filter(m => m.entry.language === targetLanguage);
+        if (langMatches.length === 0) {
+            langMatches = matches;
+        }
+
+        // 2. 评分逻辑
+        const scored = langMatches.map(m => {
             const repoStats = stats.repos[m.repoAddress];
             let score = 0;
 
             if (repoStats) {
-                // 1. 星标权重 (0-50分)
-                score += Math.min(repoStats.stars || 0, 50);
-                // 2. 活跃度权重 (0-30分)
-                score += (repoStats.activityScore || 0) * 30;
+                // 1. 星标权重 (0-100分)
+                score += Math.min(repoStats.stars || 0, 100);
+                // 2. 活跃度权重 (0-100分)
+                score += (repoStats.activityScore || 0) * 100;
                 // 3. 插件覆盖数权重 (0-20分)
                 score += Math.min(repoStats.pluginCount || 0, 20);
             }
 
-            // 4. 版本匹配权重 (额外加分)
-            if (m.entry.supported_versions === targetVersion) {
-                score += 100; // 完美匹配优先
+            // 4. 版本匹配权重
+            if (isTheme) {
+                // 主题没有提供版本解析，默认给一个过关分，避免被错误降级
+                score += 50;
+            } else {
+                score += this.isVersionCompatible(m.entry.supported_versions, targetVersion);
             }
 
             return { ...m, score };
@@ -295,7 +530,7 @@ export class AutoManager {
     private async applyTranslation(
         match: { repoAddress: string; entry: ManifestEntry },
         type: 'plugin' | 'theme'
-    ): Promise<boolean | null> {
+    ): Promise<boolean> {
         const [owner, repo] = match.repoAddress.split('/');
         const filePath = getCloudFilePath(match.entry.id, type);
 
@@ -309,14 +544,8 @@ export class AutoManager {
             // 1. 检查本地是否已有同 ID 翻译
             const existing = manager.getSource(match.entry.id);
 
-            // 如果已有且 Hash 一致，代表已是最新，返回 null
-            if (existing && existing.cloud?.hash === match.entry.hash) {
-                return null;
-            }
-
             // 2. 自动备份 (如果存在且不同)
             if (existing) {
-                // @ts-ignore
                 this.i18n.backupManager.backupTranslationSync(existing.id, manager.sourcesDir);
             }
 
@@ -345,9 +574,10 @@ export class AutoManager {
             manager.saveSource(sourceInfo);
             manager.setActive(match.entry.id, true);
 
-            // 5. 核心追加：立即应用（注入）翻译到插件
-            // 如果这一步失败，我们仍然认为下载是成功的，但返回 false 以便在统计中体现
-            const injectSuccess = await this.i18n.injectorManager.applyToPlugin(match.entry.plugin);
+            // 5. 核心追加：立即应用（注入）翻译到插件或主题
+            const injectSuccess = type === 'theme'
+                ? await this.i18n.injectorManager.applyToTheme(match.entry.plugin)
+                : await this.i18n.injectorManager.applyToPlugin(match.entry.plugin);
 
             return injectSuccess;
         } catch (error) {

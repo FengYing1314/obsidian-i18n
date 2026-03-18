@@ -11,6 +11,7 @@
 export default {
     Tabs: {
         Basis: "综合设置",
+        Auto: "自动化 (实验性)",
         Re: "正则匹配",
         Ast: "AST 提取",
         Immersive: "沉浸翻译",
@@ -18,6 +19,10 @@ export default {
         Share: "共建生态"
     },
     Basis: {
+        HeaderUpdate: "检查更新",
+        HeaderBasis: "基础配置",
+        HeaderAuto: "自动化任务 (实验性)",
+        HeaderExternal: "外部链接",
         UpdateHeader: "检查更新",
         UpdateTitle: "自动检查更新",
         UpdateDesc: "启用此功能，插件将自动检测可用更新，并在新版本发布时提醒您。",
@@ -35,12 +40,26 @@ export default {
         ManagerDesc: "访问插件管理器外部链接。",
         ManagerBtn: "前往管理器",
         AutoHeader: "自动化管理 (实验性)",
-        AutoMonitorTitle: "自动监测插件安装",
-        AutoMonitorDesc: "当您安装或启用新插件时，自动在云端匹配最佳翻译并应用。",
-        AutoStartupTitle: "启动时自动检查",
-        AutoStartupDesc: "Obsidian 启动时自动全量扫描已安装插件的翻译更新。",
+        AutoApplyTitle: "自动应用翻译",
+        AutoApplyDesc: "开启后，自动化任务在匹配到可用翻译后将尝试自动注入并重载相关插件。",
         AutoSilentTitle: "静默运行模式",
-        AutoSilentDesc: "自动执行任务时不弹出进度通知，仅在成功后简要提醒。"
+        AutoSilentDesc: "自动执行任务时不弹出进度通知，仅在成功后简要提醒。",
+        AutoTrustedReposTitle: "受信任的翻译源",
+        AutoTrustedReposDesc: "为了保证您的数据安全，本插件仅会从您信任的仓库自动获取翻译文件。每行填写一个仓库地址 (例如：eondrcode/obsidian-i18n-resources)。",
+        AutoTrustedReposPlaceholder: "owner/repo\nother/repo",
+        // 子更新系统 (Core & Injector) 新增词条
+        CheckUpdatePrefix: "更新检查",
+        CheckUpdateNotice: "发现新版本",
+        IsLatest: "当前已是最新版本",
+        NoUpdatesFound: "未发现新版本",
+        Updating: "正在更新插件...",
+        UpdateSuccessRestart: "更新成功，正在重启插件...",
+        UpdateFailed: "更新失败",
+        SmartTitle: "智能更新",
+        SmartChecking: "正在自检已翻译插件...",
+        SmartUpdate: "已自动重载 ",
+        SmartPlugins: " 个插件",
+        SmartNoUpdates: "所有插件均已同步最新翻译"
     },
     Re: {
         ParamsHeader: "正则参数配置",

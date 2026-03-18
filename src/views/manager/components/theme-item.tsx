@@ -119,53 +119,13 @@ export const ThemeItem: React.FC<ThemeItemProps> = React.memo(({ theme, i18n, da
         }
         setReplacing(true);
         try {
-            if (!translationPath || !fs.existsSync(translationPath)) {
-                i18n.notice.error(t('Manager.Errors.BackupNotFound'));
-                return;
+            const success = await i18n.injectorManager.applyToTheme(theme.name);
+            if (success) {
+                i18n.notice.result(true);
+                refreshParent();
+            } else {
+                i18n.notice.result(false, t('Manager.Errors.ErrorDesc'));
             }
-
-            const translationJson: ThemeTranslationV1 = loadTranslationFile(translationPath);
-            if (!translationJson || !translationJson.dict) {
-                i18n.notice.error(t('Manager.Errors.ErrorDesc'));
-                return;
-            }
-
-            await i18n.backupManager.createBackup(theme.name, themeDir, ['theme.css']);
-
-            let cssStr = fs.readFileSync(themeCssPath).toString();
-
-            cssStr = cssStr.replace(/\/\* @settings([\s\S]*?)\*\//g, (match, blockContent) => {
-                let newBlockContent = blockContent;
-
-                for (const item of translationJson.dict) {
-                    const type = item.type;
-                    const source = item.source;
-                    const target = item.target;
-
-                    if (source && target && source !== target) {
-                        const escapedSource = source.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                        const replacerRegex = new RegExp(`^([ \\t]*)(${type}):\\s*(["']?)${escapedSource}\\3[ \\t]*(?:\\r?\\n|$)`, 'gm');
-
-                        newBlockContent = newBlockContent.replace(replacerRegex, (fullMatch: string, indent: string, key: string, quote: string) => {
-                            return `${indent}${key}: ${quote}${target}${quote}\n`;
-                        });
-                    }
-                }
-                return `/* @settings${newBlockContent}*/`;
-            });
-
-            fs.writeFileSync(themeCssPath, cssStr);
-
-            const version = translationJson.metadata?.version || '1.0.0';
-            i18n.stateManager.setThemeState(theme.name, {
-                id: theme.name,
-                isApplied: true,
-                pluginVersion: theme.manifest?.version || '0.0.0',
-                translationVersion: String(version)
-            });
-
-            i18n.notice.result(true);
-            refreshParent();
         } catch (error) {
             i18n.notice.result(false, String(error));
         } finally {

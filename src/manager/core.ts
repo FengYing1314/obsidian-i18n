@@ -48,18 +48,18 @@ export class CoreManager {
         if (res.state) {
             const latestVersion = res.data.tag_name.replace(/^v/, '');
             if (this.i18n.manifest.version !== latestVersion) {
-                const noticeStr = `${t('func.check_update_notice')}(${latestVersion})\n${res.data.body || ''}`;
-                this.i18n.notice.primaryPrefix(t('func.check_update_prefix'), noticeStr, 15000);
+                const noticeStr = `${t('Settings.Basis.CheckUpdateNotice')}(${latestVersion})\n${res.data.body || ''}`;
+                this.i18n.notice.primaryPrefix(t('Settings.Basis.CheckUpdatePrefix'), noticeStr, 15000);
 
                 // 添加点击更新功能（如果 NoticeManager 支持或通过设置界面触发）
                 this.updatesMark = true;
                 this.updatesVersion = latestVersion;
                 this.latestRelease = res.data; // 暂存最新 Release 数据以供下载
             } else if (isManual) {
-                this.i18n.notice.successPrefix(t('func.check_update_prefix'), t('common.is_latest'));
+                this.i18n.notice.successPrefix(t('Settings.Basis.CheckUpdatePrefix'), t('Settings.Basis.IsLatest'));
             }
         } else if (isManual) {
-            this.i18n.notice.resultPrefix(t('func.check_update_prefix'), false, String(res.data));
+            this.i18n.notice.resultPrefix(t('Settings.Basis.CheckUpdatePrefix'), false, String(res.data));
         }
     }
 
@@ -68,11 +68,11 @@ export class CoreManager {
      */
     public async applyUpdate() {
         if (!this.latestRelease) {
-            this.i18n.notice.error(t('common.no_updates_found'));
+            this.i18n.notice.error(t('Settings.Basis.NoUpdatesFound'));
             return;
         }
 
-        this.i18n.notice.info(t('common.updating'));
+        this.i18n.notice.info(t('Settings.Basis.Updating'));
         try {
             const assets = this.latestRelease.assets;
             const filesToDownload = ['main.js', 'manifest.json', 'styles.css'];
@@ -97,10 +97,22 @@ export class CoreManager {
                 }
             }
 
-            this.i18n.notice.success(t('common.update_success_restart'));
+            this.i18n.notice.success(t('Settings.Basis.UpdateSuccessRestart'));
             this.updatesMark = false;
+
+            // 自动重载机制
+            setTimeout(async () => {
+                try {
+                    // @ts-ignore
+                    await this.i18n.app.plugins.disablePlugin(this.i18n.manifest.id);
+                    // @ts-ignore
+                    await this.i18n.app.plugins.enablePlugin(this.i18n.manifest.id);
+                } catch (e) {
+                    console.error("[i18n] Failed to self-reload plugin:", e);
+                }
+            }, 1000);
         } catch (error) {
-            this.i18n.notice.error(`${t('common.update_failed')}: ${error}`);
+            this.i18n.notice.error(`${t('Settings.Basis.UpdateFailed')}: ${error}`);
         }
     }
 

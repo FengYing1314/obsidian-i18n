@@ -102,9 +102,9 @@ export interface I18nSettings {
     // ==============================
     // 自动化设置 (AutoManager)
     // ==============================
-    autoMonitor: boolean;     // 是否自动监听插件变化并匹配翻译
-    autoCheckOnStartup: boolean; // 是否在启动时自动执行静默扫描
     autoSilentMode: boolean;   // 自动模式是否开启静默匹配（不弹出通知）
+    autoApply: boolean;        // 自动化匹配后是否自动执行应用 (物理替换文件)
+    autoTrustedRepos: string[]; // 受信任的自动翻译仓库列表
     lastAutoCheckTime: number; // 上次自动检查的时间戳
 }
 
@@ -231,8 +231,8 @@ export const DEFAULT_SETTINGS: I18nSettings = {
     // ==============================
     // 自动化设置 (AutoManager)
     // ==============================
-    autoMonitor: false,         // 默认开启自动监听
-    autoCheckOnStartup: false, // 默认关闭启动检查（避免启动过慢）
     autoSilentMode: false,     // 默认不进入完成静默模式（方便用户感知）
+    autoApply: true,           // 默认开启自动应用
+    autoTrustedRepos: [],      // 默认受信任源为空列表
     lastAutoCheckTime: 0,
 }

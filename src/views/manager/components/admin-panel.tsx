@@ -1,9 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCloudStore } from '../../cloud/cloud-store';
+import { ContributorCategory, ContributorEntry } from '../../cloud/types';
 import { ScrollArea, Input, Button, Badge, Checkbox, Label, Separator, Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from '~/shadcn';
-import { Search, ShieldCheck, Star, Copy, Check, Users, Info, Settings2, RefreshCw, LayoutGrid, Cloud, Loader2, Github, Heart, MessageSquare, TrendingUp, Globe, FileJson, Trophy, GitFork, CircleDot, History, Database, Languages, Zap, Palette } from 'lucide-react';
+import { Search, ShieldCheck, Star, Copy, Check, Users, Info, Settings2, RefreshCw, LayoutGrid, Cloud, Loader2, Github, Heart, MessageSquare, TrendingUp, Globe, FileJson, Trophy, GitFork, CircleDot, History, Database, Languages, Zap, Palette, Plus, Trash2, Code, Video, TestTube } from 'lucide-react';
 import { Notice } from 'obsidian';
+import { cn } from '~/shadcn/lib/utils';
 
 interface AdminPanelProps {
     i18n: any;
@@ -74,14 +76,32 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
     const pushRegistryToCloud = useCloudStore.use.pushRegistryToCloud();
     const updateRegistryItem = useCloudStore.use.updateRegistryItem();
 
+    // 贡献者管理
+    const contributors = useCloudStore.use.contributors();
+    const contributorsLoaded = useCloudStore.use.contributorsLoaded();
+    const fetchContributors = useCloudStore.use.fetchContributors();
+    const addContributor = useCloudStore.use.addContributor();
+    const removeContributor = useCloudStore.use.removeContributor();
+    const pushContributorsToCloud = useCloudStore.use.pushContributorsToCloud();
+
     useEffect(() => {
         if (!communityLoaded && !communityLoading) {
             fetchCommunityRegistry(i18n);
         }
-    }, [communityLoaded, communityLoading, fetchCommunityRegistry, i18n]);
+        if (!contributorsLoaded) {
+            fetchContributors(i18n);
+        }
+    }, [communityLoaded, communityLoading, fetchCommunityRegistry, contributorsLoaded, fetchContributors, i18n]);
 
     const [searchQuery, setSearchQuery] = useState('');
     const [copied, setCopied] = useState(false);
+
+    // 新增贡献者表单
+    const [newName, setNewName] = useState('');
+    const [newCategory, setNewCategory] = useState<ContributorCategory>('code');
+    const [newUrl, setNewUrl] = useState('');
+    const [newGithub, setNewGithub] = useState('');
+    const [newDesc, setNewDesc] = useState('');
 
     const filteredItems = useMemo(() => {
         if (!searchQuery) return communityRegistry;
@@ -110,7 +130,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
     };
 
     return (
-        <div className="flex flex-col h-full bg-background no-scrollbar select-none">
+        <div className="flex-1 min-h-0 flex flex-col w-full h-full bg-background select-none overflow-hidden">
             {/* 顶部工具栏 - 更专业的 Dashboard Header */}
             <div className="px-6 py-4 border-b bg-gradient-to-b from-muted/30 to-background flex flex-col md:flex-row md:items-end justify-between gap-4 shrink-0 box-border">
                 <div className="flex items-start gap-3">
@@ -160,7 +180,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
                 </div>
             </div>
 
-            <ScrollArea className="flex-1">
+            <ScrollArea className="flex-1 min-h-0 w-full">
                 <div className="p-6 space-y-6 max-w-[1600px] mx-auto">
                     {/* 全局概览面板 */}
                     {!communityLoading && communityStats && (
@@ -461,6 +481,129 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
                                                 </div>
                                             </CardContent>
                                         </Card>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* ========== 贡献者管理板块 ========== */}
+                    <Separator className="my-6" />
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between px-1">
+                            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">{t('Manager.Dashboard.ContributorsManagement.Title' as any, '贡献者管理')}</h3>
+                            <div className="flex items-center gap-2">
+                                <Badge variant="secondary" className="text-[9px] font-mono">{contributors.length}</Badge>
+                                <Button
+                                    variant="default"
+                                    size="sm"
+                                    className="h-7 px-3 gap-1.5 text-[9px] font-bold uppercase"
+                                    onClick={async () => {
+                                        const success = await pushContributorsToCloud(i18n);
+                                        new Notice(success ? '贡献者数据已同步至云端！' : '同步失败，请检查网络或权限');
+                                    }}
+                                    disabled={isPushing}
+                                >
+                                    {isPushing ? <Loader2 className="w-3 h-3 animate-spin" /> : <Cloud className="w-3 h-3" />}
+                                    {t('Manager.Dashboard.ContributorsManagement.PushToCloud' as any, '推送贡献者')}
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* 新增表单 */}
+                        <Card className="border-border/40 bg-card/40 py-0 rounded-xl">
+                            <CardContent className="p-4">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <Plus className="w-3.5 h-3.5 text-primary/60" />
+                                    <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground/50">{t('Manager.Dashboard.ContributorsManagement.AddNew' as any, '添加贡献者')}</span>
+                                </div>
+                                <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                                    <Input placeholder="名称 *" className="h-8 text-[10px]" value={newName} onChange={e => setNewName(e.target.value)} />
+                                    <select
+                                        className="h-8 rounded-md border border-input bg-background px-2 text-[10px] focus:outline-none focus:ring-1 focus:ring-ring"
+                                        value={newCategory}
+                                        onChange={e => setNewCategory(e.target.value as ContributorCategory)}
+                                    >
+                                        <option value="code">💻 代码</option>
+                                        <option value="video">🎬 视频</option>
+                                        <option value="testing">🧪 测试</option>
+                                        <option value="suggestion">💬 建议</option>
+                                    </select>
+                                    <Input placeholder="链接 URL" className="h-8 text-[10px]" value={newUrl} onChange={e => setNewUrl(e.target.value)} />
+                                    <Input placeholder="GitHub 用户名 (自动头像)" className="h-8 text-[10px]" value={newGithub} onChange={e => setNewGithub(e.target.value)} />
+                                    <Input placeholder="贡献描述" className="h-8 text-[10px]" value={newDesc} onChange={e => setNewDesc(e.target.value)} />
+                                </div>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="mt-2 h-7 px-3 gap-1 text-[9px] font-bold"
+                                    disabled={!newName.trim()}
+                                    onClick={() => {
+                                        addContributor({
+                                            name: newName.trim(),
+                                            category: newCategory,
+                                            url: newUrl.trim() || undefined,
+                                            githubUsername: newGithub.trim() || undefined,
+                                            description: newDesc.trim() || undefined,
+                                        });
+                                        setNewName(''); setNewUrl(''); setNewGithub(''); setNewDesc('');
+                                        new Notice(`已添加贡献者: ${newName.trim()}`);
+                                    }}
+                                >
+                                    <Plus className="w-3 h-3" />添加
+                                </Button>
+                            </CardContent>
+                        </Card>
+
+                        {/* 已有贡献者列表 */}
+                        {contributors.length > 0 && (
+                            <div className="space-y-2">
+                                {(['code', 'video', 'testing', 'suggestion'] as ContributorCategory[]).map(cat => {
+                                    const items = contributors.filter(c => c.category === cat);
+                                    if (items.length === 0) return null;
+                                    const catConfig: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
+                                        code: { icon: <Code className="w-3 h-3" />, label: '代码贡献者', color: 'text-emerald-500' },
+                                        video: { icon: <Video className="w-3 h-3" />, label: '视频创作者', color: 'text-rose-500' },
+                                        testing: { icon: <TestTube className="w-3 h-3" />, label: '测试贡献者', color: 'text-amber-500' },
+                                        suggestion: { icon: <MessageSquare className="w-3 h-3" />, label: '建议贡献者', color: 'text-violet-500' },
+                                    };
+                                    const cfg = catConfig[cat];
+                                    return (
+                                        <div key={cat} className="space-y-1">
+                                            <div className="flex items-center gap-1.5 px-1">
+                                                <span className={cn("flex items-center gap-1 text-[9px] font-black uppercase tracking-wider", cfg.color)}>
+                                                    {cfg.icon}{cfg.label}
+                                                </span>
+                                                <Badge variant="secondary" className="text-[8px] px-1 py-0 h-3.5 font-mono">{items.length}</Badge>
+                                            </div>
+                                            {items.map(c => (
+                                                <div key={`${c.category}-${c.name}`} className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border/30 bg-card/30">
+                                                    {c.githubUsername ? (
+                                                        <img src={`https://github.com/${c.githubUsername}.png?size=40`} alt={c.name} className="w-6 h-6 rounded-md ring-1 ring-border/30" />
+                                                    ) : (
+                                                        <div className="w-6 h-6 rounded-md bg-muted flex items-center justify-center text-[9px] font-bold">
+                                                            {c.name.charAt(0).toUpperCase()}
+                                                        </div>
+                                                    )}
+                                                    <div className="flex-1 min-w-0">
+                                                        <span className="text-[11px] font-bold truncate block">{c.name}</span>
+                                                        {c.description && <span className="text-[9px] text-muted-foreground/50 truncate block">{c.description}</span>}
+                                                    </div>
+                                                    {c.url && <span className="text-[8px] text-muted-foreground/30 truncate max-w-32">{c.url}</span>}
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-6 w-6 text-destructive/40 hover:text-destructive"
+                                                        onClick={() => {
+                                                            removeContributor(c.name, c.category);
+                                                            new Notice(`已移除贡献者: ${c.name}`);
+                                                        }}
+                                                    >
+                                                        <Trash2 className="w-3 h-3" />
+                                                    </Button>
+                                                </div>
+                                            ))}
+                                        </div>
                                     );
                                 })}
                             </div>

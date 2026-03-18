@@ -19,7 +19,7 @@ export class InjectorManager {
         if (this.i18n.settings.automaticUpdate) {
             let plugins: PluginManifest[] = [];
             if (isManual) {
-                this.i18n.notice.successPrefix(t('settings.local.smart_title'), t('settings.local.notice_checking'));
+                this.i18n.notice.successPrefix(t('Settings.Basis.SmartTitle'), t('Settings.Basis.SmartChecking'));
             }
 
             // @ts-ignore
@@ -33,10 +33,44 @@ export class InjectorManager {
                     if (success) updateitem++;
                 }
             }
+
+            // Check themes
+            try {
+                // @ts-ignore
+                const basePath = this.i18n.app.vault.adapter.getBasePath ? path.normalize(this.i18n.app.vault.adapter.getBasePath()) : '';
+                if (basePath) {
+                    const themesDir = path.join(basePath, this.i18n.app.vault.configDir, 'themes');
+                    if (fs.existsSync(themesDir)) {
+                        const entries = fs.readdirSync(themesDir, { withFileTypes: true });
+                        for (const entry of entries) {
+                            if (!entry.isDirectory()) continue;
+                            const themeId = entry.name;
+                            const manifestPath = path.join(themesDir, themeId, 'manifest.json');
+                            let currentVersion = '0.0.0';
+                            if (fs.existsSync(manifestPath)) {
+                                try {
+                                    const themeManifest = fs.readJsonSync(manifestPath);
+                                    if (themeManifest && themeManifest.version) {
+                                        currentVersion = themeManifest.version;
+                                    }
+                                } catch (e) { }
+                            }
+                            const state = this.i18n.stateManager.getThemeState(themeId);
+                            if (state && state.isApplied && currentVersion !== state.pluginVersion) {
+                                const success = await this.applyToTheme(themeId);
+                                if (success) updateitem++;
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('[i18n] Failed to check theme updates', error);
+            }
+
             if (updateitem > 0) {
-                this.i18n.notice.successPrefix(t('settings.local.smart_title'), `${t('settings.local.notice_update')}${updateitem}${t('settings.local.notice_plugins')}`);
+                this.i18n.notice.successPrefix(t('Settings.Basis.SmartTitle'), `${t('Settings.Basis.SmartUpdate')}${updateitem}${t('Settings.Basis.SmartPlugins')}`);
             } else if (isManual) {
-                this.i18n.notice.successPrefix(t('settings.local.smart_title'), t('settings.local.notice_no_updates'));
+                this.i18n.notice.successPrefix(t('Settings.Basis.SmartTitle'), t('Settings.Basis.SmartNoUpdates'));
             }
         }
 
@@ -108,21 +142,126 @@ export class InjectorManager {
                 translationVersion: translationJson.metadata?.version || '0.0.0'
             });
 
-            // 7. 重启插件
+            // 7. 重启插件与健康检查
             // @ts-ignore
-            if (this.i18n.app.plugins.enabledPlugins.has(plugin.id)) {
+            const wasEnabled = this.i18n.app.plugins.enabledPlugins.has(plugin.id);
+            if (wasEnabled) {
                 // @ts-ignore
                 await this.i18n.app.plugins.disablePlugin(plugin.id);
-                // @ts-ignore
-                await this.i18n.app.plugins.enablePlugin(plugin.id);
-                console.log(`[i18n] Successfully injected and reloaded: ${pluginId}`);
+
+                try {
+                    // @ts-ignore
+                    await this.i18n.app.plugins.enablePlugin(plugin.id);
+
+                    // 二次验证：检查插件是否真的起来了且被系统记录为开启
+                    // @ts-ignore
+                    if (!this.i18n.app.plugins.enabledPlugins.has(plugin.id)) {
+                        throw new Error('Plugin failed to load after injection (not in enabledPlugins list)');
+                    }
+                    console.log(`[i18n] Successfully injected and reloaded: ${pluginId}`);
+                } catch (loadError) {
+                    console.warn(`[i18n] Health check failed for ${pluginId}, triggering automatic rollback...`);
+
+                    // 立即还原备份
+                    await this.i18n.backupManager.restoreBackup(plugin.id, pluginDir);
+
+                    // 尝试重启原始版本
+                    try {
+                        // @ts-ignore
+                        await this.i18n.app.plugins.enablePlugin(plugin.id);
+                        this.i18n.notice.warning(t('Manager.Notices.RollbackSuccess', { id: pluginId }));
+                    } catch (restoreError) {
+                        console.error(`[i18n] Even restore failed for ${pluginId}`, restoreError);
+                    }
+
+                    // 向外抛出特定错误，以便 UI 或 AutoManager 能标识为已回退状态
+                    throw new Error('ROLLBACK_TRIGGERED');
+                }
             } else {
                 console.log(`[i18n] Injected but plugin is disabled: ${pluginId}`);
             }
 
             return true;
         } catch (error) {
+            if (error.message === 'ROLLBACK_TRIGGERED') {
+                throw error; // 向上抛出，以便 AutoManager 捕获并显示回退状态
+            }
             console.error(`[i18n] Failed to inject translation to ${pluginId}:`, error);
+            return false;
+        }
+    }
+
+    /**
+     * 对单个主题应用当前激活的翻译 (注入)
+     * @param themeId 主题ID
+     * @returns 
+     */
+    public async applyToTheme(themeId: string): Promise<boolean> {
+        // @ts-ignore
+        const basePath = path.normalize(this.i18n.app.vault.adapter.getBasePath());
+        const themeDir = path.join(basePath, this.i18n.app.vault.configDir, 'themes', themeId);
+        const themeCssPath = path.join(themeDir, 'theme.css');
+
+        if (!fs.existsSync(themeCssPath)) return false;
+
+        try {
+            // Read manifest 
+            let themeVersion = '0.0.0';
+            const manifestPath = path.join(themeDir, 'manifest.json');
+            if (fs.existsSync(manifestPath)) {
+                try {
+                    const manifest = fs.readJsonSync(manifestPath);
+                    if (manifest && manifest.version) themeVersion = manifest.version;
+                } catch (e) { }
+            }
+
+            // Read translation
+            // @ts-ignore
+            const translationPath = this.i18n.sourceManager.getActiveSourcePath(themeId);
+            if (!translationPath) return false;
+            const translationJson = loadTranslationFile(translationPath);
+            if (!translationJson || !translationJson.dict) return false;
+
+            // Backup
+            await this.i18n.backupManager.createBackup(themeId, themeDir, ['theme.css']);
+
+            let cssStr = fs.readFileSync(themeCssPath).toString();
+
+            cssStr = cssStr.replace(/\/\* @settings([\s\S]*?)\*\//g, (match, blockContent) => {
+                let newBlockContent = blockContent;
+
+                for (const item of translationJson.dict as any[]) {
+                    const type = item.type;
+                    const source = item.source;
+                    const target = item.target;
+
+                    if (source && target && source !== target) {
+                        const escapedSource = source.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        const replacerRegex = new RegExp(`^([ \\t]*)(${type}):\\s*(["']?)${escapedSource}\\3[ \\t]*(?:\\r?\\n|$)`, 'gm');
+
+                        newBlockContent = newBlockContent.replace(replacerRegex, (fullMatch: string, indent: string, key: string, quote: string) => {
+                            return `${indent}${key}: ${quote}${target}${quote}\n`;
+                        });
+                    }
+                }
+                return `/* @settings${newBlockContent}*/`;
+            });
+
+            fs.writeFileSync(themeCssPath, cssStr);
+
+            const version = translationJson.metadata?.version || '1.0.0';
+            this.i18n.stateManager.setThemeState(themeId, {
+                id: themeId,
+                isApplied: true,
+                pluginVersion: themeVersion,
+                translationVersion: String(version)
+            });
+
+            console.log(`[i18n] Successfully injected theme: ${themeId}`);
+
+            return true;
+        } catch (error) {
+            console.error(`[i18n] Failed to inject translation to ${themeId}:`, error);
             return false;
         }
     }

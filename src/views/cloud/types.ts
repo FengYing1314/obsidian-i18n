@@ -2,6 +2,23 @@
  * 云端翻译管理视图类型定义
  */
 
+// ========== 贡献者鸣谢数据 (contributors.json) ==========
+export type ContributorCategory = 'code' | 'video' | 'testing' | 'suggestion';
+
+export interface ContributorEntry {
+    name: string;                       // 显示名称
+    category: ContributorCategory;      // 贡献类别
+    url?: string;                       // 个人主页链接 (GitHub/B站/小红书等)
+    avatarUrl?: string;                 // 头像 URL (可选，有则直接使用)
+    githubUsername?: string;            // GitHub 用户名 (自动生成头像: github.com/{user}.png)
+    description?: string;              // 贡献描述
+}
+
+export interface ContributorsData {
+    contributors: ContributorEntry[];
+}
+
+
 
 // 搜索参数
 export interface SearchParams {

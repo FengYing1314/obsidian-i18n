@@ -23,7 +23,8 @@ export default {
         SelectSource: "选择数据源",
         Reload: "重载插件",
         GoToEditor: "前往编辑器",
-        ContinueApply: "坚持应用"
+        ContinueApply: "坚持应用",
+        StartAuto: "开始一键任务"
     },
     Placeholders: {
         SearchPlugins: "搜索插件...",
@@ -41,6 +42,7 @@ export default {
     Labels: {
         Plugins: "插件",
         Themes: "主题",
+        Auto: "自动",
         Admin: "管理",
         Mtime: "最后更新",
         SupportVer: "支持版本",
@@ -59,9 +61,82 @@ export default {
         Reloading: "重载中...",
         NoPlugins: "未发现插件",
         NoThemes: "未发现主题",
+        Labels: {
+            pending: '等待中',
+            processing: '处理中',
+            success: '应用成功',
+            found: '已发现匹配',
+            skipped: '已跳过',
+            error: '任务失败',
+            plugin: '插件',
+            theme: '主题',
+        },
         AutoStarting: "正在启动一键自动化处理...",
         ScanningInstalled: "正在扫描已安装项 ({{count}})...",
-        Running: "自动化任务正在运行中"
+        Running: "正在自动化扫描...",
+        ParsingEntries: "正在解析翻译注册表 ({{count}})...",
+        CacheHitApplying: "命中本地缓存，正在应用: {{id}}",
+        DownloadingBest: "正在下载最佳翻译: {{id}}",
+        NoLogs: "暂无自动化任务记录",
+        AutoRollbacked: '运行异常已自动回滚'
+    },
+    Modes: {
+        Incremental: '增量检查',
+        Full: '全量自检'
+    },
+    AutoDashboard: {
+        Stats: {
+            TotalInstalled: '已安装总数',
+            AppliedCount: '累计翻译应用',
+            CurrentSuccess: '本次成功',
+            CurrentSkipped: '本次跳过/失败',
+            Plugins: '插件',
+            Themes: '主题',
+            LastCheckTime: '上次检查：{{time}}'
+        },
+        Repos: {
+            Title: '受信任的仓库',
+            AddPlaceholder: '添加仓库 (owner/repo)...',
+            Empty: '暂无受信任仓库',
+            RemoveConfirm: '确定移除该仓库吗？',
+            ScanRegistry: '扫描注册表'
+        },
+        QuickSettings: {
+            Title: '自动化配置',
+            AutoApply: '自动应用翻译',
+            SilentMode: '静默运行'
+        },
+        Tips: {
+            Title: '提示',
+            Desc: '自动化扫描仅会从您信任的仓库中检查翻译 Registry。确保仓库地址格式为 <code className="bg-muted px-1 rounded">owner/repo</code>。'
+        }
+    },
+    Tabs: {
+        AutoManagerTitle: "自动化",
+        AutoManagerDesc: "查看一键翻译的后台执行状态与详情。",
+        Credits: "鸣谢"
+    },
+    Credits: {
+        Title: "致谢所有贡献者",
+        Subtitle: "感谢每一位以不同方式为本项目付出努力的人。",
+        NoData: "暂未加载到社区创作者数据",
+        StatCreators: "位创作者",
+        StatStars: "个星标",
+        StatTranslations: "份译文",
+        UnitRepos: "仓库",
+        UnitPlugins: "插件",
+        Footer: "感谢所有贡献者的无私付出",
+        ComingSoon: "暂无数据，敬请期待",
+        CatTranslation: "翻译贡献者",
+        CatTranslationDesc: "为插件与主题提供多语言翻译的社区成员",
+        CatCode: "代码贡献者",
+        CatCodeDesc: "为项目提供代码贡献的开发者",
+        CatVideo: "视频创作者",
+        CatVideoDesc: "制作教程、介绍视频的创作者",
+        CatTesting: "测试贡献者",
+        CatTestingDesc: "帮助发现和反馈问题的测试人员",
+        CatSuggestion: "建议贡献者",
+        CatSuggestionDesc: "提供宝贵意见与建议的社区成员"
     },
     Dialogs: {
         EmptyTranslationTitle: "未检测到翻译内容",
@@ -82,6 +157,10 @@ export default {
         ThemeRestorePrefix: "主题还原",
         ApplySuccess: "翻译应用成功",
         AutoFillComplete: "自动化处理完成: 成功 {{success}} 项, 跳过 {{skip}} 项",
+        ApplyPluginSuccess: "{{id}} 翻译应用成功",
+        AutoApplied: "自动已为 {{count}} 个新插件应用翻译",
+        AutoComplete: "一键处理完成！统计：成功 {{success}}，已最新 {{upToDate}}，失败 {{error}}，未找到 {{skip}}",
+        NoMatchFound: "未在社区库中找到匹配的翻译 (跳过: {{skip}})",
         CopySuccess: "Registry JSON 已复制到剪贴板",
         SyncSuccess: "中心库注册表同步成功！"
     },
@@ -99,7 +178,10 @@ export default {
         BackupNotFound: "备份文件不存在，无法还原",
         FetchCommunityDataFailed: "获取社区注册表数据失败，请检查网络",
         AutoFailed: "自动化处理过程中发生错误",
-        SyncFailed: "中心库同步失败，请检查网络或 Token 权限"
+        PluginProcessFailed: "处理插件 {{id}} 时出错",
+        SyncFailed: "中心库同步失败，请检查网络或 Token 权限",
+        TrustedRepoNotInRegistry: "您配置的信任源未在云端注册表中找到匹配项，请检查设置。",
+        NoTrustedRepos: "[安全防范] 未配置任何受信任的翻译仓库源，已终止自动同步。请前往设置中添加。"
     },
     Dashboard: {
         Title: "社区数据看板",
