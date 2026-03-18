@@ -230,7 +230,7 @@ const ReactEditor: React.FC<EditorProps> = (_) => {
 
             // @ts-ignore
             const basePath = path.normalize(i18n.app.vault.adapter.getBasePath());
-            const fileDoc = path.join(basePath, manifest.dir, currentFile);
+            const fileDoc = path.join(basePath, manifest.dir || '', currentFile);
 
             if (!fs.existsSync(fileDoc)) {
                 notice.error(t('Common.Notices.MainNotFound').replace('main.js', currentFile) + ` (${currentFile})`);
@@ -270,7 +270,7 @@ const ReactEditor: React.FC<EditorProps> = (_) => {
 
             // @ts-ignore
             const basePath = path.normalize(i18n.app.vault.adapter.getBasePath());
-            const fileDoc = path.join(basePath, manifest.dir, currentFile);
+            const fileDoc = path.join(basePath, manifest.dir || '', currentFile);
 
             if (!fs.existsSync(fileDoc)) {
                 notice.error(t('Common.Notices.MainNotFound', { file: currentFile }));
@@ -308,7 +308,7 @@ const ReactEditor: React.FC<EditorProps> = (_) => {
 
             // @ts-ignore
             const basePath = path.normalize(i18n.app.vault.adapter.getBasePath());
-            const fileDoc = path.join(basePath, manifest.dir, currentFile);
+            const fileDoc = path.join(basePath, manifest.dir || '', currentFile);
 
             if (!fs.existsSync(fileDoc)) {
                 notice.error(t('Common.Notices.MainNotFound', { file: currentFile }));
@@ -357,7 +357,7 @@ const ReactEditor: React.FC<EditorProps> = (_) => {
                         if (manifest) {
                             // @ts-ignore
                             const basePath = path.normalize(i18n.app.vault.adapter.getBasePath());
-                            const pluginDir = path.join(basePath, manifest.dir);
+                            const pluginDir = path.join(basePath, manifest.dir || '');
                             const targetFilePath = path.join(pluginDir, currentFile);
                             if (fs.existsSync(targetFilePath)) {
                                 originalCode = fs.readFileSync(targetFilePath, 'utf8');
