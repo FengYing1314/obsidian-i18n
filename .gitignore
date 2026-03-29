@@ -17,12 +17,14 @@ states.json
 metadata.json
 
 # 文件夹
+obsidian-i18n-resources
 document
 translations
 backups
 cache
 
 更新日志.md
+
 
 # 排除macOS Finder （System Explorer）视图状态
 .DS_Store
