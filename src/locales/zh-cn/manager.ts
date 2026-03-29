@@ -8,7 +8,7 @@ export default {
     Actions: {
         Search: "搜索",
         MoreActions: "更多选项",
-        Sponsor: "请喝咖啡",
+        Sponsor: "支持作者",
         Help: "使用帮助",
         HelpDoc: "官方文档教程",
         Cloud: "云端译文",
@@ -167,7 +167,9 @@ export default {
         CatTesting: "测试贡献者",
         CatTestingDesc: "帮助发现和反馈问题的测试人员",
         CatSuggestion: "建议贡献者",
-        CatSuggestionDesc: "提供宝贵意见与建议的社区成员"
+        CatSuggestionDesc: "提供宝贵意见与建议的社区成员",
+        CatSponsor: "爱发电持续赞助",
+        CatSponsorDesc: "为项目持续提供电力的金主爸爸"
     },
     Dialogs: {
         EmptyTranslationTitle: "未检测到翻译内容",

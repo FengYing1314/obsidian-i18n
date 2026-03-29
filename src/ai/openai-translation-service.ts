@@ -177,7 +177,10 @@ export class OpenAITranslationService {
 
                     resultsBuffer[index] = batchResult;
                 } catch (error) {
-                    console.error(`Batch ${index + 1} failed:`, error);
+                    if ((error as Error).message !== '翻译任务已取消') {
+                        console.error(`Batch ${index + 1} failed:`, error);
+                        useGlobalStoreInstance.getState().i18n.notice.error(`AI翻译批次 ${index + 1} 失败: ${(error as Error).message}`);
+                    }
                     // 即使失败也需要填充占位，确保整体流程不中断
                     completedBatchesCount++;
                     resultsBuffer[index] = batch.map(item => ({ ...item, target: (item as any).source || '' })) as unknown as T[];
@@ -269,7 +272,10 @@ export class OpenAITranslationService {
         // 转换结果
         return items.map(item => {
             const result = (simplifiedResults as any[]).find(r => r.i === item.id);
-            const target = result ? result.t : (item.target || item.source);
+            let target = result ? result.t : undefined;
+            if (!target || target.trim() === '' || target.trim() === '空') {
+                target = item.target || item.source;
+            }
             return { ...item, target };
         });
     }
@@ -291,7 +297,10 @@ export class OpenAITranslationService {
         // 转换结果
         return items.map(item => {
             const result = (simplifiedResults as any[]).find(r => r.i === item.id);
-            const target = result ? result.t : (item.target || item.source);
+            let target = result ? result.t : undefined;
+            if (!target || target.trim() === '' || target.trim() === '空') {
+                target = item.target || item.source;
+            }
             return { ...item, target };
         });
     }
@@ -313,7 +322,10 @@ export class OpenAITranslationService {
         // 转换结果
         return items.map(item => {
             const result = (simplifiedResults as any[]).find(r => r.i === (item as any).id);
-            const target = result ? result.t : (item.target || item.source);
+            let target = result ? result.t : undefined;
+            if (!target || target.trim() === '' || target.trim() === '空') {
+                target = item.target || item.source;
+            }
             return { ...item, target };
         });
     }
@@ -435,10 +447,10 @@ export class OpenAITranslationService {
         }
 
         const errorMsg = lastError ? (lastError as Error).message : '未知错误';
-        console.error(`[OpenAI API] 批次翻译API调用最终失败，已跳过该批次:`, errorMsg, `\n请求数据：${JSON.stringify(items)}`);
+        console.error(`[OpenAI API] 批次翻译API调用最终失败:`, errorMsg, `\n请求数据：${JSON.stringify(items)}`);
 
-        // 既然最终失败了，我们构造一个与输入一致但未翻译的占位返回
-        return items.map(item => ({ ...item, target: item.source || '' }));
+        // 抛出错误，交由上层的 executeParallelBatches 统一捕获并执行界面提醒
+        throw new Error(errorMsg);
     }
 }
 

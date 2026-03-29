@@ -45,7 +45,12 @@ const AstEditor: React.FC<Props> = () => {
         // 2. 按搜索词筛选
         if (deferredSearchQuery.trim()) {
             const query = deferredSearchQuery.toLowerCase();
-            items = items.filter(item => item.source.toLowerCase().includes(query) || item.target.toLowerCase().includes(query) || item.name.toLowerCase().includes(query) || item.type.toLowerCase().includes(query));
+            items = items.filter(item =>
+                (item.source && item.source.toLowerCase().includes(query)) ||
+                (item.target && item.target.toLowerCase().includes(query)) ||
+                (item.name && item.name.toLowerCase().includes(query)) ||
+                (item.type && item.type.toLowerCase().includes(query))
+            );
         }
         return items;
     }, [astItems, deferredSearchQuery, deferredFilterType]);

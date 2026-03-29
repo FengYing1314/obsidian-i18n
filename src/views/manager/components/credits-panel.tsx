@@ -97,6 +97,14 @@ export const CreditsPanel: React.FC<CreditsPanelProps> = ({ i18n }) => {
     // ========== 类别配置（模块级常量通过闭包引用） ==========
     const categories: CreditCategory[] = useMemo(() => [
         {
+            id: 'sponsor',
+            icon: <Award className="w-4 h-4" />,
+            colorFrom: 'from-fuchsia-500/15',
+            colorTo: 'to-purple-500/10',
+            ringColor: 'ring-fuchsia-500/30',
+            badgeColor: 'bg-fuchsia-500/15 text-fuchsia-600',
+        },
+        {
             id: 'translation',
             icon: <Globe className="w-4 h-4" />,
             colorFrom: 'from-blue-500/10',
@@ -141,7 +149,7 @@ export const CreditsPanel: React.FC<CreditsPanelProps> = ({ i18n }) => {
     // 将远程贡献者按类别分组
     const contributorsByCategory = useMemo(() => {
         const map: Record<string, ContributorEntry[]> = {
-            code: [], video: [], testing: [], suggestion: [],
+            sponsor: [], code: [], video: [], testing: [], suggestion: [],
         };
         for (const c of contributors) {
             if (map[c.category]) map[c.category].push(c);
@@ -176,9 +184,38 @@ export const CreditsPanel: React.FC<CreditsPanelProps> = ({ i18n }) => {
 
                 {/* 各类别板块 */}
                 <div className="space-y-6">
+                    {/* 爱发电赞助者 - 从 contributors.json 加载并置顶 */}
+                    {(() => {
+                        const sponsorCat = categories[0];
+                        const sponsorEntries = contributorsByCategory[sponsorCat.id] || [];
+                        return (
+                            <CategorySection
+                                key={sponsorCat.id}
+                                category={sponsorCat}
+                                title={t(`Manager.Credits.CatSponsor`)}
+                                subtitle={t(`Manager.Credits.CatSponsorDesc`)}
+                                count={sponsorEntries.length}
+                                t={t}
+                                defaultOpen={true}
+                            >
+                                {sponsorEntries.length > 0 ? (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                        {sponsorEntries.map((c) => (
+                                            <ContributorCard key={`${c.category}-${c.name}`} contributor={c} category={sponsorCat} />
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-6 text-xs text-muted-foreground/40 italic">
+                                        {t('Manager.Credits.ComingSoon')}
+                                    </div>
+                                )}
+                            </CategorySection>
+                        );
+                    })()}
+
                     {/* 翻译贡献者 - 从云端社区数据拉取 */}
                     <CategorySection
-                        category={categories[0]}
+                        category={categories[1]}
                         title={t('Manager.Credits.CatTranslation')}
                         subtitle={t('Manager.Credits.CatTranslationDesc')}
                         count={cloudCreators.length}
@@ -193,7 +230,7 @@ export const CreditsPanel: React.FC<CreditsPanelProps> = ({ i18n }) => {
                                         creator={creator}
                                         rank={index + 1}
                                         badge={authorBadgeMap[creator.name]}
-                                        category={categories[0]}
+                                        category={categories[1]}
                                         t={t}
                                     />
                                 ))}
@@ -206,7 +243,7 @@ export const CreditsPanel: React.FC<CreditsPanelProps> = ({ i18n }) => {
                     </CategorySection>
 
                     {/* 其他类别 – 从 contributors.json 加载 */}
-                    {categories.slice(1).map((cat) => {
+                    {categories.slice(2).map((cat) => {
                         const entries = contributorsByCategory[cat.id] || [];
                         return (
                             <CategorySection

@@ -1,172 +1,121 @@
 <div align="center">
-
-<img src="https://raw.githubusercontent.com/0011000000110010/obsidian-i18n/master/icon.png" width="120" height="120" alt="Obsidian i18n Logo">
-
-# 💎 Obsidian i18n v2.0
-### The Ultimate Industrial-Grade Localization Suite
-
-[![GitHub Release](https://img.shields.io/github/v/release/0011000000110010/obsidian-i18n?style=for-the-badge&color=7C3AED)](https://github.com/0011000000110010/obsidian-i18n)
-[![Obsidian Version](https://img.shields.io/badge/Obsidian-v1.0+-7C3AED?style=for-the-badge&logo=obsidian&logoColor=white)](https://obsidian.md)
-[![License](https://img.shields.io/badge/License-MIT-success?style=for-the-badge)](LICENSE)
-
-<br/>
-
-**「 不止于翻译，更是生态的重构 」**
-<br/>
-基于 **AST 语法树** 的编译级提取，配合 **AI 并行加速** 与 **BackupSync 2.0**，
-为您的 Obsidian 提供最专业、最稳健、最优雅的多语言本地化方案。
-
----
-
-[✨ 特性矩阵](#-特性矩阵) • [🏗️ 架构深潜](#️-架构深潜) • [🧠 核心技术](#-核心技术) • [🚀 极速上手](#-极速上手) • [🔧 进阶指南](#-进阶指南)
-
+  <h1>🌍 Obsidian i18n</h1>
+  <p><b>基于 AST 解析与大模型 (LLM) 驱动的全自动本地化插件翻译工具</b></p>
+  <p>
+    <a href="https://github.com/eondrcode/obsidian-i18n/releases"><img src="https://img.shields.io/github/v/release/eondrcode/obsidian-i18n?style=flat-square&color=blue" alt="Release"></a>
+    <a href="https://github.com/eondrcode/obsidian-i18n/blob/master/LICENSE"><img src="https://img.shields.io/github/license/eondrcode/obsidian-i18n?style=flat-square" alt="License"></a>
+    <a href="https://afdian.net/a/eondrcode"><img src="https://img.shields.io/badge/%E7%88%B1%E5%8F%91%E7%94%B5-%E8%B5%9E%E5%8A%A9%E4%BD%9C%E8%80%85-946ce6?style=flat-square" alt="Afdian"></a>
+  </p>
 </div>
 
 ---
 
-## ✨ 特性矩阵 (Feature Matrix)
+**Obsidian i18n** 是一款专为 Obsidian 打造的本地化语言辅助工具，旨在帮助用户轻松翻译和汉化 Obsidian 的任意社区插件与个性化主题。
 
-> [!TIP]
-> **v2.0 是一次从“脚本”到“系统”的代际跨越。**
+无需解包，无需懂代码！通过本插件首创的 **AST 提取可视化编辑器** 与 **高并发大模型机器翻译引擎**，任何人都能在一杯咖啡的时间内生成、维护并与社区分享属于自己的“官方级”汉化包，彻底消除晦涩难懂的语言障碍。
 
-| 核心特性 | 深度描述 | 价值收益 |
-| :--- | :--- | :--- |
-| **AST 自动机** | 基于 Babel 的代码流重写引擎，智能感知 UI 上下文 | **0 崩溃风险**，精准命中 UI 文本 |
-| **AI 并行调度** | 并发 Batch 翻译 + Zod 严格 Schema 校验 | 速度提升 **300%**，100% 格式正确 |
-| **BackupSync 2.0** | 增量 Gzip 备份 + GitHub API 极速同步 | 数据永不丢失，跨设备秒级对齐 |
-| **资源全覆盖** | 原生支持插件 (Plugins) 与 **主题 (Themes)** 翻译 | 真正的全界面 100% 汉化 |
-| **智能 Wizard** | 交互式新手引导流，配置过程丝滑顺畅 | 开箱即用，无需阅读厚重手册 |
+## 🎯 核心特性一览 (Highlights)
+
+- 🌳 **绝对安全的所见即所得**：基于底层抽象语法树（AST）解析，无需触碰危险的源代码，像填写 Excel 行内表格一样直观地查漏补缺。
+- 🤖 **并发 AI 极速引擎**：自由配置请求并发数与批处理量，内置本地翻译缓存库，翻译得越多，API 消耗费用越趋近于零。
+- 💰 **首创账单防刺客系统**：执行翻译动作前，面板将精准预估所需消耗的 Tokens 和对应的人民币/美元开销，所有成本完全透明。
+- 📦 **翻译数据解耦与防丢失**：您的译文库独立于目标插件保存。即使目标插件大版本更新或重装，您的中文翻译配置依然稳如泰山。
 
 ---
 
-## 🏗️ 架构深潜 (Technical Architecture)
+## 🚀 快速开始 (Getting Started)
 
-v2.0 引入了**服务中台化 (Manager-Based)** 架构，确保了高内聚与低耦合：
+### 📦 下载与安装
 
-```mermaid
-graph TD
-    %% 控制层
-    subgraph "UI Dashboard (React 19)"
-        MainView["Manager View<br/>(Plugin/Theme Center)"]
-        Wizard["Wizard Onboarding<br/>(Interactive Setup)"]
-        Editor["Source Editor<br/>(AST/Regex Diff)"]
-    end
+由于目前插件尚未上架官方社区市场，我们为您提供以下两种安装方式：
 
-    %% 服务层
-    subgraph "Manager Bus (Core Logic)"
-        Core["CoreManager<br/>(Updates/Styles)"]
-        SM["SourceManager<br/>(NanoID/Metadata)"]
-        IM["InjectorManager<br/>(Static Injection)"]
-        BM["BackupManager<br/>(zlib/Gzip)"]
-    end
+#### 方法一：使用 BRAT 安装（🌟 推荐）
 
-    %% 基础设施层
-    subgraph "Engine & Storage"
-        AST["Babel AST Engine"]
-        LLM["AI Translation Service<br/>(Parallel/Batching)"]
-        Sync["GitHub/Gitee Driver"]
-    end
+使用 [Obsidian42 - BRAT](https://github.com/TfTHacker/obsidian42-brat) 可以方便地自动拉取本插件的后续更新，无需每次手动去下载压缩包。
 
-    %% 连线
-    MainView --> SM
-    Wizard --> SM
-    Editor --> IM
-    IM --> AST
-    IM --> BM
-    SM --> Sync
-    SM --> LLM
-```
+1. 打开 BRAT 的设置页面，点击 **Add Beta plugin**。
+2. 粘贴本仓库地址：`https://github.com/eondrcode/obsidian-i18n`
+3. 安装完成后，在 Obsidian 的“第三方插件”列表中找到 **Obsidian i18n** 并将其启用。
+
+#### 方法二：纯手动安装
+
+如果网络环境受限导致 BRAT 安装报错，您可以尝试手动载入：
+
+1. 访问本插件的 [Releases 发行页](https://github.com/eondrcode/obsidian-i18n/releases)。
+2. 下载最新版本的 `obsidian-i18n.zip` 压缩包。
+3. 在您的笔记库中将其解压至 `.obsidian/plugins/` 目录之下。
+   *(确认目录结构为 `.obsidian/plugins/obsidian-i18n/main.js`)*
+4. 重启 Obsidian 并在设置中启用。
 
 ---
 
-## 🧠 核心技术 (Core Technologies)
+## ⚙️ 初始配置 (Initial Setup)
 
-<details open>
-<summary><b>1. 编译级提取引擎 (AST Extraction Engine)</b></summary>
-<br/>
-传统的正则匹配（Regex）在处理混淆代码时极易误伤逻辑常量。2.0 的 **AST 引擎** 会像编译器一样解析 `main.js`：
-- **语义识别**：区分代码逻辑字符串与用户界面字符串。
-- **白名单机制**：利用 `VariableDeclarator`, `AssignmentExpression` 等路径进行精准过滤。
-- **非破坏性更新**：仅修改关键节点，保持原有代码逻辑的完整性。
-</details>
+插件启用后，只需完成简单的环境配置，即可激活全自动机器汉化。
 
-<details>
-<summary><b>2. AI 工业级翻译套件 (AI Suite)</b></summary>
-<br/>
-集成 OpenAI 兼容接口，通过 Zod 强类型校验确保译文质量：
-- **批处理 (Batching)**：利用分词器对内容进行分片，单次请求并发处理多个词条。
-- **上下文感知**：翻译时自动携带词条所属的文件名、键名等元数据，提升语境准确度。
-- **状态回显**：翻译进度实时同步至 UI。
-</details>
+### 1. 配置语言模型 (Ai) (🔥 核心)
 
-<details>
-<summary><b>3. BackupSync 2.0 同步系统</b></summary>
-<br/>
-基于 Git 思想构建的本地与云端同步链路：
-- **Checkpoint**：在长耗时的备份过程中自动保存检查点。
-- **Gzip 压缩**：多文件打包压缩存入 `.js.gz`，极大地节省了 GitHub 仓库空间。
-- **冲突预防**：同步前自动校验 `metadata.json` 指纹，避免版本错乱。
-</details>
+进入插件设置页，切换至 **”语言模型“** 选项卡。您可以建立多套配置方案（Profile）在不同的模型厂商之间切换。
+
+* **API 接口地址**：填写模型服务商的请求路径（如官方的 `https://api.openai.com/v1` 或国内兼容代理地址）。
+* **API 密钥 (Key)**：粘贴您的密钥。插件会将其安全地加密存储在本地。
+* **模型型号**：选择下拉菜单或手动输入模型标识符（如 `gpt-4o` 或 `deepseek-chat`）。
+* **测试与诊断**：填写完毕后，务必点击底部的 **“立即测试”**。插件内置的深度诊断机制会帮您排查连通性，直到展现_“连接成功”_字样。
+
+### 2. 基础偏好与智能更新 (Basis)
+
+强烈建议您切换至 **“综合设置”** 选项卡完成以下配置：
+
+* **目标语言**：设定为您最终想要输出的语种（例如填写：`zh-cn`）。
+* **作者署名**：留下您的昵称，将以此作为您后续打包译文的作者印记。
+* **智能更新（强烈推荐）**：开启后，当 Obsidian 检测到目标插件发布新版更迭时，i18n 插件会自动为您重新映射并**自动应用本地原有的译文缓存**，免去您重新翻译的无用功。
 
 ---
 
-## 🚀 极速上手 (Quick Start)
+## 📖 核心功能指南 (Core Features)
 
-### 1. 初始化向导
-首次启用时，**Wizard** 会自动弹出。您只需填入 GitHub Token，系统将自动创建翻译资源库。
+通过 `Obsidian i18n`，插件汉化不再是懂写代码的高端极客专属。
 
-### 2. 扫描与翻译
-- 进入 **Manager 面板**。
-- 找到想要翻译的插件，选择 **AST 模式**（Beta/推荐）进行扫描。
-- 点击“AI 翻译”，稍等片刻，专业本地化译文即可就绪。
+### 🌳 1. 可视化 AST 语言编辑器 (Visual Editor)
 
-### 3. 应用变更
-点击 **“注入”**。系统会：
-1. 自动创建 Gzip 备份。
-2. 将译文硬编码入目标文件。
-3. 自动重载插件（无需手动重启 Obsidian）。
+本工具摒弃了让用户修改 `main.js` 或多重嵌套 JSON 的危险行为，为您打造了最友好的数据修改体验：
 
----
+* **智能深层提取 (Extract)**：在“资源管理”主面板找到待汉化插件，点击。引擎会瞬间将深埋在逻辑流和前端框架里的展示文本剥离出来。
+* **行内光速直写 (Inline Editing)**：跳出繁琐的保存弹窗。点进右侧的“译文”单元格，打入中文，光标移开即刻自动保存录入，如同使用最现代的在线表格工具。
+* **多维检索引擎**：遇到包含上千行配置词条的庞然大物，利用上方顶部的全息搜索框，输入生词，即可穿透 `节点类型 / 变量名称 / 原文 / 译文` 瞬间锁定，同时使用下拉框可一键筛出“未翻译 (Untranslated)”项目进行突击攻坚。
 
-## 🔧 进阶指南 (Advanced Guide)
+### 🤖 2. 高并发机器翻译驱动 (AI Translation)
 
-### 过滤规则自定义
-在设置中，您可以调整 **Regex/AST 过滤器**：
-- `astValidRe`: 强制捕获匹配此正则的字符串。
-- `astRejectRe`: 屏蔽所有包含特定关键词的字符串（如 ID、URL、变量）。
+让大模型接管那千篇一律的体力劳动！
 
-### AI 性能调优
-- **Batch Size**: 默认 50，可根据模型 Token 限制进行调整。
-- **Concurrency Rate**: 动态调整并行请求数，平衡速度与速率限制（Rate Limit）。
+* **高并发批量翻译 (Batch)**：前往编辑器的“Ai 语言模型面板”，针对海量的剩余英文字符，输入您偏好的处理“并发数”与“批次条目数”，点击翻译后，优雅地看着实时进度条拉满即可。
+* **账单防刺客估价 (Token Estimation)**：全网首创打消恐惧。在点击前，系统会通过底层试探立刻在面板告之：**本次翻译将预计耗费您多少 Token 数，折算合共多少金额（例如 `≈ ¥0.15`）！**
+* **本地化记忆缓存体系 (Memory Cache)**：诸如 `Settings`, `Cancel` 这类 UI 词汇全靠重复利用。只要底层识别到该词曾经被您翻译过，它会主动在本地强硬阻断向上游 API 发出的扣款请求，实现零延迟、零费用的“秒翻”投喂。
+
+### 💾 3. 译文工作区统御与生态 (Workspace)
+
+* **非破坏性注入 (Apply / Restore)**：一键点击“应用”，译文数据将映射到底层文件。不用担心弄坏源文件，若遇报错崩溃插件失灵，立刻点击 **“还原 (Restore)”** 即可无损回滚至原始母语状态。
+* **资源库生态 (Export / Import)**：除了独善其身，更可兼济天下。点击“批量导出”生成轻小体积的汉化包 JSON 文件分享给群友；抑或是拿到社区大佬打磨的语料库并点击“导入译文”，一瞬融入您自己的专属知识库构建全中文语境。
 
 ---
 
-## ❓ 常见问题 (FAQ)
+## ❓ 常见问题排错 (FAQ)
 
-<details>
-<summary><b>注入翻译后插件打不开怎么办？</b></summary>
-点击“还原 (Restore)”按钮。系统会立即解压 `.js.gz` 备份文件，瞬时恢复到注入前的原始状态。
-</details>
+### Q1: 测试连接失败或翻译完全无进度？
+* 首先通过设置页“立即测试”进行深度诊断。
+* 若提示 `401` 请检查 API 密钥中的隐藏空格。若提示 `429` 则表示并发过高被厂商熔断或金额耗尽。
+* 提示网络超时：如果是 OpenAI 等受限接口，请自备全局代理或更换为国内转发代理接口。
 
-<details>
-<summary><b>为什么 AST 提取的词条比 Regex 少？</b></summary>
-这是正常的。AST 提取是通过语法结构过滤掉非 UI 字符串，虽然数量少，但准确率更高且更安全。
-</details>
+### Q2: 提示 "插件重载失败/JavaScript 修订损坏"
+如果在手动录入过程中，不小心误删除了源文中诸如 `${变量}` 或 `\n` 之类属于代码范畴的控制符。应用后即会触发报错。请返回主界面狠狠点击 **“还原 (Restore)”** 按钮，系统会基于快照瞬间帮其秽土转生。
 
 ---
 
-## 📄 License & Credits
+## 🤝 参与支持与鸣谢 (Support & Thanks)
 
-- 本项目采用 **MIT License**。
-- 感谢 [OpenAI](https://openai.com/), [Babel](https://babeljs.io/), [React](https://reactjs.dev/) 等卓越的工具。
-- 核心灵感源自对 Obsidian 无障碍生态的极致追求。
+每一个优雅特性的背后，都凝结着榨干最后业余时间的挣扎尝试。如果这款工具切实帮到了你的痛点，不妨让我们在虚拟的另一端感受到一点这实打实的回馈：
 
----
+* 💖 **[前往 爱发电 (Afdian) 请作者喝杯咖啡吧](https://afdian.net/a/eondrcode)** 
+* 您的每一次充电，都是支持我们在深夜继续死磕前沿解析方案的精神氮泵。我们会在插件内部置顶展出**「爱发电金主」**们的 ID 与徽章以作表彰！
 
-<div align="center">
-  
-**Proudly built with ❤️ for Obsidian Community.**
-
-[参与项目贡献](https://github.com/0011000000110010/obsidian-i18n/pulls) | [反馈问题](https://github.com/0011000000110010/obsidian-i18n/issues)
-
-</div>
+如果您发现了任何稀奇古怪的 Bug、未兼容的目标插件或是提出脑洞大开的需求，请带上含有控制台错误截图的红字，前往 [GitHub Issues](https://github.com/eondrcode/obsidian-i18n/issues) 毫无保留地向我们开炮！
