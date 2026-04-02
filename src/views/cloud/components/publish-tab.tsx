@@ -239,19 +239,19 @@ export const PublishTab: React.FC = () => {
             i18n.notice.successPrefix(t('Cloud.Status.Processing'), t('Cloud.Status.UpdatingIndex'));
             let manifest: ManifestEntry[] = [];
             let manifestSha: string | undefined;
-            try {
-                // 使用 getFileContent 获取最新内容（避免 getRawContent 的 5 分钟 CDN 缓存导致覆盖旧数据）
-                const manifestRes = await i18n.api.github.getFileContent(username, userRepo, 'metadata.json');
-                if (manifestRes.state && manifestRes.data?.content) {
-                    manifestSha = manifestRes.data.sha; // 获取当前文件的 SHA
-                    const decoded = Buffer.from(manifestRes.data.content, 'base64').toString('utf-8');
-                    const parsed = JSON.parse(decoded);
-                    if (Array.isArray(parsed)) {
-                        manifest = parsed;
-                    }
+            // 获取最新内容
+            const manifestRes = await i18n.api.github.getFileContent(username, userRepo, 'metadata.json');
+
+            if (manifestRes.state && manifestRes.data?.content) {
+                manifestSha = manifestRes.data.sha;
+                const decoded = Buffer.from(manifestRes.data.content, 'base64').toString('utf-8');
+                const parsed = JSON.parse(decoded);
+                if (Array.isArray(parsed)) {
+                    manifest = parsed;
                 }
-            } catch {
-                // manifest 不存在或为空，使用空数组
+            } else if (manifestRes.status !== 404) {
+                // 熔断：除了“文件确实不存在”之外，任何错误（频率限制、授权过期、网络超时）都不允许覆盖索引
+                throw new Error(t('Cloud.Errors.UpdateManifestFail') + ': ' + (manifestRes.data?.message || 'Network Error'));
             }
 
             const now = new Date().toISOString();
@@ -294,15 +294,15 @@ export const PublishTab: React.FC = () => {
                 JSON.stringify(manifest, null, 4), 'utf-8'
             ).toString('base64');
 
-            const manifestRes = await i18n.api.github.uploadFile(
+            const uploadManifestRes = await i18n.api.github.uploadFile(
                 username, userRepo, 'metadata.json', manifestContent,
                 t('Cloud.Labels.UpdateManifestMsg', { plugin: selectedPluginId }),
                 'main',
                 manifestSha
             );
 
-            if (!manifestRes.state) {
-                throw new Error(`${t('Cloud.Errors.UpdateManifestFail')}: ${manifestRes.data?.message || manifestRes.data}`);
+            if (!uploadManifestRes.state) {
+                throw new Error(`${t('Cloud.Errors.UpdateManifestFail')}: ${uploadManifestRes.data?.message || uploadManifestRes.data}`);
             }
 
             // 5. 更新本地实体源的云端绑定
@@ -529,8 +529,8 @@ export const PublishTab: React.FC = () => {
                         <section className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-500">
                             <div className="flex items-center gap-2 mb-1">
                                 <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold">3</div>
-                            <Label className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">{t('Cloud.Steps.SelectSource')}</Label>
-                        </div>
+                                <Label className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">{t('Cloud.Steps.SelectSource')}</Label>
+                            </div>
                             <Card className="border-border/50 shadow-sm overflow-hidden transition-all hover:shadow-md hover:border-primary/20">
                                 <CardHeader className="pb-3 bg-muted/30">
                                     <div className="flex items-center justify-between">

@@ -252,7 +252,7 @@ export class GitHubAPI {
      * @param path 文件路径
      * @param ref 分支/标签 (可选)
      */
-    public async getFileContent(owner: string, repo: string, path: string, ref?: string): Promise<{ state: boolean; data: any }> {
+    public async getFileContent(owner: string, repo: string, path: string, ref?: string): Promise<{ state: boolean; data: any; status?: number }> {
         try {
             let url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
             const separator = url.includes('?') ? '&' : '?';
@@ -263,11 +263,17 @@ export class GitHubAPI {
                 url,
                 method: 'GET',
                 headers: this.authHeaders(),
+                throw: false, // 允许手动处理状态码
             };
             const response = await requestWithTimeout(params);
-            return { state: true, data: response.json };
+            
+            if (response.status >= 400) {
+                return { state: false, data: response.json || response.text, status: response.status };
+            }
+
+            return { state: true, data: response.json, status: response.status };
         } catch (error) {
-            return { state: false, data: error };
+            return { state: false, data: error, status: 500 };
         }
     }
 
@@ -279,7 +285,7 @@ export class GitHubAPI {
      */
     public async getFileContentWithFallback(
         owner: string, repo: string, path: string, branch: string = 'main'
-    ): Promise<{ state: boolean; data: any; isRateLimit?: boolean }> {
+    ): Promise<{ state: boolean; data: any; status?: number; isRateLimit?: boolean }> {
         // 策略 1: 先尝试普通 Contents API（带 Auth）
         try {
             const res = await this.getFileContent(owner, repo, path, branch);
@@ -288,21 +294,24 @@ export class GitHubAPI {
                 if (res.data.content) {
                     const decoded = Buffer.from(res.data.content, 'base64').toString('utf-8');
                     try {
-                        return { state: true, data: JSON.parse(decoded) };
+                        return { state: true, data: JSON.parse(decoded), status: res.status };
                     } catch {
-                        return { state: true, data: decoded };
+                        return { state: true, data: decoded, status: res.status };
                     }
                 }
                 // 大文件场景：虽然 Contents API 成功，但没有 content 字段（通常会有 download_url）
                 if (res.data.download_url) {
                     const rawRes = await requestWithTimeout({ url: res.data.download_url, method: 'GET' });
-                    return { state: true, data: rawRes.json || rawRes.text };
+                    return { state: true, data: rawRes.json || rawRes.text, status: rawRes.status };
                 }
-            } else if (res.data?.status === 403) {
-                // 可能是频率限制，记录状态但继续尝试 Raw 降级
-                const isRateLimit = res.data?.text?.includes('rate limit') || res.data?.json?.message?.includes('rate limit');
+            } else {
+                // 如果是 404 直接返回，不再尝试 Raw (因为 Raw 容易受缓存影响)
+                if (res.status === 404) return res;
+                
+                // 记录是否是频率限制
+                const isRateLimit = res.status === 403 && (res.data?.message?.includes('rate limit') || res.data?.text?.includes('rate limit'));
                 if (isRateLimit) {
-                    // 如果是频率限制且没有 Token，API 大概率会一直失败，直接尝试 Raw
+                    // 后续会尝试 Raw 获取
                 }
             }
         } catch (e) {

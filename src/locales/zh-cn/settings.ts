@@ -247,8 +247,8 @@ export default {
         Verifying: "正在验证...",
         VerifyInsufficient: "权限不足 (需 repo 权限)",
         VerifyError: "验证失败",
-        TutorialTitle: "获取访问令牌",
-        TutorialTip: "前往代码托管平台生成具备 repo 权限的访问令牌。",
+        TutorialTitle: "获取令牌",
+        TutorialTip: "推荐生成仅包含必需权限的 Fine-grained Token (需授权对应或全部仓库的 Contents 读写权限)。",
         SyncTitle: "同步配置",
         RepoTitle: "目标仓库",
         RepoDesc: "用于存储和分享翻译的远程仓库名。",
@@ -256,6 +256,15 @@ export default {
         LogoutTitle: "退出登录",
         LogoutDesc: "清除本地存储的身份验证信息。",
         LogoutBtn: "退出登录",
-        LogoutSuccess: "已退出登录"
+        LogoutSuccess: "已退出登录",
+        ProfileSelectTitle: "账号方案 (Account Profile)",
+        ProfileSelectDesc: "管理并快速切换不同的 GitHub 账号及对应的翻译仓库方案。",
+        ProfileAddBtn: "新增账号",
+        ProfileDelBtn: "删除账号",
+        ProfileDelConfirm: "确定要删除此账号方案吗？操作无法恢复。",
+        ProfileNameTitle: "方案标识名",
+        ProfileNameDesc: "为当前账号方案自定义一个显示名称以便区分（如：工作张号、主账号等）。",
+        ProfileNamePlaceholder: "请输入名称...",
+        ProfileAddNotice: "账号方案已创建"
     }
 } as const;

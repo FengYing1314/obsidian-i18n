@@ -12,6 +12,13 @@ export interface OpenAIProfile {
     priceOutput: number;
 }
 
+export interface GitHubProfile {
+    id: string;
+    name: string;
+    token: string;
+    repo: string;
+}
+
 export interface I18nSettings {
     // ==============================
     // 基础设置
@@ -66,6 +73,8 @@ export interface I18nSettings {
     // ==============================
     shareToken: string;       // 用户提交翻译用的 Gitee Token
     shareRepo: string;        // 用户的个人翻译 Gitee 仓库名
+    shareProfiles: GitHubProfile[]; // 多账号切换方案
+    shareActiveProfileId: string;   // 当前激活的账号方案 ID
 
     // ==============================
     // 正则提取匹配规则
@@ -171,6 +180,8 @@ export const DEFAULT_SETTINGS: I18nSettings = {
     // ==============================
     shareToken: '',           // 默认 Token 为空
     shareRepo: '',            // 默认 Repo 为空
+    shareProfiles: [],
+    shareActiveProfileId: '',
 
     // ==============================
     // 正则匹配

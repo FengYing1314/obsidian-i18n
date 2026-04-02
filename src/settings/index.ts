@@ -1,4 +1,4 @@
-import { App, PluginSettingTab } from 'obsidian';
+import { App, PluginSettingTab, setIcon } from 'obsidian';
 import I18N from "../main";
 
 import I18nBasis from './ui/i18n-basis';
@@ -43,67 +43,95 @@ class I18nSettingTab extends PluginSettingTab {
         observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
         // 确保在设置页面重新渲染或关闭时断开观察器 (Obsidian 每次 display 都会清空并重建)
-        // 注意：由于 display() 频繁调用，我们需要确保旧的 observer 被清理
         if ((containerEl as any)._darkObserver) {
             (containerEl as any)._darkObserver.disconnect();
         }
         (containerEl as any)._darkObserver = observer;
 
         // 基础布局：全屏、垂直伸缩
-        containerEl.addClass('i18n-settings-wrapper', 'flex', 'flex-col', 'w-full', 'h-full', 'pb-4', 'text-[13px]');
+        containerEl.addClass('i18n-settings-wrapper', 'flex', 'flex-col', 'w-full', 'h-full', 'pb-4');
 
-        // 顶层导航容器 (卡片式)
+        // 注入响应式样式，防止文字竖排，空间过小时仅保留图标
+        const styleEl = containerEl.createEl('style');
+        styleEl.textContent = `
+            .i18n-settings-nav-item {
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+            @media (max-width: 750px) {
+                .i18n-settings-nav-text { display: none; }
+                .i18n-settings-nav-item { padding: 6px 14px !important; gap: 0 !important; justify-content: center; }
+            }
+        `;
+
+        // 顶层导航容器 (仿 OB 原生导航条)
         const tabsWrapper = containerEl.createEl('div');
-        tabsWrapper.addClass('flex', 'p-1', 'bg-muted/40', 'rounded-xl', 'border', 'border-border/30', 'mb-6', 'self-start');
+        tabsWrapper.addClass('flex', 'p-1', 'bg-transparent', 'mb-6', 'self-start', 'gap-1', 'overflow-x-auto', 'custom-scrollbar');
+        tabsWrapper.style.backgroundColor = 'var(--background-modifier-form-field)';
+        tabsWrapper.style.borderRadius = 'var(--radius-m)';
+        tabsWrapper.style.maxWidth = '100%';
 
         // 内容区容器
         this.contentEl = containerEl.createEl('div');
         this.contentEl.addClass('flex-1', 'overflow-y-auto', 'px-1', 'custom-scrollbar');
 
         const navItems = [
-            { id: 'basis', text: t('Settings.Tabs.Basis'), icon: '', content: () => this.basisDisplay() },
-            { id: 're', text: t('Settings.Tabs.Re'), icon: '', content: () => this.reDisplay() },
-            { id: 'ast', text: t('Settings.Tabs.Ast'), icon: '', content: () => this.astDisplay() },
-            { id: 'immersive', text: t('Settings.Tabs.Immersive'), icon: '', content: () => this.imtDisplay() },
-            { id: 'ai', text: t('Settings.Tabs.Ai'), icon: '', content: () => this.llmDisplay() },
-            { id: 'share', text: t('Settings.Tabs.Share'), icon: '', content: () => this.shareDisplay() },
+            { id: 'basis', text: t('Settings.Tabs.Basis'), icon: 'settings', content: () => this.basisDisplay() },
+            { id: 're', text: t('Settings.Tabs.Re'), icon: 'search-code', content: () => this.reDisplay() },
+            { id: 'ast', text: t('Settings.Tabs.Ast'), icon: 'code-2', content: () => this.astDisplay() },
+            { id: 'immersive', text: t('Settings.Tabs.Immersive'), icon: 'languages', content: () => this.imtDisplay() },
+            { id: 'ai', text: t('Settings.Tabs.Ai'), icon: 'sparkles', content: () => this.llmDisplay() },
+            { id: 'share', text: t('Settings.Tabs.Share'), icon: 'share-2', content: () => this.shareDisplay() },
         ];
 
         const navItemEls: HTMLDivElement[] = [];
-        const activeItemClass = ['bg-background', 'text-emerald-600', 'shadow-sm', 'ring-1', 'ring-border/50'];
-        const inactiveItemClass = ['text-muted-foreground', 'hover:text-foreground', 'hover:bg-background/40'];
-        const baseItemClass = ['flex', 'items-center', 'gap-2', 'px-4', 'py-1.5', 'rounded-lg', 'cursor-pointer', 'transition-all', 'duration-300', 'font-medium', 'text-[12.5px]'];
 
-        navItems.forEach((item, index) => {
+        // 样式定义
+        const applyStyles = (el: HTMLElement, isActive: boolean) => {
+            el.className = 'i18n-settings-nav-item flex items-center gap-2 px-4 py-1.5 cursor-pointer transition-all duration-200 font-medium text-[13px]';
+            el.style.borderRadius = 'var(--radius-s)';
+
+            if (isActive) {
+                el.style.backgroundColor = 'var(--background-primary)';
+                el.style.color = 'var(--text-normal)';
+                el.style.boxShadow = 'var(--shadow-s)';
+                el.style.border = 'none';
+            } else {
+                el.style.backgroundColor = 'transparent';
+                el.style.color = 'var(--text-muted)';
+                el.style.border = 'none';
+                el.style.boxShadow = 'none';
+
+                // Hover 效果 (通过 JS 模拟)
+                el.onmouseenter = () => { if (this.i18n.activeSettingTab !== el.dataset.id) el.style.backgroundColor = 'var(--background-modifier-hover)'; };
+                el.onmouseleave = () => { if (this.i18n.activeSettingTab !== el.dataset.id) el.style.backgroundColor = 'transparent'; };
+            }
+        };
+
+        navItems.forEach((item) => {
             const itemEl = tabsWrapper.createEl('div');
-            itemEl.addClass(...baseItemClass);
+            itemEl.dataset.id = item.id;
 
-            // 图标
-            const iconEl = itemEl.createEl('span');
-            iconEl.textContent = item.icon;
-            iconEl.addClass('text-[14px]', 'opacity-80');
+            // 图标容器
+            const iconEl = itemEl.createEl('span', { cls: 'nav-icon flex items-center shrink-0' });
+            setIcon(iconEl, item.icon);
 
-            // 文本
-            const textEl = itemEl.createEl('span');
-            textEl.textContent = item.text;
+            // 文本容器
+            const textEl = itemEl.createEl('span', { text: item.text, cls: 'i18n-settings-nav-text' });
 
             navItemEls.push(itemEl);
 
-            if (item.id === this.i18n.activeSettingTab) {
-                itemEl.addClass(...activeItemClass);
-                item.content();
-            } else {
-                itemEl.addClass(...inactiveItemClass);
-            }
+            const isActive = item.id === this.i18n.activeSettingTab;
+            applyStyles(itemEl, isActive);
+
+            if (isActive) item.content();
 
             itemEl.addEventListener('click', () => {
                 this.i18n.activeSettingTab = item.id;
                 navItemEls.forEach(el => {
-                    el.removeClass(...activeItemClass);
-                    el.addClass(...inactiveItemClass);
+                    const it = navItems.find(n => n.id === el.dataset.id);
+                    applyStyles(el, el.dataset.id === item.id);
                 });
-                itemEl.removeClass(...inactiveItemClass);
-                itemEl.addClass(...activeItemClass);
                 item.content();
             });
         });

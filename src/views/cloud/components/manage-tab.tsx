@@ -402,9 +402,13 @@ export const ManageTab: React.FC = () => {
             // (2) 清理 metadata.json
             let currentManifest: ManifestEntry[] = [];
             const manifestRes = await i18n.api.github.getFileContent(username, userRepo, 'metadata.json');
+            
             if (manifestRes.state && manifestRes.data?.content) {
                 const decoded = Buffer.from(manifestRes.data.content, 'base64').toString('utf-8');
                 currentManifest = JSON.parse(decoded);
+            } else if (manifestRes.status !== 404) {
+                // 熔断：如果不是 404 (文件不存在)，说明是网络或其他错误，此时绝不能继续，否则会覆盖为空数组
+                throw new Error(t('Cloud.Errors.UpdateIndexFail') + ': ' + (manifestRes.data?.message || 'Network Error'));
             }
 
             // 从数组里剔除这一个
