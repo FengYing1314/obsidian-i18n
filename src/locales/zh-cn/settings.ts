@@ -11,9 +11,8 @@
 export default {
     Tabs: {
         Basis: "综合设置",
-        Auto: "自动化 (实验性)",
-        Re: "正则匹配",
-        Ast: "AST 提取",
+        Re: "RE 配置",
+        Ast: "AST 配置",
         Immersive: "沉浸翻译",
         Ai: "语言模型",
         Share: "共建生态"
@@ -185,7 +184,7 @@ export default {
         ResponseFormatDesc: "LLM 返回数据的解析方式。",
         ResponseFormatText: "Text (通用)",
         ResponseFormatJsonObject: "JSON Object",
-        ResponseFormatJsonSchema: "JSON Schema (推荐)",
+        ResponseFormatJsonSchema: "JSON Schema",
         ModelTitle: "模型",
         ModelDesc: "用于翻译的模型名称。",
         ModelSelectPlaceholder: "选择内置模型",
@@ -254,7 +253,22 @@ export default {
         PriceInputTitle: "输入单价 (¥/1M tokens)",
         PriceInputDesc: "每百万输入 Token 的人民币价格，如 gpt-4o-mini ≈ 1.1。",
         PriceOutputTitle: "输出单价 (¥/1M tokens)",
-        PriceOutputDesc: "每百万输出 Token 的人民币价格，支持 4 位小数。"
+        PriceOutputDesc: "每百万输出 Token 的人民币价格，支持 4 位小数。",
+        // ── Gemini 专属 ──
+        GeminiKeyTitle: "Gemini API 密钥",
+        GeminiKeyDesc: "Google AI Studio 的 API Key，密钥加密存储在本地。",
+        GeminiKeyMissing: "请先配置 Gemini API Key",
+        // ── Ollama 专属 ──
+        OllamaUrlTitle: "Ollama 端点地址",
+        OllamaUrlDesc: "本地 Ollama 服务的 HTTP 地址，默认为 http://localhost:11434。",
+        OllamaModelDesc: "选择或输入已安装的 Ollama 模型名称。",
+        OllamaModelPlaceholder: "例: qwen2.5 或 llama3",
+        OllamaFetchModelsBtn: "刷新模型列表",
+        OllamaNoModels: "未检测到已安装模型，请先通过 Ollama 下载模型。",
+        OllamaModelsLoaded: "已加载 {{count}} 个模型",
+        OllamaFetchFailed: "无法连接 Ollama 服务，请检查是否已启动。",
+        OllamaConnectFail: "无法连接 Ollama",
+        OllamaModelNotFound: "模型 {{model}} 未找到，请先执行 ollama pull {{model}}",
     },
     Share: {
         AuthTitle: "远程仓库",

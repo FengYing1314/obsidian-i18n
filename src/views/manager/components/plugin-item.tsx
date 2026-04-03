@@ -146,7 +146,7 @@ export const PluginItem: React.FC<PluginItemProps> = React.memo(({ plugin, i18n,
         setExtracting(true);
         try {
             if (!await fs.pathExists(mainDoc)) {
-                i18n.notice.error(t('Manager.Errors.MainNotFound'));
+                i18n.notice.error(t('Manager.Plugins.Errors.MainNotFound'));
                 return;
             }
             const mainBuffer = await fs.readFile(mainDoc);
@@ -160,7 +160,7 @@ export const PluginItem: React.FC<PluginItemProps> = React.memo(({ plugin, i18n,
 
             if (sourceManager) {
                 await sourceManager.extractAndSaveSource(plugin.id, translationJson, { title: plugin.name });
-                i18n.notice.successPrefix(t('Manager.Notices.ExtractSuccess'), t('Manager.Hints.ExtractSuccessDesc'));
+                i18n.notice.successPrefix(t('Manager.Plugins.Notices.ExtractSuccess'), t('Manager.Plugins.Hints.ExtractSuccessDesc'));
             }
             refreshParent();
         } catch (error) {
@@ -205,7 +205,7 @@ export const PluginItem: React.FC<PluginItemProps> = React.memo(({ plugin, i18n,
                     if (targetFilePath.endsWith('.js')) {
                         const checkTranslator = new AstTranslator(i18n.settings);
                         if (!checkTranslator.loadCode(fileString)) {
-                            throw new Error(t('Manager.Errors.SyntaxError', { file }));
+                            throw new Error(t('Manager.Plugins.Errors.SyntaxError', { file }));
                         }
                     }
 
@@ -222,7 +222,7 @@ export const PluginItem: React.FC<PluginItemProps> = React.memo(({ plugin, i18n,
                 const reloadRes = await reloadPlugin(plugin.id);
                 // @ts-ignore
                 if (reloadRes && !i18n.app.plugins.enabledPlugins.has(plugin.id)) {
-                    i18n.notice.error(t('Manager.Errors.LoadFailedAfterApply'));
+                    i18n.notice.error(t('Manager.Plugins.Errors.LoadFailedAfterApply'));
                 }
             }
             refreshParent();
@@ -243,7 +243,7 @@ export const PluginItem: React.FC<PluginItemProps> = React.memo(({ plugin, i18n,
                 if (isEnabled) await reloadPlugin(plugin.id);
                 i18n.notice.result(true);
             } else {
-                i18n.notice.result(false, t('Manager.Errors.BackupNotFound'));
+                i18n.notice.result(false, t('Manager.Plugins.Errors.BackupNotFound'));
             }
             refreshParent();
         } catch (error) {
@@ -300,7 +300,7 @@ export const PluginItem: React.FC<PluginItemProps> = React.memo(({ plugin, i18n,
                                     }}
                                 >
                                     <SelectTrigger className="w-[110px] text-[10px] px-2 h-7 bg-muted/40 border-none shadow-none hover:bg-muted/60 transition-all rounded-none" size="sm">
-                                        <SelectValue placeholder={t('Manager.Actions.SelectSource')} />
+                                        <SelectValue placeholder={t('Manager.Common.Actions.SelectSource')} />
                                     </SelectTrigger>
                                     <SelectContent className="backdrop-blur-md bg-background/95 border-border/40">
                                         {sources.map(source => (
@@ -318,10 +318,10 @@ export const PluginItem: React.FC<PluginItemProps> = React.memo(({ plugin, i18n,
                                             <TooltipTrigger asChild>
                                                 <Button variant="default" size="sm" className="h-7 px-3 text-[10px] font-bold shadow-sm hover:shadow-md hover:bg-primary/90 transition-all active:scale-95 rounded-none" onClick={handleReplace} disabled={replacing}>
                                                     {replacing && <Loader2 className="w-2.5 h-2.5 animate-spin mr-1" />}
-                                                    {t('Manager.Actions.Apply')}
+                                                    {t('Manager.Common.Actions.Apply')}
                                                 </Button>
                                             </TooltipTrigger>
-                                            <TooltipContent side="top" className="text-[10px]">{t('Manager.Actions.Apply')}</TooltipContent>
+                                            <TooltipContent side="top" className="text-[10px]">{t('Manager.Common.Actions.Apply')}</TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
                                 )}
@@ -331,10 +331,10 @@ export const PluginItem: React.FC<PluginItemProps> = React.memo(({ plugin, i18n,
                                             <TooltipTrigger asChild>
                                                 <Button variant="outline" size="sm" className="h-7 px-3 text-[10px] font-bold border-border/50 hover:bg-secondary/20 transition-all active:scale-95 rounded-none" onClick={handleRestore} disabled={restoring}>
                                                     {restoring && <Loader2 className="w-2.5 h-2.5 animate-spin mr-1" />}
-                                                    {t('Manager.Actions.Restore')}
+                                                    {t('Manager.Common.Actions.Restore')}
                                                 </Button>
                                             </TooltipTrigger>
-                                            <TooltipContent side="top" className="text-[10px]">{t('Manager.Actions.Restore')}</TooltipContent>
+                                            <TooltipContent side="top" className="text-[10px]">{t('Manager.Common.Actions.Restore')}</TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
                                 )}
@@ -383,12 +383,12 @@ export const PluginItem: React.FC<PluginItemProps> = React.memo(({ plugin, i18n,
                                                 i18n.view.activateView(EDITOR_VIEW_TYPE);
                                             }} className="text-[12px] py-2">
                                                 <Pen className="w-3.5 h-3.5 mr-2.5 text-primary/70" />
-                                                <span>{t('Manager.Actions.Edit')}</span>
+                                                <span>{t('Manager.Common.Actions.Edit')}</span>
                                             </DropdownMenuItem>
                                         )}
                                         <DropdownMenuItem onClick={handleExtract} disabled={extracting} className="text-[12px] py-2">
                                             <FileOutput className="w-3.5 h-3.5 mr-2.5 text-blue-500/70" />
-                                            <span>{t('Manager.Actions.Extract')}</span>
+                                            <span>{t('Manager.Plugins.Actions.Extract')}</span>
                                         </DropdownMenuItem>
                                         {activeSourceId && (
                                             <DropdownMenuItem onClick={() => {
@@ -396,7 +396,7 @@ export const PluginItem: React.FC<PluginItemProps> = React.memo(({ plugin, i18n,
                                                 refreshParent();
                                             }} className="text-[12px] py-2 text-destructive focus:text-destructive focus:bg-destructive/5">
                                                 <XCircle className="w-3.5 h-3.5 mr-2.5 opacity-70" />
-                                                <span>{t('Manager.Actions.Delete')}</span>
+                                                <span>{t('Manager.Common.Actions.Delete')}</span>
                                             </DropdownMenuItem>
                                         )}
                                         <DropdownMenuSeparator className="bg-border/40" />
@@ -408,12 +408,12 @@ export const PluginItem: React.FC<PluginItemProps> = React.memo(({ plugin, i18n,
                                                 i18n.app.setting.openTabById(plugin.id);
                                             }} className="text-[12px] py-2">
                                                 <Settings className="w-3.5 h-3.5 mr-2.5 text-orange-500/70" />
-                                                <span>{t('Manager.Actions.OpenSettings')}</span>
+                                                <span>{t('Manager.Plugins.Actions.OpenSettings')}</span>
                                             </DropdownMenuItem>
                                         )}
                                         <DropdownMenuItem onClick={() => i18nOpen(i18n, pluginDir)} className="text-[12px] py-2">
                                             <FolderOpen className="w-3.5 h-3.5 mr-2.5 text-amber-500/70" />
-                                            <span>{t('Manager.Actions.OpenFolder')}</span>
+                                            <span>{t('Manager.Common.Actions.OpenFolder')}</span>
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
@@ -457,7 +457,7 @@ export const PluginItem: React.FC<PluginItemProps> = React.memo(({ plugin, i18n,
                             }}
                         >
                             <SelectTrigger className="w-[125px] h-8 text-[11px] bg-muted/40 border-none shadow-none hover:bg-muted/60 transition-all rounded-none" size="sm">
-                                <SelectValue placeholder={t('Manager.Actions.SelectSource')} />
+                                <SelectValue placeholder={t('Manager.Common.Actions.SelectSource')} />
                             </SelectTrigger>
                             <SelectContent className="backdrop-blur-md bg-background/95 border-border/40">
                                 {sources.map(source => (
@@ -483,7 +483,7 @@ export const PluginItem: React.FC<PluginItemProps> = React.memo(({ plugin, i18n,
                                             <Pen className="w-3.5 h-3.5" />
                                         </Button>
                                     </TooltipTrigger>
-                                    <TooltipContent className="text-[10px]">{t('Manager.Actions.Edit')}</TooltipContent>
+                                    <TooltipContent className="text-[10px]">{t('Manager.Common.Actions.Edit')}</TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
                         )}
@@ -494,10 +494,10 @@ export const PluginItem: React.FC<PluginItemProps> = React.memo(({ plugin, i18n,
                                     <TooltipTrigger asChild>
                                         <Button variant="default" size="sm" className="h-8 px-4 text-[11px] font-bold shadow-sm hover:shadow-md hover:translate-y-[-1px] active:scale-95 transition-all rounded-none" onClick={handleReplace} disabled={replacing}>
                                             {replacing && <Loader2 className="w-3 h-3 animate-spin mr-1.5" />}
-                                            {t('Manager.Actions.Apply')}
+                                            {t('Manager.Common.Actions.Apply')}
                                         </Button>
                                     </TooltipTrigger>
-                                    <TooltipContent className="text-[10px]">{t('Manager.Actions.Apply')}</TooltipContent>
+                                    <TooltipContent className="text-[10px]">{t('Manager.Common.Actions.Apply')}</TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
                         )}
@@ -508,10 +508,10 @@ export const PluginItem: React.FC<PluginItemProps> = React.memo(({ plugin, i18n,
                                     <TooltipTrigger asChild>
                                         <Button variant="outline" size="sm" className="h-8 px-4 text-[11px] font-bold border-border/50 hover:bg-secondary/20 transition-all active:scale-95 rounded-none" onClick={handleRestore} disabled={restoring}>
                                             {restoring && <Loader2 className="w-3 h-3 animate-spin mr-1.5" />}
-                                            {t('Manager.Actions.Restore')}
+                                            {t('Manager.Common.Actions.Restore')}
                                         </Button>
                                     </TooltipTrigger>
-                                    <TooltipContent className="text-[10px]">{t('Manager.Actions.Restore')}</TooltipContent>
+                                    <TooltipContent className="text-[10px]">{t('Manager.Common.Actions.Restore')}</TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
                         )}
@@ -554,7 +554,7 @@ export const PluginItem: React.FC<PluginItemProps> = React.memo(({ plugin, i18n,
                             <DropdownMenuContent align="end" className="w-48 shadow-2xl backdrop-blur-md bg-background/95 border-border/40">
                                 <DropdownMenuItem onClick={handleExtract} disabled={extracting} className="text-[12px] py-2">
                                     <FileOutput className="w-3.5 h-3.5 mr-2.5 text-blue-500/70" />
-                                    <span>{t('Manager.Actions.Extract')}</span>
+                                    <span>{t('Manager.Plugins.Actions.Extract')}</span>
                                 </DropdownMenuItem>
                                 {activeSourceId && (
                                     <DropdownMenuItem onClick={() => {
@@ -562,7 +562,7 @@ export const PluginItem: React.FC<PluginItemProps> = React.memo(({ plugin, i18n,
                                         refreshParent();
                                     }} className="text-[12px] py-2 text-destructive focus:text-destructive focus:bg-destructive/5">
                                         <XCircle className="w-3.5 h-3.5 mr-2.5 opacity-70" />
-                                        <span>{t('Manager.Actions.Delete')}</span>
+                                        <span>{t('Manager.Common.Actions.Delete')}</span>
                                     </DropdownMenuItem>
                                 )}
                                 <DropdownMenuSeparator className="bg-border/40" />
@@ -574,12 +574,12 @@ export const PluginItem: React.FC<PluginItemProps> = React.memo(({ plugin, i18n,
                                         i18n.app.setting.openTabById(plugin.id);
                                     }} className="text-[12px] py-2">
                                         <Settings className="w-3.5 h-3.5 mr-2.5 text-orange-500/70" />
-                                        <span>{t('Manager.Actions.OpenSettings')}</span>
+                                        <span>{t('Manager.Plugins.Actions.OpenSettings')}</span>
                                     </DropdownMenuItem>
                                 )}
                                 <DropdownMenuItem onClick={() => i18nOpen(i18n, pluginDir)} className="text-[12px] py-2">
                                     <FolderOpen className="w-3.5 h-3.5 mr-2.5 text-amber-500/70" />
-                                    <span>{t('Manager.Actions.OpenFolder')}</span>
+                                    <span>{t('Manager.Common.Actions.OpenFolder')}</span>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
@@ -589,10 +589,10 @@ export const PluginItem: React.FC<PluginItemProps> = React.memo(({ plugin, i18n,
                                 <DialogHeader>
                                     <DialogTitle className="flex items-center gap-2 text-amber-500">
                                         <span className="text-xl">⚠️</span>
-                                        {t('Manager.Dialogs.EmptyTranslationTitle')}
+                                        {t('Manager.Plugins.Dialogs.EmptyTranslationTitle')}
                                     </DialogTitle>
                                     <DialogDescription className="pt-4 leading-relaxed text-foreground/80">
-                                        {t('Manager.Dialogs.EmptyTranslationDesc')}
+                                        {t('Manager.Plugins.Dialogs.EmptyTranslationDesc')}
                                     </DialogDescription>
                                 </DialogHeader>
                                 <DialogFooter className="mt-6 flex justify-center">

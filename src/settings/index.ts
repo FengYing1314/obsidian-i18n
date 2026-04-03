@@ -5,6 +5,8 @@ import I18nBasis from './ui/i18n-basis';
 import I18nModIMT from './ui/i18n-mode-imt';
 import I18nLLM from './ui/i18n-llm';
 import I18nLLMOpenAI from './ui/i18n-llm-openai';
+import I18nLLMGemini from './ui/i18n-llm-gemini';
+import I18nLLMOllama from './ui/i18n-llm-ollama';
 import I18nRE from './ui/i18n-re';
 import I18nAST from './ui/i18n-ast';
 import I18nShare from './ui/i18n-mode-share';
@@ -137,7 +139,16 @@ class I18nSettingTab extends PluginSettingTab {
         });
     }
     basisDisplay() { this.contentEl.empty(); new I18nBasis(this).display(); }
-    llmDisplay() { this.contentEl.empty(); new I18nLLM(this).display(); new I18nLLMOpenAI(this).display(); }
+    llmDisplay() {
+        this.contentEl.empty();
+        new I18nLLM(this).display();
+        switch (this.i18n.settings.llmApi) {
+            case 1: new I18nLLMOpenAI(this).display(); break;
+            case 2: new I18nLLMGemini(this).display(); break;
+            case 3: new I18nLLMOllama(this).display(); break;
+            default: new I18nLLMOpenAI(this).display(); break;
+        }
+    }
     imtDisplay() { this.contentEl.empty(); new I18nModIMT(this).display(); }
     shareDisplay() { this.contentEl.empty(); new I18nShare(this).display(); }
     reDisplay() { this.contentEl.empty(); new I18nRE(this).display(); }

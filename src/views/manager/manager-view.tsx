@@ -23,7 +23,7 @@ export class ManagerView extends ItemView {
     }
 
     getDisplayText(): string {
-        return t('Manager.Titles.Main');
+        return t('Manager.Common.Titles.Main');
     }
 
     getIcon(): string {

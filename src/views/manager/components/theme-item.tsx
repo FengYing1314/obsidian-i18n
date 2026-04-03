@@ -140,7 +140,7 @@ export const ThemeItem: React.FC<ThemeItemProps> = React.memo(({ theme, i18n, da
         setExtracting(true);
         try {
             if (!fs.existsSync(themeCssPath)) {
-                i18n.notice.error(t('Manager.Errors.ThemeCssNotFound'));
+                i18n.notice.error(t('Manager.Themes.Errors.ThemeCssNotFound'));
                 return;
             }
 
@@ -155,13 +155,13 @@ export const ThemeItem: React.FC<ThemeItemProps> = React.memo(({ theme, i18n, da
             const themeTranslation = generateTheme(manifest, cssStr, i18n.settings);
 
             if (themeTranslation.dict.length === 0) {
-                i18n.notice.error(t('Manager.Errors.NoSettingsBlock'));
+                i18n.notice.error(t('Manager.Themes.Errors.NoSettingsBlock'));
                 return;
             }
 
             if (i18n.sourceManager) {
                 await i18n.sourceManager.extractAndSaveSource(theme.name, themeTranslation, { title: theme.name, type: 'theme' });
-                i18n.notice.successPrefix(t('Manager.Notices.ThemeExtractPrefix'), t('Manager.Hints.ExtractSuccessDesc'));
+                i18n.notice.successPrefix(t('Manager.Themes.Notices.ThemeExtractPrefix'), t('Manager.Plugins.Hints.ExtractSuccessDesc'));
             }
             refreshParent();
         } catch (error) {
@@ -184,7 +184,7 @@ export const ThemeItem: React.FC<ThemeItemProps> = React.memo(({ theme, i18n, da
                 i18n.notice.result(true);
                 refreshParent();
             } else {
-                i18n.notice.result(false, t('Manager.Errors.ErrorDesc'));
+                i18n.notice.result(false, t('Manager.Common.Errors.ErrorDesc'));
             }
         } catch (error) {
             i18n.notice.result(false, String(error));
@@ -202,7 +202,7 @@ export const ThemeItem: React.FC<ThemeItemProps> = React.memo(({ theme, i18n, da
                 i18n.stateManager.deleteThemeState(theme.name);
                 i18n.notice.result(true);
             } else {
-                i18n.notice.result(false, t('Manager.Errors.BackupNotFound'));
+                i18n.notice.result(false, t('Manager.Themes.Errors.BackupNotFound'));
             }
             refreshParent();
         } catch (error) {
@@ -223,7 +223,7 @@ export const ThemeItem: React.FC<ThemeItemProps> = React.memo(({ theme, i18n, da
                         <div className="flex flex-col overflow-hidden min-w-0">
                             <div className="flex items-center gap-2 min-w-0">
                                 <span className="font-bold truncate text-[14px] leading-tight text-foreground/90 group-hover:text-primary transition-colors duration-300 whitespace-nowrap" title={theme.name}>{theme.name}</span>
-                                {theme.isActive && <Badge variant="secondary" className="px-1.5 py-0 h-4 text-[8px] font-extrabold uppercase tracking-tighter rounded-none bg-primary/10 text-primary border-none shadow-xs shrink-0">{t('Manager.Labels.ThemeActive')}</Badge>}
+                                {theme.isActive && <Badge variant="secondary" className="px-1.5 py-0 h-4 text-[8px] font-extrabold uppercase tracking-tighter rounded-none bg-primary/10 text-primary border-none shadow-xs shrink-0">{t('Manager.Themes.Labels.ThemeActive')}</Badge>}
                             </div>
                             <div className="flex items-center gap-2 mt-1">
                                 <span className="text-[10px] text-muted-foreground/60 font-semibold tracking-tight bg-muted/30 px-1.5 py-0.5 rounded-none">
@@ -245,7 +245,7 @@ export const ThemeItem: React.FC<ThemeItemProps> = React.memo(({ theme, i18n, da
                     <div
                         className="flex-1 text-[11px] text-muted-foreground overflow-hidden leading-relaxed break-words font-medium relative line-clamp-2"
                     >
-                        {description || (theme.manifest?.author ? `${t('Manager.Labels.Author')}: ${theme.manifest.author}` : t('Common.Status.Unknown'))}
+                        {description || (theme.manifest?.author ? `${t('Manager.Common.Labels.Author')}: ${theme.manifest.author}` : t('Common.Status.Unknown'))}
                         <div className="absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-card to-transparent pointer-events-none opacity-50" />
                     </div>
                     <div className="flex flex-col gap-3 mt-auto pt-3 border-t border-border/50">
@@ -259,7 +259,7 @@ export const ThemeItem: React.FC<ThemeItemProps> = React.memo(({ theme, i18n, da
                                     }}
                                 >
                                     <SelectTrigger className="w-[110px] text-[10px] px-2 h-7 bg-muted/40 border-none shadow-none hover:bg-muted/60 transition-all rounded-none" size="sm">
-                                        <SelectValue placeholder={t('Manager.Filters.All')} />
+                                        <SelectValue placeholder={t('Manager.Common.Filters.All')} />
                                     </SelectTrigger>
                                     <SelectContent className="backdrop-blur-md bg-background/95 border-border/40">
                                         {sources.map(source => (
@@ -277,10 +277,10 @@ export const ThemeItem: React.FC<ThemeItemProps> = React.memo(({ theme, i18n, da
                                             <TooltipTrigger asChild>
                                                 <Button variant="default" size="sm" className="h-7 px-3 text-[10px] font-bold shadow-sm hover:shadow-md hover:bg-primary/90 transition-all active:scale-95 rounded-none" onClick={handleReplace} disabled={replacing}>
                                                     {replacing && <Loader2 className="w-2.5 h-2.5 animate-spin mr-1" />}
-                                                    {t('Manager.Actions.Apply')}
+                                                    {t('Manager.Common.Actions.Apply')}
                                                 </Button>
                                             </TooltipTrigger>
-                                            <TooltipContent side="top" className="text-[10px]">{t('Manager.Notices.ThemeApplyPrefix')}</TooltipContent>
+                                            <TooltipContent side="top" className="text-[10px]">{t('Manager.Themes.Notices.ThemeApplyPrefix')}</TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
                                 )}
@@ -290,10 +290,10 @@ export const ThemeItem: React.FC<ThemeItemProps> = React.memo(({ theme, i18n, da
                                             <TooltipTrigger asChild>
                                                 <Button variant="outline" size="sm" className="h-7 px-3 text-[10px] font-bold border-border/50 hover:bg-secondary/20 transition-all active:scale-95 rounded-none" onClick={handleRestore} disabled={restoring}>
                                                     {restoring && <Loader2 className="w-2.5 h-2.5 animate-spin mr-1" />}
-                                                    {t('Manager.Actions.Restore')}
+                                                    {t('Manager.Common.Actions.Restore')}
                                                 </Button>
                                             </TooltipTrigger>
-                                            <TooltipContent side="top" className="text-[10px]">{t('Manager.Notices.ThemeRestorePrefix')}</TooltipContent>
+                                            <TooltipContent side="top" className="text-[10px]">{t('Manager.Themes.Notices.ThemeRestorePrefix')}</TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
                                 )}
@@ -345,12 +345,12 @@ export const ThemeItem: React.FC<ThemeItemProps> = React.memo(({ theme, i18n, da
                                                 }
                                             }} className="text-[12px] py-2">
                                                 <Pen className="w-3.5 h-3.5 mr-2.5 text-primary/70" />
-                                                <span>{t('Manager.Actions.Edit')}</span>
+                                                <span>{t('Manager.Common.Actions.Edit')}</span>
                                             </DropdownMenuItem>
                                         )}
                                         <DropdownMenuItem onClick={handleExtract} disabled={extracting} className="text-[12px] py-2">
                                             <FileOutput className="w-3.5 h-3.5 mr-2.5 text-blue-500/70" />
-                                            <span>{t('Manager.Notices.ThemeExtractPrefix')}</span>
+                                            <span>{t('Manager.Themes.Notices.ThemeExtractPrefix')}</span>
                                         </DropdownMenuItem>
                                         {activeSourceId && (
                                             <DropdownMenuItem onClick={() => {
@@ -358,13 +358,13 @@ export const ThemeItem: React.FC<ThemeItemProps> = React.memo(({ theme, i18n, da
                                                 refreshParent();
                                             }} className="text-[12px] py-2 text-destructive focus:text-destructive focus:bg-destructive/5">
                                                 <XCircle className="w-3.5 h-3.5 mr-2.5 opacity-70" />
-                                                <span>{t('Manager.Actions.Delete')}</span>
+                                                <span>{t('Manager.Common.Actions.Delete')}</span>
                                             </DropdownMenuItem>
                                         )}
                                         <DropdownMenuSeparator className="bg-border/40" />
                                         <DropdownMenuItem onClick={() => i18nOpen(i18n, themeDir)} className="text-[12px] py-2">
                                             <FolderOpen className="w-3.5 h-3.5 mr-2.5 text-amber-500/70" />
-                                            <span>{t('Manager.Actions.OpenFolder')}</span>
+                                            <span>{t('Manager.Common.Actions.OpenFolder')}</span>
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
@@ -394,7 +394,7 @@ export const ThemeItem: React.FC<ThemeItemProps> = React.memo(({ theme, i18n, da
                     </span>
                     {theme.isActive && (
                         <Badge variant="secondary" className="px-1.5 py-0 h-4 text-[8px] font-extrabold uppercase tracking-tighter rounded-none bg-primary/10 text-primary border-none shadow-xs shrink-0">
-                            {t('Manager.Labels.ThemeActive')}
+                            {t('Manager.Themes.Labels.ThemeActive')}
                         </Badge>
                     )}
                     {translationVersion && (
@@ -414,7 +414,7 @@ export const ThemeItem: React.FC<ThemeItemProps> = React.memo(({ theme, i18n, da
                             }}
                         >
                             <SelectTrigger className="w-[125px] h-8 text-[11px] bg-muted/40 border-none shadow-none hover:bg-muted/60 transition-all rounded-none" size="sm">
-                                <SelectValue placeholder={t('Manager.Filters.All')} />
+                                <SelectValue placeholder={t('Manager.Common.Filters.All')} />
                             </SelectTrigger>
                             <SelectContent className="backdrop-blur-md bg-background/95 border-border/40">
                                 {sources.map(source => (
@@ -443,7 +443,7 @@ export const ThemeItem: React.FC<ThemeItemProps> = React.memo(({ theme, i18n, da
                                             <Pen className="w-3.5 h-3.5" />
                                         </Button>
                                     </TooltipTrigger>
-                                    <TooltipContent className="text-[10px]">{t('Manager.Actions.Edit')}</TooltipContent>
+                                    <TooltipContent className="text-[10px]">{t('Manager.Common.Actions.Edit')}</TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
                         )}
@@ -454,10 +454,10 @@ export const ThemeItem: React.FC<ThemeItemProps> = React.memo(({ theme, i18n, da
                                     <TooltipTrigger asChild>
                                         <Button variant="default" size="sm" className="h-8 px-4 text-[11px] font-bold shadow-sm hover:shadow-md hover:translate-y-[-1px] active:scale-95 transition-all rounded-none" onClick={handleReplace} disabled={replacing}>
                                             {replacing && <Loader2 className="w-3 h-3 animate-spin mr-1.5" />}
-                                            {t('Manager.Actions.Apply')}
+                                            {t('Manager.Common.Actions.Apply')}
                                         </Button>
                                     </TooltipTrigger>
-                                    <TooltipContent className="text-[10px]">{t('Manager.Notices.ThemeApplyPrefix')}</TooltipContent>
+                                    <TooltipContent className="text-[10px]">{t('Manager.Themes.Notices.ThemeApplyPrefix')}</TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
                         )}
@@ -468,10 +468,10 @@ export const ThemeItem: React.FC<ThemeItemProps> = React.memo(({ theme, i18n, da
                                     <TooltipTrigger asChild>
                                         <Button variant="outline" size="sm" className="h-8 px-4 text-[11px] font-bold border-border/50 hover:bg-secondary/20 transition-all active:scale-95 rounded-none" onClick={handleRestore} disabled={restoring}>
                                             {restoring && <Loader2 className="w-3 h-3 animate-spin mr-1.5" />}
-                                            {t('Manager.Actions.Restore')}
+                                            {t('Manager.Common.Actions.Restore')}
                                         </Button>
                                     </TooltipTrigger>
-                                    <TooltipContent className="text-[10px]">{t('Manager.Notices.ThemeRestorePrefix')}</TooltipContent>
+                                    <TooltipContent className="text-[10px]">{t('Manager.Themes.Notices.ThemeRestorePrefix')}</TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
                         )}
@@ -514,7 +514,7 @@ export const ThemeItem: React.FC<ThemeItemProps> = React.memo(({ theme, i18n, da
                             <DropdownMenuContent align="end" className="w-48 shadow-2xl backdrop-blur-md bg-background/95 border-border/40">
                                 <DropdownMenuItem onClick={handleExtract} disabled={extracting} className="text-[12px] py-2">
                                     <FileOutput className="w-3.5 h-3.5 mr-2.5 text-blue-500/70" />
-                                    <span>{t('Manager.Notices.ThemeExtractPrefix')}</span>
+                                    <span>{t('Manager.Themes.Notices.ThemeExtractPrefix')}</span>
                                 </DropdownMenuItem>
                                 {activeSourceId && (
                                     <DropdownMenuItem onClick={() => {
@@ -522,13 +522,13 @@ export const ThemeItem: React.FC<ThemeItemProps> = React.memo(({ theme, i18n, da
                                         refreshParent();
                                     }} className="text-[12px] py-2 text-destructive focus:text-destructive focus:bg-destructive/5">
                                         <XCircle className="w-3.5 h-3.5 mr-2.5 opacity-70" />
-                                        <span>{t('Manager.Actions.Delete')}</span>
+                                        <span>{t('Manager.Common.Actions.Delete')}</span>
                                     </DropdownMenuItem>
                                 )}
                                 <DropdownMenuSeparator className="bg-border/40" />
                                 <DropdownMenuItem onClick={() => i18nOpen(i18n, themeDir)} className="text-[12px] py-2">
                                     <FolderOpen className="w-3.5 h-3.5 mr-2.5 text-amber-500/70" />
-                                    <span>{t('Manager.Actions.OpenFolder')}</span>
+                                    <span>{t('Manager.Common.Actions.OpenFolder')}</span>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
@@ -538,10 +538,10 @@ export const ThemeItem: React.FC<ThemeItemProps> = React.memo(({ theme, i18n, da
                                 <DialogHeader>
                                     <DialogTitle className="flex items-center gap-2 text-amber-500">
                                         <span className="text-xl">⚠️</span>
-                                        {t('Manager.Dialogs.EmptyTranslationTitle')}
+                                        {t('Manager.Themes.Dialogs.EmptyTranslationTitle')}
                                     </DialogTitle>
                                     <DialogDescription className="pt-4 leading-relaxed text-foreground/80">
-                                        {t('Manager.Dialogs.EmptyTranslationDesc')}
+                                        {t('Manager.Themes.Dialogs.EmptyTranslationDesc')}
                                     </DialogDescription>
                                 </DialogHeader>
                                 <DialogFooter className="mt-6 flex justify-center">

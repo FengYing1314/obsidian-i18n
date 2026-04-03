@@ -552,7 +552,7 @@ const ReactEditor: React.FC<EditorProps> = (_) => {
                             {/* 固定标题栏 */}
                             <div className="flex items-center gap-2 px-3 py-2 border-b shrink-0 min-h-[36px]">
                                 <Folder className="w-4 h-4 text-primary shrink-0" />
-                                <span className="text-sm font-semibold truncate">{metadata?.plugin || t('Manager.Labels.Plugins')}</span>
+                                <span className="text-sm font-semibold truncate">{metadata?.plugin || t('Manager.Plugins.TabName')}</span>
                             </div>
                             <div className="flex flex-col w-full flex-1 min-h-0 p-2">
                                 {/* 可滚动的卡片区域 */}

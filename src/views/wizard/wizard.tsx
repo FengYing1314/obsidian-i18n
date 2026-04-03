@@ -5,7 +5,7 @@ import { getWizardConfig } from './wizard-config-service';
 import { useTranslation } from 'react-i18next';
 import {
     PlaySquare, BookOpen, Settings, Cloud, LayoutGrid,
-    Users, Github, ListTodo, LucideIcon,
+    Users, Github, ListTodo, LucideIcon, MessageSquare, Coffee
 } from 'lucide-react';
 import {
     WizardSectionConfig, WizardItemConfig,
@@ -23,6 +23,8 @@ const ICON_MAP: Record<string, LucideIcon> = {
     Users,
     Github,
     ListTodo,
+    Discord: MessageSquare,
+    Afdian: Coffee,
 };
 
 // ========== 渲染用类型 ==========
@@ -118,7 +120,7 @@ export const Wizard: React.FC = () => {
             <div className="text-center space-y-2 mt-2">
                 <h1 className="text-2xl font-bold tracking-tight text-primary">Obsidian-I18N</h1>
                 <p className="text-sm text-muted-foreground">
-                    I18N {t('Wizard.Labels.Ver')} {i18n?.manifest?.version || t('Common.Status.Unknown')}
+                    I18N {t('Wizard.VerLabel')} {i18n?.manifest?.version || t('Common.Status.Unknown')}
                 </p>
             </div>
 
@@ -130,8 +132,10 @@ export const Wizard: React.FC = () => {
                             {section.items.map((item, itemIdx) => {
                                 if (item.type === 'placeholder') {
                                     return (
-                                        <div key={itemIdx} className="border-2 border-dashed rounded-lg flex items-center justify-center p-4 text-muted-foreground text-sm opacity-50 h-full">
-                                            {item.text}
+                                        <div key={itemIdx} className="h-full">
+                                            <Card className="h-full border-dashed border-2 bg-transparent/50 shadow-none flex flex-col justify-center items-center opacity-70 transition-colors p-4 min-h-[82px]">
+                                                <span className="text-muted-foreground text-sm font-medium">{item.text}</span>
+                                            </Card>
                                         </div>
                                     );
                                 }

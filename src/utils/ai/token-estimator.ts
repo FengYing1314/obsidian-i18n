@@ -9,8 +9,18 @@ export interface TokenEstimation {
 }
 
 const PRICING = {
+    // OpenAI
     'gpt-4o': { input: 0.000005, output: 0.000015 },
     'gpt-4o-mini': { input: 0.00000015, output: 0.0000006 },
+    'gpt-4-turbo': { input: 0.00001, output: 0.00003 },
+    // Gemini (Google AI Studio pricing, USD per token)
+    'gemini-2.5-flash': { input: 0, output: 0 },           // 免费层
+    'gemini-2.5-pro': { input: 0.00000125, output: 0.00001 },
+    'gemini-2.0-flash': { input: 0, output: 0 },           // 免费层
+    'gemini-2.0-flash-lite': { input: 0, output: 0 },      // 免费层
+    // Ollama (本地模型，免费)
+    'ollama': { input: 0, output: 0 },
+    // 回退默认
     'default': { input: 0.000005, output: 0.000015 }
 };
 

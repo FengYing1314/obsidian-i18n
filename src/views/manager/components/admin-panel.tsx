@@ -21,8 +21,8 @@ const LanguageDistributionChart: React.FC<{ data: Record<string, number> }> = ({
     return (
         <Card className="border-none shadow-none bg-transparent py-0 gap-4">
             <CardHeader className="px-0 py-0 flex-row items-baseline justify-between space-y-0">
-                <CardTitle className="text-[10px] font-black uppercase tracking-wider text-muted-foreground/60">{t('Manager.Dashboard.LanguageDistribution.Title')}</CardTitle>
-                <div className="text-[10px] font-medium text-primary/80">{t('Manager.Dashboard.LanguageDistribution.TotalTranslations', { count: total })}</div>
+                <CardTitle className="text-[10px] font-black uppercase tracking-wider text-muted-foreground/60">{t('Manager.Admin.LanguageDistribution.Title')}</CardTitle>
+                <div className="text-[10px] font-medium text-primary/80">{t('Manager.Admin.LanguageDistribution.TotalTranslations', { count: total })}</div>
             </CardHeader>
             <CardContent className="px-0 space-y-4">
                 <div className="h-2 w-full flex rounded-full overflow-hidden bg-muted/30 border border-border/5 shadow-inner">
@@ -116,16 +116,16 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
         const json = JSON.stringify(communityRegistry, null, 2);
         navigator.clipboard.writeText(json);
         setCopied(true);
-        new Notice(t('Manager.Notices.CopySuccess') || 'Registry JSON 已复制到剪贴板');
+        new Notice(t('Manager.Common.Notices.CopySuccess'));
         setTimeout(() => setCopied(false), 2000);
     };
 
     const handlePushToCloud = async () => {
         const success = await pushRegistryToCloud(i18n);
         if (success) {
-            new Notice(t('Manager.Notices.SyncSuccess') || '中心库注册表同步成功！');
+            new Notice(t('Manager.Common.Notices.SyncSuccess'));
         } else {
-            new Notice(t('Manager.Errors.SyncFailed') || '同步失败，请检查网络或 Token 权限');
+            new Notice(t('Manager.Common.Errors.SyncFailed'));
         }
     };
 
@@ -139,10 +139,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
                     </div>
                     <div>
                         <div className="flex items-center gap-2 mb-0.5">
-                            <h2 className="text-xl font-black tracking-tighter text-foreground/90 uppercase">{t('Manager.Dashboard.Title')}</h2>
-                            <Badge variant="outline" className="h-4 px-1 border-primary/30 text-primary/80 bg-primary/5 text-[8px] font-black uppercase">{t('Manager.Dashboard.AdminControl')}</Badge>
+                            <h2 className="text-xl font-black tracking-tighter text-foreground/90 uppercase">{t('Manager.Admin.Title')}</h2>
+                            <Badge variant="outline" className="h-4 px-1 border-primary/30 text-primary/80 bg-primary/5 text-[8px] font-black uppercase">{t('Manager.Admin.AdminControl')}</Badge>
                         </div>
-                        <p className="text-[10px] text-muted-foreground/70 font-medium">{t('Manager.Dashboard.Subtitle')}</p>
+                        <p className="text-[10px] text-muted-foreground/70 font-medium">{t('Manager.Admin.Subtitle')}</p>
                     </div>
                 </div>
 
@@ -150,7 +150,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
                     <div className="relative group">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                         <Input
-                            placeholder={t('Manager.Dashboard.SearchPlaceholder')}
+                            placeholder={t('Manager.Admin.SearchPlaceholder')}
                             className="pl-9 h-9 w-56 lg:w-72 bg-background/40 border-border/40 hover:bg-background/60 focus:bg-background/80 transition-all rounded-lg text-[10px] font-bold tracking-tight uppercase"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
@@ -165,14 +165,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
                             disabled={isPushing}
                         >
                             {isPushing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Cloud className="w-3.5 h-3.5" />}
-                            <span>{t('Manager.Dashboard.PushToCloud')}</span>
+                            <span>{t('Manager.Admin.PushToCloud')}</span>
                         </Button>
                         <Button
                             variant="outline"
                             size="icon"
                             className="h-9 w-9 border-border/40 bg-background/40 hover:bg-background rounded-lg transition-all"
                             onClick={handleCopyJson}
-                            title={t('Manager.Dashboard.ExportJson')}
+                            title={t('Manager.Admin.ExportJson')}
                         >
                             {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <FileJson className="w-3.5 h-3.5" />}
                         </Button>
@@ -188,11 +188,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
                             {/* 左侧：核心指标 */}
                             <div className="lg:col-span-2 grid grid-cols-2 sm:grid-cols-5 gap-2">
                                 {[
-                                    { label: t('Manager.Dashboard.Stats.Repos'), value: communityStats.summary.totalRepos, icon: Github, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-                                    { label: t('Manager.Dashboard.Stats.Stars'), value: communityStats.summary.totalStars, icon: Star, color: 'text-amber-500', bg: 'bg-amber-500/10' },
-                                    { label: t('Manager.Dashboard.Stats.Contribs'), value: communityStats.summary.totalContributors, icon: Users, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-                                    { label: t('Manager.Dashboard.Stats.Plugins'), value: communityStats.summary.totalPlugins, icon: LayoutGrid, color: 'text-purple-500', bg: 'bg-purple-500/10' },
-                                    { label: t('Manager.Dashboard.Stats.Translations'), value: communityStats.summary.totalTranslations || Object.values(communityStats.summary.languageDistribution).reduce((a, b) => a + b, 0), icon: Languages, color: 'text-rose-500', bg: 'bg-rose-500/10' },
+                                    { label: t('Manager.Admin.Stats.Repos'), value: communityStats.summary.totalRepos, icon: Github, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+                                    { label: t('Manager.Admin.Stats.Stars'), value: communityStats.summary.totalStars, icon: Star, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+                                    { label: t('Manager.Admin.Stats.Contribs'), value: communityStats.summary.totalContributors, icon: Users, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+                                    { label: t('Manager.Admin.Stats.Plugins'), value: communityStats.summary.totalPlugins, icon: LayoutGrid, color: 'text-purple-500', bg: 'bg-purple-500/10' },
+                                    { label: t('Manager.Admin.Stats.Translations'), value: communityStats.summary.totalTranslations || Object.values(communityStats.summary.languageDistribution).reduce((a, b) => a + b, 0), icon: Languages, color: 'text-rose-500', bg: 'bg-rose-500/10' },
                                 ].map((stat: any) => (
                                     <Card key={stat.label} className="border-border/40 bg-card/40 hover:bg-card hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 group py-0 rounded-xl">
                                         <CardHeader className="p-3 pb-0 flex-row items-center justify-between space-y-0">
@@ -214,8 +214,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
                                                 <Trophy className="w-5 h-5" />
                                             </div>
                                             <div>
-                                                <CardTitle className="text-xs font-black uppercase tracking-tight">{t('Manager.Dashboard.Leaderboard.Title')}</CardTitle>
-                                                <CardDescription className="text-[9px] font-medium uppercase tracking-wider opacity-60">{t('Manager.Dashboard.Leaderboard.Subtitle')}</CardDescription>
+                                                <CardTitle className="text-xs font-black uppercase tracking-tight">{t('Manager.Admin.Leaderboard.Title')}</CardTitle>
+                                                <CardDescription className="text-[9px] font-medium uppercase tracking-wider opacity-60">{t('Manager.Admin.Leaderboard.Subtitle')}</CardDescription>
                                             </div>
                                         </div>
                                         <div className="flex -space-x-2 overflow-hidden p-1">
@@ -251,21 +251,21 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
                     {/* 仓库列表部分 */}
                     <div className="space-y-4">
                         <div className="flex items-center justify-between px-1">
-                            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">{t('Manager.Dashboard.Management.Title')}</h3>
+                            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">{t('Manager.Admin.Management.Title')}</h3>
                             <div className="text-[9px] font-medium text-muted-foreground/30 uppercase tracking-wider">
-                                {t('Manager.Dashboard.Management.ShowingStats', { filtered: filteredItems.length, total: communityRegistry.length })}
+                                {t('Manager.Admin.Management.ShowingStats', { filtered: filteredItems.length, total: communityRegistry.length })}
                             </div>
                         </div>
 
                         {communityLoading ? (
                             <div className="flex flex-col items-center justify-center py-24 text-muted-foreground bg-muted/5 rounded-2xl border border-dashed text-center">
                                 <RefreshCw className="w-10 h-10 animate-spin text-primary/30 mb-4 mx-auto" />
-                                <p className="text-[10px] font-black uppercase tracking-widest opacity-40">{t('Manager.Dashboard.Management.SyncingData')}</p>
+                                <p className="text-[10px] font-black uppercase tracking-widest opacity-40">{t('Manager.Admin.Management.SyncingData')}</p>
                             </div>
                         ) : filteredItems.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-24 text-muted-foreground bg-muted/5 rounded-2xl border border-dashed text-center">
                                 <LayoutGrid className="w-12 h-12 opacity-10 mb-4 mx-auto" />
-                                <h3 className="text-xs font-black uppercase tracking-wider opacity-30">{t('Manager.Dashboard.Management.NoData')}</h3>
+                                <h3 className="text-xs font-black uppercase tracking-wider opacity-30">{t('Manager.Admin.Management.NoData')}</h3>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 gap-4">
@@ -294,7 +294,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
                                                                 <div className="flex items-center gap-2">
                                                                     <p className="text-[10px] text-muted-foreground/60 font-bold uppercase tracking-wide truncate">{item.repoAddress.split('/')[0]}</p>
                                                                     <span className="text-[9px] opacity-20">•</span>
-                                                                    <p className="text-[9px] font-mono text-muted-foreground/40">{stats?.license || t('Manager.Dashboard.Management.NoLicense')}</p>
+                                                                    <p className="text-[9px] font-mono text-muted-foreground/40">{stats?.license || t('Manager.Admin.Management.NoLicense')}</p>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -305,7 +305,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
                                                                 <div className="flex items-center justify-between mb-0.5">
                                                                     <div className="flex items-center gap-1.5 text-muted-foreground/50">
                                                                         <Star className="w-3 h-3 group-hover/stat:text-amber-500 transition-colors" />
-                                                                        <span className="text-[9px] font-black uppercase tracking-wider">{t('Manager.Dashboard.Stats.Stars')}</span>
+                                                                        <span className="text-[9px] font-black uppercase tracking-wider">{t('Manager.Admin.Stats.Stars')}</span>
                                                                     </div>
                                                                     <div className="flex items-center gap-1 text-[8px] opacity-30">
                                                                         <GitFork className="w-2.5 h-2.5" />
@@ -318,7 +318,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
                                                                 <div className="flex items-center justify-between mb-0.5">
                                                                     <div className="flex items-center gap-1.5 text-muted-foreground/50">
                                                                         <TrendingUp className="w-3 h-3 group-hover/stat:text-blue-500 transition-colors" />
-                                                                        <span className="text-[9px] font-black uppercase tracking-wider whitespace-nowrap">{t('Manager.Dashboard.Stats.Commits30d')}</span>
+                                                                        <span className="text-[9px] font-black uppercase tracking-wider whitespace-nowrap">{t('Manager.Admin.Stats.Commits30d')}</span>
                                                                     </div>
                                                                     <div className="flex items-center gap-1 text-[8px] opacity-30">
                                                                         <CircleDot className="w-2.5 h-2.5" />
@@ -331,7 +331,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
                                                                 <div className="flex items-center justify-between mb-0.5">
                                                                     <div className="flex items-center gap-1.5 text-muted-foreground/50">
                                                                         <LayoutGrid className="w-3 h-3 group-hover/stat:text-purple-500 transition-colors" />
-                                                                        <span className="text-[9px] font-black uppercase tracking-wider">{t('Manager.Dashboard.Stats.Plugins')}</span>
+                                                                        <span className="text-[9px] font-black uppercase tracking-wider">{t('Manager.Admin.Stats.Plugins')}</span>
                                                                     </div>
                                                                     <div className="flex items-center gap-1 text-[8px] opacity-40 font-bold text-primary/60">
                                                                         <Languages className="w-2.5 h-2.5" />
@@ -341,12 +341,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
                                                                 <div className="flex items-baseline gap-2">
                                                                     <div className="flex items-center gap-1.5">
                                                                         <span className="text-base font-black tracking-tighter">{stats?.pluginCount || 0}</span>
-                                                                        <span className="text-[8px] text-muted-foreground/40 font-bold uppercase tracking-widest">{t('Manager.Labels.Plugins')}</span>
+                                                                        <span className="text-[8px] text-muted-foreground/40 font-bold uppercase tracking-widest">{t('Manager.Plugins.TabName')}</span>
                                                                     </div>
                                                                     {stats?.themeCount !== undefined && stats.themeCount > 0 && (
                                                                         <div className="flex items-center gap-1.5 border-l border-border/10 pl-2">
                                                                             <span className="text-sm font-black tracking-tighter text-purple-500/80">{stats.themeCount}</span>
-                                                                            <span className="text-[8px] text-muted-foreground/40 font-bold uppercase tracking-widest">{t('Manager.Labels.Themes')}</span>
+                                                                            <span className="text-[8px] text-muted-foreground/40 font-bold uppercase tracking-widest">{t('Manager.Themes.TabName')}</span>
                                                                         </div>
                                                                     )}
                                                                 </div>
@@ -355,7 +355,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
                                                                 <div className="flex items-center justify-between mb-0.5">
                                                                     <div className="flex items-center gap-1.5 text-muted-foreground/50">
                                                                         <History className="w-3 h-3 group-hover/stat:text-emerald-500 transition-colors" />
-                                                                        <span className="text-[9px] font-black uppercase tracking-wider">{t('Manager.Dashboard.Stats.LastUpdate')}</span>
+                                                                        <span className="text-[9px] font-black uppercase tracking-wider">{t('Manager.Admin.Stats.LastUpdate')}</span>
                                                                     </div>
                                                                     <div className="flex items-center gap-1 text-[8px] opacity-30">
                                                                         <Database className="w-2.5 h-2.5" />
@@ -370,7 +370,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
 
                                                         <div className="space-y-1.5 px-1">
                                                             <div className="flex items-center justify-between text-[9px] font-black uppercase text-muted-foreground/40 tracking-widest leading-none">
-                                                                <span>{t('Manager.Dashboard.Stats.ActivityIndex')}</span>
+                                                                <span>{t('Manager.Admin.Stats.ActivityIndex')}</span>
                                                                 <span className="text-primary/70">{Math.round((stats?.activityScore || 0) * 100)}%</span>
                                                             </div>
                                                             <div className="h-1 w-full bg-muted/50 rounded-full overflow-hidden shadow-inner">
@@ -390,11 +390,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
                                                             <div className="space-y-1.5">
                                                                 <Label className="text-[9px] font-black flex items-center gap-1.5 text-muted-foreground/60 uppercase tracking-[0.1em]">
                                                                     <Users className="w-3 h-3" />
-                                                                    {t('Manager.Dashboard.Fields.AuthorReputation')}
+                                                                    {t('Manager.Admin.Fields.AuthorReputation')}
                                                                 </Label>
                                                                 <Input
                                                                     value={item.authorBadge || ''}
-                                                                    placeholder={t('Manager.Dashboard.Fields.AuthorReputationPlaceholder')}
+                                                                    placeholder={t('Manager.Admin.Fields.AuthorReputationPlaceholder')}
                                                                     className="h-9 text-[10px] bg-muted/20 border-border/60 focus:border-primary/40 focus:bg-background/80 transition-all rounded-lg font-bold uppercase tracking-wide"
                                                                     onChange={(e) => updateRegistryItem(item.repoAddress, { authorBadge: e.target.value })}
                                                                 />
@@ -402,11 +402,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
                                                             <div className="space-y-1.5">
                                                                 <Label className="text-[9px] font-black flex items-center gap-1.5 text-muted-foreground/60 uppercase tracking-[0.1em]">
                                                                     <Heart className="w-3 h-3" />
-                                                                    {t('Manager.Dashboard.Fields.RegistryBadges')}
+                                                                    {t('Manager.Admin.Fields.RegistryBadges')}
                                                                 </Label>
                                                                 <Input
                                                                     value={JSON.stringify(item.badges || [])}
-                                                                    placeholder={t('Manager.Dashboard.Fields.RegistryBadgesPlaceholder')}
+                                                                    placeholder={t('Manager.Admin.Fields.RegistryBadgesPlaceholder')}
                                                                     className="h-9 text-[9px] bg-muted/20 font-mono border-border/60 focus:border-primary/40 rounded-lg"
                                                                     onChange={(e) => {
                                                                         try {
@@ -421,11 +421,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
                                                         <div className="space-y-1.5">
                                                             <Label className="text-[9px] font-black flex items-center gap-1.5 text-muted-foreground/60 uppercase tracking-[0.1em]">
                                                                 <MessageSquare className="w-3 h-3" />
-                                                                {t('Manager.Dashboard.Fields.FeaturedContext')}
+                                                                {t('Manager.Admin.Fields.FeaturedContext')}
                                                             </Label>
                                                             <Input
                                                                 value={item.reason || ''}
-                                                                placeholder={t('Manager.Dashboard.Fields.FeaturedContextPlaceholder')}
+                                                                placeholder={t('Manager.Admin.Fields.FeaturedContextPlaceholder')}
                                                                 className="h-9 text-[10px] bg-muted/20 border-border/60 focus:border-primary/40 rounded-lg"
                                                                 onChange={(e) => updateRegistryItem(item.repoAddress, { reason: e.target.value })}
                                                             />
@@ -443,8 +443,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
                                                                     <ShieldCheck className="w-4 h-4" />
                                                                 </div>
                                                                 <div>
-                                                                    <p className="text-[10px] font-black uppercase tracking-tight">{t('Manager.Dashboard.Controls.Official')}</p>
-                                                                    <p className="text-[7px] uppercase font-bold text-muted-foreground/40 tracking-tighter">{t('Manager.Dashboard.Controls.VerifiedNode')}</p>
+                                                                    <p className="text-[10px] font-black uppercase tracking-tight">{t('Manager.Admin.Controls.Official')}</p>
+                                                                    <p className="text-[7px] uppercase font-bold text-muted-foreground/40 tracking-tighter">{t('Manager.Admin.Controls.VerifiedNode')}</p>
                                                                 </div>
                                                             </div>
                                                             <Checkbox
@@ -465,8 +465,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
                                                                     <Zap className={`w-4 h-4 ${item.isFeatured ? 'fill-current' : ''}`} />
                                                                 </div>
                                                                 <div>
-                                                                    <p className="text-[10px] font-black uppercase tracking-tight">{t('Manager.Dashboard.Controls.Featured')}</p>
-                                                                    <p className="text-[7px] uppercase font-bold text-muted-foreground/40 tracking-tighter">{t('Manager.Dashboard.Controls.HighlightedContent')}</p>
+                                                                    <p className="text-[10px] font-black uppercase tracking-tight">{t('Manager.Admin.Controls.Featured')}</p>
+                                                                    <p className="text-[7px] uppercase font-bold text-muted-foreground/40 tracking-tighter">{t('Manager.Admin.Controls.HighlightedContent')}</p>
                                                                 </div>
                                                             </div>
                                                             <Checkbox
@@ -491,7 +491,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
                     <Separator className="my-6" />
                     <div className="space-y-4">
                         <div className="flex items-center justify-between px-1">
-                            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">{t('Manager.Dashboard.ContributorsManagement.Title' as any, '贡献者管理')}</h3>
+                            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">{t('Manager.Admin.ContributorsManagement.Title')}</h3>
                             <div className="flex items-center gap-2">
                                 <Badge variant="secondary" className="text-[9px] font-mono">{contributors.length}</Badge>
                                 <Button
@@ -500,12 +500,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
                                     className="h-7 px-3 gap-1.5 text-[9px] font-bold uppercase"
                                     onClick={async () => {
                                         const success = await pushContributorsToCloud(i18n);
-                                        new Notice(success ? '贡献者数据已同步至云端！' : '同步失败，请检查网络或权限');
+                                        new Notice(success ? t('Manager.Common.Notices.SyncSuccess') : t('Manager.Common.Errors.SyncFailed'));
                                     }}
                                     disabled={isPushing}
                                 >
                                     {isPushing ? <Loader2 className="w-3 h-3 animate-spin" /> : <Cloud className="w-3 h-3" />}
-                                    {t('Manager.Dashboard.ContributorsManagement.PushToCloud' as any, '推送贡献者')}
+                                    {t('Manager.Admin.ContributorsManagement.PushToCloud')}
                                 </Button>
                             </div>
                         </div>
@@ -515,10 +515,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
                             <CardContent className="p-4">
                                 <div className="flex items-center gap-2 mb-3">
                                     <Plus className="w-3.5 h-3.5 text-primary/60" />
-                                    <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground/50">{t('Manager.Dashboard.ContributorsManagement.AddNew' as any, '添加贡献者')}</span>
+                                    <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground/50">{t('Manager.Admin.ContributorsManagement.AddNew')}</span>
                                 </div>
                                 <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
-                                    <Input placeholder="名称 *" className="h-8 text-[10px]" value={newName} onChange={e => setNewName(e.target.value)} />
+                                    <Input placeholder={t('Manager.Admin.ContributorsManagement.Name')} className="h-8 text-[10px]" value={newName} onChange={e => setNewName(e.target.value)} />
                                     <select
                                         className="h-8 rounded-md border border-input bg-background px-2 text-[10px] focus:outline-none focus:ring-1 focus:ring-ring"
                                         value={newCategory}
@@ -529,9 +529,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
                                         <option value="testing">🧪 测试</option>
                                         <option value="suggestion">💬 建议</option>
                                     </select>
-                                    <Input placeholder="链接 URL" className="h-8 text-[10px]" value={newUrl} onChange={e => setNewUrl(e.target.value)} />
-                                    <Input placeholder="GitHub 用户名 (自动头像)" className="h-8 text-[10px]" value={newGithub} onChange={e => setNewGithub(e.target.value)} />
-                                    <Input placeholder="贡献描述" className="h-8 text-[10px]" value={newDesc} onChange={e => setNewDesc(e.target.value)} />
+                                    <Input placeholder={t('Manager.Admin.ContributorsManagement.Url')} className="h-8 text-[10px]" value={newUrl} onChange={e => setNewUrl(e.target.value)} />
+                                    <Input placeholder={t('Manager.Admin.ContributorsManagement.Github')} className="h-8 text-[10px]" value={newGithub} onChange={e => setNewGithub(e.target.value)} />
+                                    <Input placeholder={t('Manager.Admin.ContributorsManagement.Description')} className="h-8 text-[10px]" value={newDesc} onChange={e => setNewDesc(e.target.value)} />
                                 </div>
                                 <Button
                                     variant="outline"
@@ -547,10 +547,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
                                             description: newDesc.trim() || undefined,
                                         });
                                         setNewName(''); setNewUrl(''); setNewGithub(''); setNewDesc('');
-                                        new Notice(`已添加贡献者: ${newName.trim()}`);
+                                        new Notice(t('Manager.Admin.ContributorsManagement.AddSuccess', { name: newName.trim() }));
                                     }}
                                 >
-                                    <Plus className="w-3 h-3" />添加
+                                    <Plus className="w-3 h-3" />{t('Manager.Admin.ContributorsManagement.Add')}
                                 </Button>
                             </CardContent>
                         </Card>
@@ -596,7 +596,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ i18n }) => {
                                                         className="h-6 w-6 text-destructive/40 hover:text-destructive"
                                                         onClick={() => {
                                                             removeContributor(c.name, c.category);
-                                                            new Notice(`已移除贡献者: ${c.name}`);
+                                                            new Notice(t('Manager.Admin.ContributorsManagement.RemoveSuccess', { name: c.name }));
                                                         }}
                                                     >
                                                         <Trash2 className="w-3 h-3" />

@@ -25,7 +25,7 @@ export class WizardView extends ItemView {
     }
 
     getDisplayText() {
-        return t('Wizard.Titles.Main');
+        return t('Wizard.MainTitle');
     }
 
     getIcon() {

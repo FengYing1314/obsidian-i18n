@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useRegexStore } from '../../store';
 import { useGlobalStore } from '~/utils';
-import { OpenAITranslationService } from '@/src/ai/openai-translation-service';
+import { createTranslationProvider } from '@/src/ai/provider-factory';
 import { toast } from "sonner";
 import { t } from "@/src/locales";
 import { STYLES } from '@/src/constants/llm-options';
@@ -167,7 +167,7 @@ export const useRegexTranslation = () => {
         abortControllerRef.current = new AbortController();
 
         try {
-            const op = new OpenAITranslationService();
+            const op = createTranslationProvider();
             await op.regexTranslate(
                 targetItems,
                 async (batchResult, batchIndex, totalBatchesVal) => {
@@ -224,7 +224,7 @@ export const useRegexTranslation = () => {
             timeout,
             timeoutError,
             get estimation() {
-                const op = new OpenAITranslationService();
+                const op = createTranslationProvider();
                 return op.estimateTokens(targetItems, 'regex');
             }
         },

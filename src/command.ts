@@ -12,7 +12,7 @@ const commands = (app: App, i18n: I18N) => {
 
     i18n.addCommand({
         id: 'i18n-auto-manager',
-        name: t('Manager.Tabs.AutoManagerTitle'),
+        name: t('Manager.Auto.TabName'),
         callback: () => {
             i18n.settings.managerTab = 'auto';
             i18n.saveSettings();

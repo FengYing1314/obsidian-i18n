@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useRegexStore } from '../../store';
 import { useGlobalStore } from '~/utils';
-import { OpenAITranslationService } from '~/ai/openai-translation-service';
+import { createTranslationProvider } from '~/ai/provider-factory';
 import { toast } from "sonner";
 import { t } from "@/src/locales";
 import { STYLES } from '~/constants/llm-options';
@@ -167,7 +167,7 @@ export const useAstTranslation = () => {
         abortControllerRef.current = new AbortController();
 
         try {
-            const op = new OpenAITranslationService();
+            const op = createTranslationProvider();
             await op.astTranslate(
                 targetItems,
                 async (batchResult, batchIndex, totalBatchesVal) => {
@@ -224,7 +224,7 @@ export const useAstTranslation = () => {
             timeout,
             timeoutError,
             get estimation() {
-                const op = new OpenAITranslationService();
+                const op = createTranslationProvider();
                 return op.estimateTokens(targetItems, 'ast');
             }
         },

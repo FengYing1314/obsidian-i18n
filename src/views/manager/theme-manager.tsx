@@ -101,12 +101,12 @@ export const ThemeManager: React.FC<ThemeManagerProps> = ({ i18n }) => {
     ], [t]);
 
     const filterOptions = useMemo(() => [
-        { key: 'all', label: t('Manager.Filters.All') },
-        { key: 'toExtract', label: t('Manager.Filters.ToExtract') },
-        { key: 'untranslated', label: t('Manager.Filters.Untranslated') },
-        { key: 'translated', label: t('Manager.Filters.Translated') },
-        { key: 'unapplied', label: t('Manager.Filters.Unapplied') },
-        { key: 'applied', label: t('Manager.Filters.Applied') }
+        { key: 'all', label: t('Manager.Common.Filters.All') },
+        { key: 'toExtract', label: t('Manager.Themes.Filters.ToExtract') },
+        { key: 'untranslated', label: t('Manager.Themes.Filters.Untranslated') },
+        { key: 'translated', label: t('Manager.Themes.Filters.Translated') },
+        { key: 'unapplied', label: t('Manager.Themes.Filters.Unapplied') },
+        { key: 'applied', label: t('Manager.Themes.Filters.Applied') }
     ], [t]);
 
     useEffect(() => {
@@ -197,23 +197,23 @@ export const ThemeManager: React.FC<ThemeManagerProps> = ({ i18n }) => {
             }
 
             let statusColor: string = "bg-muted-foreground";
-            let statusText: string = t('Manager.Status.ToExtract');
-            let statusDesc: string = t('Manager.Hints.NoTransDesc');
+            let statusText: string = t('Manager.Themes.Status.ToExtract');
+            let statusDesc: string = t('Manager.Plugins.Hints.NoTransDesc');
 
             const isApplied = !!(state && state.isApplied);
 
             if (isApplied) {
                 statusColor = "bg-green-500 dark:bg-green-600";
-                statusText = t('Manager.Status.Applied');
+                statusText = t('Manager.Themes.Status.Applied');
             } else if (isTranslated) {
                 statusColor = "bg-blue-500 dark:bg-blue-600";
-                statusText = t('Manager.Status.Unapplied');
+                statusText = t('Manager.Themes.Status.Unapplied');
             } else if (hasTranslation) {
                 statusColor = "bg-amber-500 dark:bg-amber-600";
-                statusText = t('Manager.Status.Untranslated');
+                statusText = t('Manager.Themes.Status.Untranslated');
             } else {
                 statusColor = "bg-muted-foreground";
-                statusText = t('Manager.Status.ToExtract');
+                statusText = t('Manager.Themes.Status.ToExtract');
             }
             statusDesc = theme.manifest ? `v${theme.manifest.version}` : '';
 
@@ -309,7 +309,7 @@ export const ThemeManager: React.FC<ThemeManagerProps> = ({ i18n }) => {
                     <div className="relative flex-1">
                         <Search className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
                         <Input
-                            placeholder={t('Manager.Placeholders.SearchThemes')}
+                            placeholder={t('Manager.Themes.Placeholders.SearchThemes')}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="pl-8 h-9 rounded-none"
@@ -337,7 +337,7 @@ export const ThemeManager: React.FC<ThemeManagerProps> = ({ i18n }) => {
 
                     <Select value={statusFilter} onValueChange={(val: any) => setStatusFilter(val)}>
                         <SelectTrigger className="w-[120px] h-9 rounded-none" size="default">
-                            <SelectValue placeholder={t('Manager.Filters.All')} />
+                            <SelectValue placeholder={t('Manager.Common.Filters.All')} />
                         </SelectTrigger>
                         <SelectContent>
                             {filterOptions.map((opt) => (
@@ -405,7 +405,7 @@ export const ThemeManager: React.FC<ThemeManagerProps> = ({ i18n }) => {
                         })}
                         {displayThemes.length === 0 && (
                             <div className="text-center text-muted-foreground py-8 col-span-full">
-                                {t('Manager.Status.NoThemes')}
+                                {t('Manager.Themes.Status.NoThemes')}
                             </div>
                         )}
                     </div>

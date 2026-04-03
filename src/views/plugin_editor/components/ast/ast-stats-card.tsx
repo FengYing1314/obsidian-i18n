@@ -90,7 +90,7 @@ const AstStatsCard: React.FC<Props> = memo(({ items }) => {
             icon={ChartPie}
             extra={
                 <Badge variant="secondary" className="text-xs font-medium px-2.5 py-0.5 bg-muted text-muted-foreground border transition-all duration-300">
-                    {progress}% {t('Manager.Filters.Applied')}
+                    {progress}% {t('Manager.Plugins.Filters.Applied')}
                 </Badge>
             }
         >

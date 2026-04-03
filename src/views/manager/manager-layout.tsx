@@ -46,28 +46,28 @@ export const ManagerLayout: React.FC<ManagerLayoutProps> = ({ i18n, close }) => 
                     <TabsList className="h-9 p-1 bg-muted/50 border rounded-none shadow-inner">
                         <TabsTrigger className="h-7 text-xs data-[state=active]:shadow-sm gap-1.5 px-3 rounded-none" value="plugins">
                             <LayoutGrid className="w-3.5 h-3.5" />
-                            {t('Manager.Labels.Plugins')}
+                            {t('Manager.Plugins.TabName')}
                         </TabsTrigger>
                         <TabsTrigger className="h-7 text-xs data-[state=active]:shadow-sm gap-1.5 px-3 rounded-none" value="themes">
                             <Palette className="w-3.5 h-3.5" />
-                            {t('Manager.Labels.Themes')}
+                            {t('Manager.Themes.TabName')}
                         </TabsTrigger>
                         <TabsTrigger className="h-7 text-xs data-[state=active]:shadow-sm gap-1.5 px-3 rounded-none" value="sources">
                             <FileJson className="w-3.5 h-3.5" />
-                            {t('Manager.Tabs.Sources')}
+                            {t('Manager.Sources.TabName')}
                         </TabsTrigger>
                         <TabsTrigger className="h-7 text-xs data-[state=active]:shadow-sm gap-1.5 px-3 rounded-none" value="auto">
                             <MonitorPlay className="w-3.5 h-3.5" />
-                            {t('Manager.Tabs.AutoManagerTitle', '自动化')}
+                            {t('Manager.Auto.TabName', '自动化')}
                         </TabsTrigger>
                         <TabsTrigger className="h-7 text-xs data-[state=active]:shadow-sm gap-1.5 px-3 rounded-none" value="credits">
                             <Heart className="w-3.5 h-3.5" />
-                            {t('Manager.Tabs.Credits', '鸣谢')}
+                            {t('Manager.Credits.TabName', '鸣谢')}
                         </TabsTrigger>
                         {isAdmin && (
                             <TabsTrigger className="h-7 text-xs data-[state=active]:shadow-sm gap-1.5 px-3 rounded-none" value="admin">
                                 <ShieldAlert className="w-3.5 h-3.5" />
-                                {t('Manager.Labels.Admin')}
+                                {t('Manager.Common.Labels.Admin')}
                             </TabsTrigger>
                         )}
                     </TabsList>
@@ -77,10 +77,10 @@ export const ManagerLayout: React.FC<ManagerLayoutProps> = ({ i18n, close }) => 
                                 <TooltipTrigger asChild>
                                     <Button variant="ghost" className="rounded-none h-9 px-3 hover:bg-muted gap-2 text-xs" onClick={() => window.open(Url.SPONSOR)}>
                                         <Coffee className="w-4 h-4" />
-                                        <span>{t('Manager.Actions.Sponsor')}</span>
+                                        <span>{t('Manager.Common.Actions.Sponsor')}</span>
                                     </Button>
                                 </TooltipTrigger>
-                                <TooltipContent>{t('Manager.Actions.Sponsor')}</TooltipContent>
+                                <TooltipContent>{t('Manager.Common.Actions.Sponsor')}</TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
 
@@ -89,10 +89,10 @@ export const ManagerLayout: React.FC<ManagerLayoutProps> = ({ i18n, close }) => 
                                 <TooltipTrigger asChild>
                                     <Button variant="ghost" className="rounded-none h-9 px-3 hover:bg-muted gap-2 text-xs" onClick={() => { i18n.view.activateView(WIZARD_VIEW_TYPE); }}>
                                         <CircleHelp className="w-4 h-4" />
-                                        <span>{t('Manager.Actions.Help')}</span>
+                                        <span>{t('Manager.Common.Actions.Help')}</span>
                                     </Button>
                                 </TooltipTrigger>
-                                <TooltipContent>{t('Manager.Actions.HelpDoc')}</TooltipContent>
+                                <TooltipContent>{t('Manager.Common.Actions.HelpDoc')}</TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
 
@@ -103,10 +103,10 @@ export const ManagerLayout: React.FC<ManagerLayoutProps> = ({ i18n, close }) => 
                                         i18n.view.activateView(CLOUD_VIEW_TYPE);
                                     }}>
                                         <Cloud className="w-4 h-4" />
-                                        <span>{t('Manager.Actions.Cloud')}</span>
+                                        <span>{t('Manager.Common.Actions.Cloud')}</span>
                                     </Button>
                                 </TooltipTrigger>
-                                <TooltipContent>{t('Manager.Actions.Cloud')}</TooltipContent>
+                                <TooltipContent>{t('Manager.Common.Actions.Cloud')}</TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
 
@@ -120,10 +120,10 @@ export const ManagerLayout: React.FC<ManagerLayoutProps> = ({ i18n, close }) => 
                                         app.setting.openTabById(i18n.manifest.id);
                                     }}>
                                         <Settings className="w-4 h-4" />
-                                        <span>{t('Manager.Actions.Settings')}</span>
+                                        <span>{t('Manager.Common.Actions.Settings')}</span>
                                     </Button>
                                 </TooltipTrigger>
-                                <TooltipContent>{t('Manager.Actions.Settings')}</TooltipContent>
+                                <TooltipContent>{t('Manager.Common.Actions.Settings')}</TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
                     </div>

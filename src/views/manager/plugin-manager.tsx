@@ -85,12 +85,12 @@ export const PluginManager: React.FC<PluginManagerProps> = ({ i18n, close }) => 
     ], [t]);
 
     const filterOptions = useMemo(() => [
-        { key: 'all', label: t('Manager.Filters.All') },
-        { key: 'toExtract', label: t('Manager.Filters.ToExtract') },
-        { key: 'untranslated', label: t('Manager.Filters.Untranslated') },
-        { key: 'translated', label: t('Manager.Filters.Translated') },
-        { key: 'unapplied', label: t('Manager.Filters.Unapplied') },
-        { key: 'applied', label: t('Manager.Filters.Applied') }
+        { key: 'all', label: t('Manager.Common.Filters.All') },
+        { key: 'toExtract', label: t('Manager.Plugins.Filters.ToExtract') },
+        { key: 'untranslated', label: t('Manager.Plugins.Filters.Untranslated') },
+        { key: 'translated', label: t('Manager.Plugins.Filters.Translated') },
+        { key: 'unapplied', label: t('Manager.Plugins.Filters.Unapplied') },
+        { key: 'applied', label: t('Manager.Plugins.Filters.Applied') }
     ], [t]);
 
     useEffect(() => {
@@ -143,8 +143,8 @@ export const PluginManager: React.FC<PluginManagerProps> = ({ i18n, close }) => 
             }
 
             let statusColor: string = "bg-muted-foreground";
-            let statusText: string = t('Manager.Status.ToExtract');
-            let statusDesc: string = t('Manager.Hints.NoTransDesc');
+            let statusText: string = t('Manager.Plugins.Status.ToExtract');
+            let statusDesc: string = t('Manager.Plugins.Hints.NoTransDesc');
             let mtime: number = 0;
             let translationVersion = '';
             let supportedVersion = '';
@@ -158,22 +158,22 @@ export const PluginManager: React.FC<PluginManagerProps> = ({ i18n, close }) => 
 
                 if (isApplied) {
                     statusColor = "bg-green-500 dark:bg-green-600";
-                    statusText = t('Manager.Status.Applied');
+                    statusText = t('Manager.Plugins.Status.Applied');
                 } else if (isTranslated) {
                     statusColor = "bg-blue-500 dark:bg-blue-600";
-                    statusText = t('Manager.Status.Unapplied');
+                    statusText = t('Manager.Plugins.Status.Unapplied');
                 } else {
                     statusColor = "bg-amber-500 dark:bg-amber-600";
-                    statusText = t('Manager.Status.Untranslated');
+                    statusText = t('Manager.Plugins.Status.Untranslated');
                 }
-                statusDesc = `${t('Manager.Labels.Mtime')}: ${formatTimestamp(mtime)}`;
+                statusDesc = `${t('Manager.Plugins.Labels.Mtime')}: ${formatTimestamp(mtime)}`;
             } else if (localJson && !translationFormatMark) {
                 statusColor = "bg-destructive";
-                statusText = t('Manager.Errors.Error');
-                statusDesc = t('Manager.Errors.ErrorDesc');
+                statusText = t('Manager.Common.Errors.Error');
+                statusDesc = t('Manager.Common.Errors.ErrorDesc');
             } else if (!isLangDoc) {
                 statusColor = "bg-muted-foreground";
-                statusText = t('Manager.Status.ToExtract');
+                statusText = t('Manager.Plugins.Status.ToExtract');
             }
 
             stats[plugin.id] = {
@@ -282,12 +282,12 @@ export const PluginManager: React.FC<PluginManagerProps> = ({ i18n, close }) => 
                 await app.plugins.disablePlugin(id);
                 // @ts-ignore
                 await app.plugins.enablePlugin(id);
-                new Notice(t('Manager.Notices.ReloadPlugin', { id }));
+                new Notice(t('Manager.Plugins.Notices.ReloadPlugin', { id }));
                 return true;
             }
             return false;
         } catch (error) {
-            new Notice(t('Manager.Errors.ReloadPluginFailed', { error }));
+            new Notice(t('Manager.Plugins.Errors.ReloadPluginFailed', { error }));
             return false;
         }
     }, [app, t]);
@@ -306,13 +306,13 @@ export const PluginManager: React.FC<PluginManagerProps> = ({ i18n, close }) => 
                 await app.plugins.disablePlugin(currentPluginId);
                 // @ts-ignore
                 await app.plugins.enablePlugin(currentPluginId);
-                new Notice(t('Manager.Notices.ReloadSuccess'));
+                new Notice(t('Manager.Plugins.Notices.ReloadSuccess'));
             } else {
-                new Notice(t('Manager.Errors.PluginNotEnabled'));
+                new Notice(t('Manager.Plugins.Errors.PluginNotEnabled'));
                 setIsReloading(false);
             }
         } catch (error) {
-            new Notice(t('Manager.Errors.ReloadFailed', { error }));
+            new Notice(t('Manager.Plugins.Errors.ReloadFailed', { error }));
             setIsReloading(false);
         }
     }, [app, i18n.manifest.id, t]);
@@ -324,7 +324,7 @@ export const PluginManager: React.FC<PluginManagerProps> = ({ i18n, close }) => 
                     <div className="relative flex-1">
                         <Search className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
                         <Input
-                            placeholder={t('Manager.Placeholders.SearchPlugins')}
+                            placeholder={t('Manager.Plugins.Placeholders.SearchPlugins')}
                             value={searchTerm}
                             onChange={handleSearchChange}
                             className="pl-8 h-9 rounded-none"
@@ -347,7 +347,7 @@ export const PluginManager: React.FC<PluginManagerProps> = ({ i18n, close }) => 
 
                     <Select value={statusFilter} onValueChange={(val: any) => setStatusFilter(val)}>
                         <SelectTrigger className="w-[120px] h-9 rounded-none" size="default">
-                            <SelectValue placeholder={t('Manager.Filters.All')} />
+                            <SelectValue placeholder={t('Manager.Common.Filters.All')} />
                         </SelectTrigger>
                         <SelectContent>
                             {filterOptions.map((opt) => (
@@ -412,7 +412,7 @@ export const PluginManager: React.FC<PluginManagerProps> = ({ i18n, close }) => 
                         })}
                         {displayPlugins.length === 0 && (
                             <div className="text-center text-muted-foreground py-8 col-span-full">
-                                {t('Manager.Status.NoPlugins')}
+                                {t('Manager.Plugins.Status.NoPlugins')}
                             </div>
                         )}
                     </div>

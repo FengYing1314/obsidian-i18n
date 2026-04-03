@@ -164,7 +164,7 @@ export class InjectorManager {
                     try {
                         // @ts-ignore
                         await this.i18n.app.plugins.enablePlugin(plugin.id);
-                        this.i18n.notice.warning(t('Manager.Notices.RollbackSuccess', { id: pluginId }));
+                        this.i18n.notice.warning(t('Manager.Common.Notices.RollbackSuccess', { id: pluginId }));
                     } catch (restoreError) {
                         console.error(`[i18n] Even restore failed for ${pluginId}`, restoreError);
                     }

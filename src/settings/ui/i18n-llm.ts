@@ -3,7 +3,9 @@ import BaseSetting from "../base-setting";
 import { t } from "src/locales";
 
 export const apiType = {
-	1: 'OpenAI'
+	1: 'OpenAI',
+	2: 'Google Gemini',
+	3: 'Ollama (本地)'
 }
 
 // 自动更新

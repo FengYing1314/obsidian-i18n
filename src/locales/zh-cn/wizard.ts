@@ -2,34 +2,38 @@
  * [模块] 使用帮助 (Wizard)
  */
 export default {
-    Titles: {
-        Main: "使用帮助",
-        Video: "官方视频教程",
-        Doc: "官方文档教程",
-        Task: "社区翻译任务",
-        Github: "问题反馈",
-        Plugin: "插件翻译管理",
-        Cloud: "云端翻译中心",
-        Qq: "官方 Q 群"
-    },
-    Labels: {
-        CoreFeatures: "核心功能",
-        Community: "社区动态",
-        Support: "反馈与支持",
-        Ver: "版本"
-    },
-    Actions: {
-        Browse: "浏览",
-        Join: "加入"
-    },
-    Hints: {
-        VideoDesc: "详尽演示 Obsidian i18n 操作，助力快速掌握",
-        DocDesc: "Obsidian i18n 的全面探索之旅指南",
-        TaskDesc: "加入共建生态，在此认领未完成的翻译任务",
-        GithubDesc: "遇到 Bug 或有新需求？点击前往 GitHub 提交 Issue",
-        PluginDesc: "获取、启用与管理已安装插件的翻译资源",
-        CloudDesc: "探索与下载全球社区分享的精校优质译文",
-        QqDesc: "在官方群，您可发布需求、提交 BUG、分享译文，并与其他用户交流互助。",
-        MoreExpect: "敬请期待..."
-    }
+    MainTitle: "使用帮助",
+
+    // ── 教程与反馈 ──
+    VideoTitle: "官方视频教程",
+    VideoDesc: "演示插件全套操作流程，降低上手门槛，快速精通本地化工作流。",
+    DocTitle: "官方文档教程",
+    DocDesc: "全方位解析各项功能参数与进阶配置，提供详尽的操作与排错指南。",
+    GithubTitle: "开源问题反馈",
+    GithubDesc: "追踪项目代码进展，提交缺陷报告或特性需求，与开发者深度协力。",
+
+    // ── 核心功能 ──
+    PluginTitle: "本地翻译管理",
+    PluginDesc: "集中管理本地已装插件的翻译片段，一键应用并无缝掌控界面语言。",
+    CloudTitle: "云端翻译中心",
+    CloudDesc: "接入全球翻译网络，发掘并获取由社区持续维护的精校优选译文。",
+
+    // ── 社区生态 ──
+    TaskTitle: "社区翻译任务",
+    TaskDesc: "参与开源共建生态，认领并攻克未决的翻译任务，共享本地化成果。",
+    QqTitle: "QQ 官方交流群",
+    QqDesc: "国内活跃创作者阵地，分享翻译心得、极速获取一手更新与技术答疑。",
+    DiscordTitle: "Discord 交流群",
+    DiscordDesc: "加入全球化的玩家与开发者社区，分享插件经验，获取即时解答。",
+    AfdianTitle: "支持与赞助",
+    AfdianDesc: "通过爱发电赞助开发者，助力插件持续迭代与生态繁荣。",
+
+    // ── 其他标签与占位提示 ──
+    CoreFeaturesLabel: "核心功能",
+    CommunityLabel: "社区动态",
+    SupportLabel: "反馈与支持",
+    VerLabel: "版本",
+    BrowseAction: "浏览",
+    JoinAction: "加入",
+    MoreExpect: "更多硬核能力正在持续构建中，敬请期待……"
 } as const;

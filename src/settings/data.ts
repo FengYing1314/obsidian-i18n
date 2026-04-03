@@ -1,5 +1,5 @@
 import { pageRule } from '../utils';
-import { DEFAULT_AST_PROMPT_TEMPLATE, DEFAULT_REGEX_PROMPT_TEMPLATE, DEFAULT_THEME_PROMPT_TEMPLATE } from '../ai/openai-translation-service';
+import { DEFAULT_AST_PROMPT_TEMPLATE, DEFAULT_REGEX_PROMPT_TEMPLATE, DEFAULT_THEME_PROMPT_TEMPLATE } from '../ai/prompts';
 
 export interface OpenAIProfile {
     id: string;
@@ -10,6 +10,13 @@ export interface OpenAIProfile {
     useCustomPrice: boolean;
     priceInput: number;
     priceOutput: number;
+}
+
+export interface GeminiProfile {
+    id: string;
+    name: string;
+    key: string;
+    model: string;
 }
 
 export interface GitHubProfile {
@@ -61,6 +68,16 @@ export interface I18nSettings {
     llmUseCustomPrice: boolean;     // 是否使用自定义价格估算
     llmPriceInputCustom: number;    // 自定义输入价格 ($/1M tokens)
     llmPriceOutputCustom: number;   // 自定义输出价格 ($/1M tokens)
+
+    // Gemini 专属配置
+    llmGeminiKey: string;                   // Gemini API Key
+    llmGeminiModel: string;                 // 选用的 Gemini 模型名
+    llmGeminiProfiles: GeminiProfile[];     // Gemini 配置方案列表
+    llmGeminiActiveProfileId: string;       // 当前激活的 Gemini Profile ID
+
+    // Ollama 专属配置
+    llmOllamaUrl: string;                   // Ollama 端点地址 (默认 http://localhost:11434)
+    llmOllamaModel: string;                 // 选用的 Ollama 模型名
 
     // ==============================
     // 沉浸式翻译配置 (IMT)
@@ -163,6 +180,16 @@ export const DEFAULT_SETTINGS: I18nSettings = {
     llmUseCustomPrice: true,
     llmPriceInputCustom: 0,
     llmPriceOutputCustom: 0,
+
+    // Gemini 专属配置
+    llmGeminiKey: '',
+    llmGeminiModel: 'gemini-2.0-flash',
+    llmGeminiProfiles: [],
+    llmGeminiActiveProfileId: '',
+
+    // Ollama 专属配置
+    llmOllamaUrl: 'http://localhost:11434',
+    llmOllamaModel: '',
 
     // ==============================
     // 沉浸式翻译配置 (IMT)
