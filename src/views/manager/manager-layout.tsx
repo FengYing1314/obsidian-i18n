@@ -67,7 +67,7 @@ export const ManagerLayout: React.FC<ManagerLayoutProps> = ({ i18n, close }) => 
                         {isAdmin && (
                             <TabsTrigger className="h-7 text-xs data-[state=active]:shadow-sm gap-1.5 px-3 rounded-none" value="admin">
                                 <ShieldAlert className="w-3.5 h-3.5" />
-                                {t('Manager.Common.Labels.Admin')}
+                                {t('Manager.Admin.TabName', '管理')}
                             </TabsTrigger>
                         )}
                     </TabsList>
