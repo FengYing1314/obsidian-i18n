@@ -85,9 +85,20 @@ export default class I18N extends Plugin {
             this.initCores();           // [初始化] 核心函数
             this.coreManager.setupRibbonIcons();    // [初始化] 功能区图标 1
 
-            this.addSettingTab(new I18nSettingTab(this.app, this));
-            // 初始化完成赋值全局I18N实例
             useGlobalStoreInstance.getState().setI18n(this);
+            this.addSettingTab(new I18nSettingTab(this.app, this));
+
+            // [自动化] 注册定时扫描任务 (每 30 分钟检查一次是否到达设定的间隔)
+            this.registerInterval(
+                (window as any).setInterval(() => {
+                    this.autoManager.checkAndRunDiscovery();
+                }, 30 * 60 * 1000)
+            );
+
+            // 启动时延迟 30 秒执行一次增量检查 (避免拥塞启动过程)
+            setTimeout(() => {
+                this.autoManager.checkAndRunDiscovery();
+            }, 30 * 1000);
         } else {
             // 注册并打开协议视图
             this.view.addView(AGREEMENT_VIEW_TYPE, (leaf) => new AgreementView(leaf, this), true);
@@ -207,6 +218,7 @@ export default class I18N extends Plugin {
 
         if (this.settings.automaticUpdate) await this.injectorManager.run(this.app);
         await this.autoManager.initialize();
+        if (this.settings.autoDiscovery) await this.autoManager.runDiscovery();
         if (this.settings.modeImt) this.coreManager.activateIMT();
 
         // [清理] 检查并清理已卸载插件的冗余备份与状态

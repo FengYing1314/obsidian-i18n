@@ -6,7 +6,7 @@ import {
     DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 } from '~/shadcn';
 import { cn } from '~/shadcn/lib/utils';
-import { Search, Download, Upload, Trash2, MoreVertical, FileJson, Globe, HardDrive, Filter, Info, Puzzle, Palette, AlertCircle } from 'lucide-react';
+import { Search, Download, Upload, Trash2, MoreVertical, FileJson, Globe, HardDrive, Filter, Info, Puzzle, Palette, AlertCircle, Pen, FolderOpen, MoreHorizontal, CheckSquare } from 'lucide-react';
 import I18N from 'src/main';
 import { TranslationSource } from 'src/types';
 import { Notice } from 'obsidian';
@@ -241,10 +241,12 @@ export const TranslationManagerPanel: React.FC<TranslationManagerPanelProps> = (
             {/* 顶栏控制区 */}
             <div className="flex flex-col gap-4 py-2 px-4 border-b shrink-0">
                 <div className="flex items-center gap-2 flex-wrap">
+
+
                     <div className="relative flex-1 min-w-[200px]">
-                        <Search className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground/70" />
                         <Input
-                            className="pl-8 h-9 rounded-none border-muted-foreground/20 focus:ring-1 text-sm"
+                            className="pl-8 h-9 rounded-none border-muted-foreground/20 focus:ring-1 text-[13px] bg-muted/10 shadow-sm transition-colors hover:bg-muted/20"
                             placeholder={t('Manager.Sources.Filters.SearchPlaceholder')}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
@@ -254,8 +256,8 @@ export const TranslationManagerPanel: React.FC<TranslationManagerPanelProps> = (
                     <div className="flex items-center gap-2">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="sm" className="h-9 gap-1.5 rounded-none border-muted-foreground/20">
-                                    <Filter className="w-3.5 h-3.5" />
+                                <Button variant="outline" size="sm" className="h-9 shadow-sm gap-1.5 rounded-none border-muted-foreground/20 text-[13px] hover:bg-muted/30">
+                                    <Filter className="w-3.5 h-3.5 text-muted-foreground/70" />
                                     {originFilter === 'all' ? t('Manager.Common.Filters.All') :
                                         originFilter === 'local' ? t('Manager.Sources.Filters.OriginLocal') :
                                             t('Manager.Sources.Filters.OriginCloud')}
@@ -270,8 +272,8 @@ export const TranslationManagerPanel: React.FC<TranslationManagerPanelProps> = (
 
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="sm" className="h-9 gap-1.5 rounded-none border-muted-foreground/20">
-                                    <Filter className="w-3.5 h-3.5" />
+                                <Button variant="outline" size="sm" className="h-9 shadow-sm gap-1.5 rounded-none border-muted-foreground/20 text-[13px] hover:bg-muted/30">
+                                    <Filter className="w-3.5 h-3.5 text-muted-foreground/70" />
                                     {typeFilter === 'all' ? t('Manager.Common.Filters.All') :
                                         typeFilter === 'plugin' ? t('Common.Labels.Plugins') :
                                             t('Common.Labels.Themes')}
@@ -285,34 +287,47 @@ export const TranslationManagerPanel: React.FC<TranslationManagerPanelProps> = (
                         </DropdownMenu>
                     </div>
 
-                    <div className="flex items-center gap-2 border-l pl-2 border-border/50 ml-auto">
-                        <Button variant="outline" size="sm" onClick={handleSelectUninstalled} className="gap-1.5 h-9 rounded-none border-muted-foreground/20" title={t('Manager.Sources.Actions.SelectUninstalled')}>
-                            <AlertCircle className="w-3.5 h-3.5 text-destructive" />
-                            <span className="hidden lg:inline">{t('Manager.Sources.Actions.SelectUninstalled')}</span>
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={handleImport} className="gap-1.5 h-9 rounded-none border-muted-foreground/20">
-                            <Upload className="w-3.5 h-3.5" />
-                            {t('Manager.Sources.Actions.Import')}
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleBatchExport}
-                            disabled={selectedIds.size === 0}
-                            className="gap-1.5 h-9 rounded-none border-muted-foreground/20"
-                        >
-                            <Download className="w-3.5 h-3.5" />
-                            {t('Manager.Sources.Actions.Export')}
-                        </Button>
+                    <div className="flex items-center ml-auto gap-3">
+                        {/* 选取组 */}
+                        <div className="flex items-center rounded-none border border-muted-foreground/20 bg-background shadow-sm h-9">
+                            <Button variant="ghost" size="sm" onClick={toggleSelectAll} className="gap-1.5 h-9 rounded-none px-3 border-r border-muted-foreground/20 hover:bg-muted/50">
+                                <CheckSquare className={cn("w-4 h-4", allSources.length > 0 && selectedIds.size === allSources.length ? "text-primary" : "text-muted-foreground/70")} />
+                                <span className={cn("hidden lg:inline text-[13px] font-bold", allSources.length > 0 && selectedIds.size === allSources.length ? "text-primary" : "text-muted-foreground/90")}>{t('Manager.Sources.Actions.SelectAll')}</span>
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={handleSelectUninstalled} className="gap-1.5 h-9 rounded-none px-3 hover:bg-destructive/10 hover:text-destructive group" title={t('Manager.Sources.Actions.SelectUninstalled')}>
+                                <AlertCircle className="w-4 h-4 text-destructive/80 group-hover:text-destructive" />
+                                <span className="hidden lg:inline text-[13px] font-bold text-destructive/90 group-hover:text-destructive">{t('Manager.Sources.Actions.SelectUninstalled')}</span>
+                            </Button>
+                        </div>
+
+                        {/* 数据组 */}
+                        <div className="flex items-center rounded-none border border-muted-foreground/20 bg-background shadow-sm h-9">
+                            <Button variant="ghost" size="sm" onClick={handleImport} className="gap-1.5 h-9 rounded-none px-3 border-r border-muted-foreground/20 hover:bg-primary/5 hover:text-primary group">
+                                <Upload className="w-4 h-4 text-muted-foreground/70 group-hover:text-primary" />
+                                <span className="text-[13px] font-bold text-muted-foreground/90 hidden lg:inline group-hover:text-primary">{t('Manager.Sources.Actions.Import')}</span>
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleBatchExport}
+                                disabled={selectedIds.size === 0}
+                                className="gap-1.5 h-9 rounded-none px-3 hover:bg-primary/5 hover:text-primary group"
+                            >
+                                <Download className="w-4 h-4 text-muted-foreground/70 group-hover:text-primary" />
+                                <span className="text-[13px] font-bold text-muted-foreground/90 hidden lg:inline group-hover:text-primary">{t('Manager.Sources.Actions.Export')}</span>
+                            </Button>
+                        </div>
+
+                        {/* 删除动作 */}
                         <Button
                             variant="destructive"
                             size="sm"
                             onClick={handleBatchDelete}
                             disabled={selectedIds.size === 0}
-                            className="gap-1.5 h-9 rounded-none"
+                            className="gap-1.5 h-9 rounded-none shadow-sm px-3 font-bold text-[13px]"
                         >
-                            <Trash2 className="w-3.5 h-3.5" />
-                            {t('Manager.Sources.Actions.BatchDelete')}
+                            <Trash2 className="w-4 h-4" />
+                            <span className="hidden lg:inline">{t('Manager.Sources.Actions.BatchDelete')}</span>
                         </Button>
                     </div>
                 </div>
@@ -321,20 +336,7 @@ export const TranslationManagerPanel: React.FC<TranslationManagerPanelProps> = (
             {/* 内容列表区 */}
             <ScrollArea className="flex-1 min-h-0 bg-background">
                 <div className="px-4 py-2 h-full">
-                    {allSources.length > 0 && (
-                        <div className="flex items-center gap-4 px-2 pb-2 mb-1 border-b border-border/50 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                            <div className="flex items-center justify-center w-8 shrink-0">
-                                <Checkbox
-                                    className="rounded-none scale-90"
-                                    checked={allSources.length > 0 && selectedIds.size === allSources.length}
-                                    onCheckedChange={toggleSelectAll}
-                                />
-                            </div>
-                            <span className="pl-2">{t('Manager.Sources.Table.Name')}</span>
-                            <div className="flex-1"></div>
-                            <span className="hidden md:block min-w-[80px] text-right mr-10">{t('Manager.Sources.Table.Mtime')}</span>
-                        </div>
-                    )}
+
 
                     <div className="flex flex-col pb-6">
                         {allSources.length === 0 ? (
@@ -344,104 +346,117 @@ export const TranslationManagerPanel: React.FC<TranslationManagerPanelProps> = (
                                 <p className="text-xs opacity-60">{t('Manager.Common.Placeholders.SearchPlaceholder')}</p>
                             </div>
                         ) : (
-                            allSources.map(source => (
-                                <div key={source.id} className={cn(
-                                    "group relative flex items-center gap-4 py-2.5 px-2 border-b transition-colors duration-200",
-                                    selectedIds.has(source.id)
-                                        ? "bg-primary/[0.05] border-primary/20"
-                                        : "bg-transparent border-border/40 hover:bg-muted/40"
-                                )}>
-                                    <div className="flex items-center justify-center w-8 shrink-0">
-                                        <Checkbox
-                                            className={cn("rounded-none transition-opacity", selectedIds.has(source.id) ? "opacity-100" : "opacity-30 group-hover:opacity-100")}
-                                            checked={selectedIds.has(source.id)}
-                                            onCheckedChange={() => toggleSelect(source.id)}
-                                        />
-                                    </div>
+                            allSources.map(source => {
+                                const isUninstalled = !source.isInstalled;
+                                const isCloud = source.origin === 'cloud';
 
-                                    <div className={cn("flex items-center justify-center w-9 h-9 shrink-0 border border-border/20 rounded-none",
-                                        source.origin === 'cloud'
-                                            ? "bg-blue-500/10 text-blue-500"
-                                            : "bg-emerald-500/10 text-emerald-500"
+                                // Special color system for Manager (Management / Data layer)
+                                let statusColor = "bg-primary";
+                                if (isUninstalled) {
+                                    statusColor = "bg-destructive";
+                                } else if (isCloud) {
+                                    statusColor = "bg-indigo-500";
+                                } else {
+                                    statusColor = "bg-cyan-500";
+                                }
+
+                                const statusText = isUninstalled
+                                    ? (source.type === 'theme' ? t('Manager.Sources.Status.ThemeNotInstalled') : t('Manager.Sources.Status.NotInstalled'))
+                                    : (isCloud ? t('Manager.Sources.Filters.OriginCloud') : t('Manager.Sources.Filters.OriginLocal'));
+
+                                return (
+                                    <div key={source.id} className={cn(
+                                        "group relative border rounded-none text-card-foreground shadow-xs hover:shadow-md hover:bg-muted/10 transition-all duration-300 px-4 py-1.5 w-full overflow-hidden backdrop-blur-md mb-1",
+                                        isUninstalled && "border-dashed border-destructive/50",
+                                        selectedIds.has(source.id)
+                                            ? "bg-primary/[0.05] border-primary/40 ring-1 ring-primary/20"
+                                            : "bg-card/75 hover:bg-muted/20 border-border/50"
                                     )}>
-                                        {source.origin === 'cloud' ? <Globe className="w-4 h-4 drop-shadow-sm" /> : <HardDrive className="w-4 h-4 drop-shadow-sm" />}
-                                    </div>
+                                        {/* Side Status Accent */}
+                                        <div className={cn("absolute left-0 top-0 bottom-0 w-[3px] transition-colors duration-300 z-10 bg-opacity-100", statusColor, isUninstalled && "animate-pulse")} />
 
-                                    <div className="flex-1 min-w-0 flex flex-col justify-center py-0.5">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <span className="text-[13px] font-bold text-foreground truncate group-hover:text-primary transition-colors">
-                                                {source.title}
-                                            </span>
-                                            {/* 未安装提示 */}
-                                            {!source.isInstalled && (
-                                                <span className="text-[10px] text-destructive flex items-center gap-1 font-medium bg-destructive/10 px-1.5 py-0.5 rounded-sm shrink-0">
-                                                    <AlertCircle className="w-3 h-3" />
-                                                    {source.type === 'theme' ? t('Manager.Sources.Status.ThemeNotInstalled') : t('Manager.Sources.Status.NotInstalled')}
+                                        <div className="flex items-center gap-4 overflow-hidden min-w-0 relative z-0">
+                                            <div className="flex items-center justify-center shrink-0">
+                                                <Checkbox
+                                                    className={cn("rounded-none transition-opacity", selectedIds.has(source.id) ? "opacity-100" : "opacity-30 group-hover:opacity-100")}
+                                                    checked={selectedIds.has(source.id)}
+                                                    onCheckedChange={() => toggleSelect(source.id)}
+                                                />
+                                            </div>
+
+                                            <div className={cn("px-2.5 py-0.5 text-[9px] uppercase tracking-[0.1em] font-extrabold rounded-none bg-background border border-border shadow-xs flex items-center gap-1.5 shrink-0 justify-center", statusColor.replace(/bg-/g, 'text-'))}>
+                                                <span className={cn("w-1.5 h-1.5 rounded-full shadow-sm", statusColor, isUninstalled ? "animate-pulse" : "")}></span>
+                                                {statusText}
+                                            </div>
+
+                                            <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                                                <span className="font-bold truncate text-[13.5px] text-foreground/90 group-hover:text-primary transition-colors duration-300 shrink-0 max-w-[50%]" title={source.title}>
+                                                    {source.title}
                                                 </span>
-                                            )}
-                                            {source.type === 'theme' ? (
-                                                <Badge variant="secondary" className="bg-orange-500/10 text-orange-600 hover:bg-orange-500/15 border border-orange-500/20 text-[9px] px-1.5 py-0 h-[18px] font-medium shrink-0 rounded-none">
-                                                    {t('Common.Labels.Themes')}
-                                                </Badge>
-                                            ) : (
-                                                <Badge variant="secondary" className="bg-purple-500/10 text-purple-600 hover:bg-purple-500/15 border border-purple-500/20 text-[9px] px-1.5 py-0 h-[18px] font-medium shrink-0 rounded-none">
-                                                    {t('Common.Labels.Plugins')}
-                                                </Badge>
-                                            )}
-                                            <Badge variant="outline" className="hidden sm:inline-flex text-[9px] px-1.5 py-0 h-[18px] font-medium text-muted-foreground/60 border-border/50 shrink-0 rounded-none">
-                                                {source.origin === 'cloud' ? t('Manager.Sources.Filters.OriginCloud') : t('Manager.Sources.Filters.OriginLocal')}
-                                            </Badge>
+                                                <span className="text-[10px] text-muted-foreground/50 font-mono truncate bg-muted/20 px-1.5 py-0.5 rounded-none max-w-[30%] border border-border/30 relative" title={source.plugin}>
+                                                    {source.plugin}
+                                                </span>
+                                                {source.type === 'theme' ? (
+                                                    <Badge variant="secondary" className="bg-orange-500/10 text-orange-600 hover:bg-orange-500/15 border border-orange-500/20 text-[9px] px-1.5 py-0 h-[18px] font-medium shrink-0 rounded-none">
+                                                        {t('Common.Labels.Themes')}
+                                                    </Badge>
+                                                ) : (
+                                                    <Badge variant="secondary" className="bg-purple-500/10 text-purple-600 hover:bg-purple-500/15 border border-purple-500/20 text-[9px] px-1.5 py-0 h-[18px] font-medium shrink-0 rounded-none">
+                                                        {t('Common.Labels.Plugins')}
+                                                    </Badge>
+                                                )}
+                                            </div>
+
+                                            <div className="hidden md:flex flex-col items-end justify-center px-4 shrink-0 min-w-[120px] tabular-nums">
+                                                <span className="text-[11px] font-bold text-muted-foreground/80 group-hover:text-foreground/80 transition-colors">
+                                                    {formatDate(source.updatedAt).split(' ')[0]}
+                                                </span>
+                                                <span className="text-[9px] text-muted-foreground/50">
+                                                    {formatDate(source.updatedAt).split(' ')[1]}
+                                                </span>
+                                            </div>
+
+                                            <div className="shrink-0 flex items-center justify-end">
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground/50 hover:text-foreground hover:bg-muted/50 rounded-none transition-all">
+                                                            <MoreHorizontal className="w-4 h-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end" className="w-[180px] rounded-none p-1 shadow-2xl backdrop-blur-md bg-background/95 border-border/40">
+                                                        <DropdownMenuItem className="text-[12px] rounded-none cursor-pointer py-2" onClick={() => {
+                                                            const filePath = sourceManager.getSourceFilePath(source.id);
+                                                            const pluginTranslationV1 = loadTranslationFile(filePath);
+                                                            useGlobalStoreInstance.getState().setEditorPluginTranslation(pluginTranslationV1);
+                                                            useGlobalStoreInstance.getState().setEditorPluginTranslationPath(filePath);
+                                                            i18n.view.activateView(EDITOR_VIEW_TYPE);
+                                                        }}>
+                                                            <Pen className="w-3.5 h-3.5 mr-2.5 text-primary/70" />
+                                                            {t('Manager.Common.Actions.Edit')}
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem className="text-[12px] rounded-none cursor-pointer py-2" onClick={() => {
+                                                            const filePath = sourceManager.getSourceFilePath(source.id);
+                                                            i18nOpen(i18n, path.dirname(filePath));
+                                                        }}>
+                                                            <FolderOpen className="w-3.5 h-3.5 mr-2.5 text-amber-500/70" />
+                                                            {t('Manager.Common.Actions.OpenFolder')}
+                                                        </DropdownMenuItem>
+                                                        <div className="h-px bg-border/40 my-1 mx-1" />
+                                                        <DropdownMenuItem className="text-[12px] text-destructive focus:text-destructive focus:bg-destructive/10 rounded-none cursor-pointer py-2" onClick={() => {
+                                                            sourceManager.removeSource(source.id);
+                                                            new Notice(t('Common.Notices.DeleteSuccess'));
+                                                            useGlobalStoreInstance.getState().triggerSourceUpdate();
+                                                        }}>
+                                                            <Trash2 className="w-3.5 h-3.5 mr-2.5 opacity-70" />
+                                                            {t('Manager.Common.Actions.Delete')}
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </div>
                                         </div>
-                                        <span className="text-[11px] text-muted-foreground/60 font-mono truncate max-w-[400px]">
-                                            {source.plugin}
-                                        </span>
                                     </div>
-
-                                    <div className="hidden md:flex flex-col items-end justify-center px-4 shrink-0 min-w-[90px]">
-                                        <span className="text-[11px] font-medium text-muted-foreground/80">
-                                            {formatDate(source.updatedAt).split(' ')[0]}
-                                        </span>
-                                        <span className="text-[9px] text-muted-foreground/40 tabular-nums">
-                                            {formatDate(source.updatedAt).split(' ')[1]}
-                                        </span>
-                                    </div>
-
-                                    <div className="shrink-0 flex items-center justify-end">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground/50 hover:text-foreground hover:bg-muted/50 rounded-none">
-                                                    <MoreVertical className="w-4 h-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end" className="w-[160px] rounded-none p-1 shadow-md border-border/40">
-                                                <DropdownMenuItem className="text-xs rounded-none cursor-pointer" onClick={() => {
-                                                    const filePath = sourceManager.getSourceFilePath(source.id);
-                                                    const pluginTranslationV1 = loadTranslationFile(filePath);
-                                                    useGlobalStoreInstance.getState().setEditorPluginTranslation(pluginTranslationV1);
-                                                    useGlobalStoreInstance.getState().setEditorPluginTranslationPath(filePath);
-                                                    i18n.view.activateView(EDITOR_VIEW_TYPE);
-                                                }}>
-                                                    {t('Manager.Common.Actions.Edit')}
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem className="text-xs rounded-none cursor-pointer" onClick={() => {
-                                                    const filePath = sourceManager.getSourceFilePath(source.id);
-                                                    i18nOpen(i18n, path.dirname(filePath));
-                                                }}>
-                                                    {t('Manager.Common.Actions.OpenFolder')}
-                                                </DropdownMenuItem>
-                                                <div className="h-px bg-border/40 my-1 mx-1" />
-                                                <DropdownMenuItem className="text-xs text-destructive focus:text-destructive focus:bg-destructive/10 rounded-none cursor-pointer" onClick={() => {
-                                                    sourceManager.removeSource(source.id);
-                                                    new Notice(t('Common.Notices.DeleteSuccess'));
-                                                    useGlobalStoreInstance.getState().triggerSourceUpdate();
-                                                }}>
-                                                    {t('Manager.Common.Actions.Delete')}
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </div>
-                                </div>
-                            ))
+                                );
+                            })
                         )}
                     </div>
                 </div>

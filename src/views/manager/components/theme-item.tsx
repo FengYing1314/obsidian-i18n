@@ -95,10 +95,10 @@ export const ThemeItem: React.FC<ThemeItemProps> = React.memo(({ theme, i18n, da
             if (!fileRes.state || !fileRes.data) {
                 throw new Error(fileRes.isRateLimit ? 'Rate limit exceeded' : fileRes.data?.message || 'Download failed');
             }
-            
+
             const content = typeof fileRes.data === 'string' ? JSON.parse(fileRes.data) : fileRes.data;
             const { calculateChecksum } = await import('../../../utils');
-            
+
             const existingSource = sourceManager?.getAllSources().find(s => s.id === entry.id);
             if (existingSource) {
                 sourceManager?.saveSourceFile(existingSource.id, content);
@@ -110,7 +110,7 @@ export const ThemeItem: React.FC<ThemeItemProps> = React.memo(({ theme, i18n, da
                     cloud: { owner, repo: repoName, hash: entry.hash },
                     updatedAt: Date.now()
                 });
-                i18n.notice.successPrefix('Cloud' , t('Cloud.Notices.UpdateSuccess' as any) || 'Update success');
+                i18n.notice.successPrefix('Cloud', t('Cloud.Notices.UpdateSuccess' as any) || 'Update success');
             } else {
                 sourceManager?.saveSourceFile(entry.id, content);
                 const isOnly = !sourceManager?.getActiveSourceId(theme.name);

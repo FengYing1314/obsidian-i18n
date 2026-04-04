@@ -165,28 +165,6 @@ export default class I18nBasis extends BaseSetting {
         new Setting(this.containerEl).setHeading().setName(t('Settings.Basis.AutoHeader'));
 
         new Setting(this.containerEl)
-            .setName(t('Settings.Basis.AutoApplyTitle'))
-            .setDesc(t('Settings.Basis.AutoApplyDesc'))
-            .addToggle(cb => cb
-                .setValue(this.settings.autoApply)
-                .onChange(async (value) => {
-                    this.settings.autoApply = value;
-                    await this.i18n.saveSettings();
-                })
-            );
-
-        new Setting(this.containerEl)
-            .setName(t('Settings.Basis.AutoSilentTitle'))
-            .setDesc(t('Settings.Basis.AutoSilentDesc'))
-            .addToggle(cb => cb
-                .setValue(this.settings.autoSilentMode)
-                .onChange(async (value) => {
-                    this.settings.autoSilentMode = value;
-                    await this.i18n.saveSettings();
-                })
-            );
-
-        new Setting(this.containerEl)
             .setName(t('Settings.Basis.AutoTrustedReposTitle'))
             .setDesc(t('Settings.Basis.AutoTrustedReposDesc'))
             .addTextArea(cb => cb

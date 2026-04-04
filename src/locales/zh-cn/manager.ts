@@ -38,15 +38,31 @@ export default {
                 found: '已发现匹配',
                 skipped: '已跳过',
                 error: '任务失败',
+                discovered: '待审阅',
+                discovered_new: '发现新译文',
+                discovered_update: '发现版本更新',
+                up_to_date: '已是最新',
+                applied: '已应用',
                 plugin: '插件',
                 theme: '主题',
+                DiscoveryNotice: '发现更新时通知',
+                AutoApply: '找到匹配后自动应用 (不推荐)',
+                SilentMode: '完全静默模式',
+                MatchStrategy: '匹配优选策略',
+                MatchStrategies: {
+                    comprehensive: '综合优选 (推荐)',
+                    version_first: '版本最接近优先',
+                    popularity: '社区热度优先',
+                    latest_update: '最新翻译优先'
+                }
             }
         },
         Errors: {
             Error: "错误",
             ErrorDesc: "译文解析异常",
             FetchCommunityDataFailed: "获取社区注册表数据失败，请检查网络",
-            SyncFailed: "中心库同步失败，请检查网络或 Token 权限"
+            SyncFailed: "中心库同步失败，请检查网络或 Token 权限",
+            InvalidRepo: "无效的仓库地址，请确保格式为 owner/repo"
         },
         Notices: {
             ApplySuccess: "翻译应用成功",
@@ -173,21 +189,21 @@ export default {
             Actions: "操作"
         },
         Status: {
-            NotInstalled: "未安装对应插件",
-            ThemeNotInstalled: "未安装对应主题"
+            NotInstalled: "插件缺失",
+            ThemeNotInstalled: "主题缺失"
         },
         Actions: {
-            Export: "批量导出",
-            Import: "导入译文",
-            BatchDelete: "批量删除",
-            SelectUninstalled: "选中未安装",
+            Export: "导出",
+            Import: "导入",
+            BatchDelete: "删除",
+            SelectUninstalled: "异常项",
             DeleteConfirm: "确定要删除选中的 {{count}} 项译文吗？此操作不可撤销。",
             ImportSuccess: "成功导入 {{count}} 项译文",
             ExportSuccess: "译文导出成功",
             SelectAll: "全选"
         },
         Filters: {
-            SearchPlaceholder: "搜索翻译或插件 ID...",
+            SearchPlaceholder: "搜索翻译或插件...",
             OriginLocal: "本地提取",
             OriginCloud: "云端下载"
         },
@@ -198,41 +214,72 @@ export default {
     },
     Auto: {
         TabName: "自动化",
-        Title: "自动化",
-        Desc: "查看一键翻译的后台执行状态与详情。",
+        Title: "自动化服务",
+        Desc: "智能探测可用的插件翻译并进行安全审阅。",
+        Discovery: {
+            Title: "发现更新",
+            ReviewAction: "审阅并应用",
+            IgnoreAction: "忽略此更新",
+            SafetyWarning: "安全提醒：此翻译来自社区仓库，建议在应用前确认来源可靠性。",
+            NewSource: "新来源 (首次发现)",
+            HashChanged: "内容已变更 (Hash 不一致)",
+            TrustScore: "汉化信誉评分",
+            ScoreBreakdown: {
+                Title: "匹配质量评分",
+                Version: "版本兼容",
+                Popularity: "社区认可",
+                Freshness: "更新鲜活"
+            }
+        },
+        Filters: {
+            Title: "任务筛选"
+        },
+        Scoping: {
+            Title: "探测范围"
+        },
+        History: {
+            Title: "安全审计日志",
+            Empty: "暂无操作记录",
+            BatchHeader: "执行批次：{{id}}",
+            TriggerDiscovery: "后台探测",
+            TriggerManual: "手动执行",
+            TriggerStartup: "启动自检"
+        },
         Actions: {
-            StartAuto: "开始一键任务"
+            StartAuto: "探测扫描",
+            ReviewAll: "全部审阅并应用",
+            OneClickReview: "一键审阅"
         },
         Modes: {
-            Incremental: '增量检查',
-            Full: '全量自检'
-        },
-        Dialogs: {
-            AutoWarningTitle: "实验性功能风险提示",
-            AutoWarningDesc: "「一键自动化」目前处于实验阶段，稳定性较低。它会批量执行扫描、应用并重启插件。为防止非预期错误，强烈建议您先在【测试库/备份库】中验证。是否继续执行？"
+            Incremental: '增量探测',
+            Full: '全量扫描'
         },
         Status: {
-            AutoStarting: "正在启动一键自动化处理...",
+            Analyzing: "正在分析云端仓库...",
+            AutoStarting: "正在启动安全探测...",
             ScanningInstalled: "正在扫描已安装项 ({{count}})...",
-            Running: "正在自动化扫描...",
-            ParsingEntries: "正在解析翻译注册表 ({{count}})...",
-            CacheHitApplying: "命中本地缓存，正在应用: {{id}}",
-            DownloadingBest: "正在下载最佳翻译: {{id}}",
-            NoLogs: "暂无自动化任务记录",
-            AutoRollbacked: "运行异常已自动回滚"
+            Running: "正在探测更新...",
+            DiscoveryComplete: "探测完成，发现 {{count}} 项待审阅",
+            NoLogs: "暂无扫描结果记录",
+            AutoRollbacked: "运行异常已自动回滚",
+            BatchApply: "批量应用发现",
+            BatchComplete: "批量任务已结束: 成功 {{success}}, 失败 {{fail}}",
+            SkipReasons: {
+                Exclusion: "插件已加入排除名单",
+                NoMatch: "所有信任源中均无该插件记录",
+                NoVersion: "未找到符合过滤条件的汉化版本"
+            }
         },
-        Errors: {
-            AutoFailed: "自动化处理过程中发生错误",
-            TrustedRepoNotInRegistry: "您配置的信任源未在云端注册表中找到匹配项，请检查设置。",
-            NoTrustedRepos: "[安全防范] 未配置任何受信任的翻译仓库源，已终止自动同步。请前往设置中添加。"
-        },
-        Notices: {
-            AutoFillComplete: "自动化处理完成: 成功 {{success}} 项, 跳过 {{skip}} 项",
-            AutoApplied: "自动已为 {{count}} 个新插件应用翻译",
-            AutoComplete: "一键处理完成！统计：成功 {{success}}，已最新 {{upToDate}}，失败 {{error}}，未找到 {{skip}}",
-            NoMatchFound: "未在社区库中找到匹配的翻译 (跳过: {{skip}})",
+        QuickSettings: {
+            Title: '自动化策略',
+            AutoApply: '自动应用翻译',
+            DiscoveryNotice: '后台探测与通知',
+            CheckInterval: '探测周期',
+            Hours: '小时'
         },
         Stats: {
+            Health: '汉化健康度',
+            VaultStatus: '汉化状态',
             TotalInstalled: '已安装总数',
             AppliedCount: '累计翻译应用',
             CurrentSuccess: '本次成功',
@@ -241,17 +288,19 @@ export default {
             Themes: '主题',
             LastCheckTime: '上次检查：{{time}}'
         },
+        Errors: {
+            NoCachedManifest: "未找到该插件的缓存清单",
+            NoBestMatch: "最佳匹配已不可用",
+            LocalApplyFailed: "本地应用失败",
+            DownloadApplyFailed: "下载或应用失败",
+            BatchApplyFailed: "批量应用失败"
+        },
         Repos: {
             Title: '受信任的仓库',
             AddPlaceholder: '添加仓库 (owner/repo)...',
             Empty: '暂无受信任仓库',
             RemoveConfirm: '确定移除该仓库吗？',
             ScanRegistry: '扫描注册表'
-        },
-        QuickSettings: {
-            Title: '自动化配置',
-            AutoApply: '自动应用翻译',
-            SilentMode: '静默运行'
         },
         Tips: {
             Title: '提示',

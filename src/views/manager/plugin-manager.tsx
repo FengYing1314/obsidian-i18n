@@ -266,7 +266,7 @@ export const PluginManager: React.FC<PluginManagerProps> = ({ i18n, close }) => 
     const rowVirtualizer = useVirtualizer({
         count: rowCount,
         getScrollElement: () => parentRef.current,
-        estimateSize: useCallback(() => viewMode === 'list' ? 44 + 6 : 200 + 12, [viewMode]), // 列表项约44px+6px间距，网格约200px+12px间距总和
+        estimateSize: useCallback(() => viewMode === 'list' ? 44 + 4 : 200 + 12, [viewMode]), // 列表项约44px+4px间距，网格约200px+12px间距总和
         getItemKey: useCallback((index: number) => `${viewMode}-${index}`, [viewMode]),
         overscan: 5,
     });
@@ -322,18 +322,18 @@ export const PluginManager: React.FC<PluginManagerProps> = ({ i18n, close }) => 
             <div className="flex flex-col gap-4 py-2 px-4 border-b shrink-0">
                 <div className="flex gap-2">
                     <div className="relative flex-1">
-                        <Search className="absolute left-2 top-2 h-4 w-4 text-muted-foreground" />
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground/70" />
                         <Input
                             placeholder={t('Manager.Plugins.Placeholders.SearchPlugins')}
                             value={searchTerm}
                             onChange={handleSearchChange}
-                            className="pl-8 h-9 rounded-none"
+                            className="pl-8 h-9 rounded-none border-muted-foreground/20 focus:ring-1 text-[13px] bg-muted/10 shadow-sm transition-colors hover:bg-muted/20"
                         />
                     </div>
 
-                    <div className="flex items-center gap-1 border rounded-none p-0.5 h-9 bg-muted/20">
+                    <div className="flex items-center gap-1 border border-muted-foreground/20 rounded-none p-0.5 h-9 bg-muted/20 shadow-sm">
                         <Button variant={viewMode === 'list' ? 'secondary' : 'ghost'} size="icon" className="h-8 w-8 rounded-none transition-all" onClick={() => setViewMode('list')} >
-                            <List className="h-4 w-4" />
+                            <List className="h-4 w-4 text-muted-foreground/80" />
                         </Button>
                         <Button
                             variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
@@ -341,12 +341,12 @@ export const PluginManager: React.FC<PluginManagerProps> = ({ i18n, close }) => 
                             className="h-8 w-8 rounded-none transition-all"
                             onClick={() => setViewMode('grid')}
                         >
-                            <LayoutGrid className="h-4 w-4" />
+                            <LayoutGrid className="h-4 w-4 text-muted-foreground/80" />
                         </Button>
                     </div>
 
                     <Select value={statusFilter} onValueChange={(val: any) => setStatusFilter(val)}>
-                        <SelectTrigger className="w-[120px] h-9 rounded-none" size="default">
+                        <SelectTrigger className="w-[120px] h-9 rounded-none border-muted-foreground/20 shadow-sm text-[13px]" size="default">
                             <SelectValue placeholder={t('Manager.Common.Filters.All')} />
                         </SelectTrigger>
                         <SelectContent>
@@ -357,7 +357,7 @@ export const PluginManager: React.FC<PluginManagerProps> = ({ i18n, close }) => 
                     </Select>
 
                     <Select value={sortType} onValueChange={handleSortChange}>
-                        <SelectTrigger className="w-[130px] h-9 rounded-none" size="default">
+                        <SelectTrigger className="w-[130px] h-9 rounded-none border-muted-foreground/20 shadow-sm text-[13px]" size="default">
                             <SelectValue placeholder={t('Common.Data.SortAsc')} />
                         </SelectTrigger>
                         <SelectContent>
@@ -390,7 +390,7 @@ export const PluginManager: React.FC<PluginManagerProps> = ({ i18n, close }) => 
                                         display: 'grid',
                                         gridTemplateColumns: `repeat(${columns}, 1fr)`,
                                         gap: viewMode === 'list' ? '0px' : '12px',
-                                        paddingBottom: viewMode === 'list' ? '6px' : '12px',
+                                        paddingBottom: viewMode === 'list' ? '4px' : '12px',
                                     }}
                                 >
                                     {itemsInRow.map((plugin) => (

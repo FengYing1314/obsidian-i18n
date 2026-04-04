@@ -1,0 +1,702 @@
+[
+  {
+    "id": "1775287612564",
+    "time": 1775287612564,
+    "trigger": "discovery",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775287478025",
+    "time": 1775287478025,
+    "trigger": "discovery",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775287324829",
+    "time": 1775287324829,
+    "trigger": "manual",
+    "summary": {
+      "total": 22,
+      "success": 0,
+      "error": 0,
+      "skipped": 22,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775287317722",
+    "time": 1775287317722,
+    "trigger": "manual",
+    "summary": {
+      "total": 22,
+      "success": 0,
+      "error": 0,
+      "skipped": 22,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775287312542",
+    "time": 1775287312542,
+    "trigger": "manual",
+    "summary": {
+      "total": 22,
+      "success": 0,
+      "error": 0,
+      "skipped": 22,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775287305861",
+    "time": 1775287305861,
+    "trigger": "manual",
+    "summary": {
+      "total": 2,
+      "success": 0,
+      "error": 0,
+      "skipped": 2,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775287285156",
+    "time": 1775287285156,
+    "trigger": "discovery",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775287110109",
+    "time": 1775287110109,
+    "trigger": "manual",
+    "summary": {
+      "total": 22,
+      "success": 0,
+      "error": 0,
+      "skipped": 22,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775287104519",
+    "time": 1775287104519,
+    "trigger": "manual",
+    "summary": {
+      "total": 2,
+      "success": 0,
+      "error": 0,
+      "skipped": 2,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775287099550",
+    "time": 1775287099550,
+    "trigger": "startup",
+    "summary": {
+      "total": 22,
+      "success": 0,
+      "error": 0,
+      "skipped": 2,
+      "discovered": 7,
+      "upToDate": 13
+    },
+    "details": "[{\"id\":\"calendar\",\"type\":\"plugin\",\"name\":\"calendar\",\"status\":\"up_to_date\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":25,\"popularity\":9,\"freshness\":20,\"total\":52}},{\"id\":\"copilot\",\"type\":\"plugin\",\"name\":\"copilot\",\"status\":\"up_to_date\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":25,\"popularity\":9,\"freshness\":20,\"total\":52}},{\"id\":\"homepage\",\"type\":\"plugin\",\"name\":\"homepage\",\"status\":\"up_to_date\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":50,\"popularity\":9,\"freshness\":20,\"total\":89}},{\"id\":\"immersive-translate\",\"type\":\"plugin\",\"name\":\"immersive-translate\",\"status\":\"up_to_date\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":50,\"popularity\":9,\"freshness\":20,\"total\":89}},{\"id\":\"obsidian-admonition\",\"type\":\"plugin\",\"name\":\"obsidian-admonition\",\"status\":\"discovered_new\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":0,\"popularity\":9,\"freshness\":20,\"total\":14}},{\"id\":\"obsidian-excalidraw-plugin\",\"type\":\"plugin\",\"name\":\"obsidian-excalidraw-plugin\",\"status\":\"up_to_date\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":25,\"popularity\":9,\"freshness\":20,\"total\":52}},{\"id\":\"obsidian-icon-folder\",\"type\":\"plugin\",\"name\":\"obsidian-icon-folder\",\"status\":\"up_to_date\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":50,\"popularity\":9,\"freshness\":20,\"total\":89}},{\"id\":\"obsidian-kanban\",\"type\":\"plugin\",\"name\":\"obsidian-kanban\",\"status\":\"discovered_new\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":50,\"popularity\":9,\"freshness\":20,\"total\":89}},{\"id\":\"obsidian-list-callouts\",\"type\":\"plugin\",\"name\":\"obsidian-list-callouts\",\"status\":\"up_to_date\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":50,\"popularity\":9,\"freshness\":20,\"total\":89}},{\"id\":\"obsidian-meta-bind-plugin\",\"type\":\"plugin\",\"name\":\"obsidian-meta-bind-plugin\",\"status\":\"up_to_date\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":50,\"popularity\":9,\"freshness\":20,\"total\":89}},{\"id\":\"obsidian-style-settings\",\"type\":\"plugin\",\"name\":\"obsidian-style-settings\",\"status\":\"up_to_date\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":50,\"popularity\":9,\"freshness\":20,\"total\":89}},{\"id\":\"obsidian-tasks-plugin\",\"type\":\"plugin\",\"name\":\"obsidian-tasks-plugin\",\"status\":\"discovered_new\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":25,\"popularity\":9,\"freshness\":20,\"total\":52}},{\"id\":\"obsidian42-brat\",\"type\":\"plugin\",\"name\":\"obsidian42-brat\",\"status\":\"discovered_new\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":25,\"popularity\":9,\"freshness\":20,\"total\":52}},{\"id\":\"omnisearch\",\"type\":\"plugin\",\"name\":\"omnisearch\",\"status\":\"up_to_date\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":25,\"popularity\":9,\"freshness\":20,\"total\":52}},{\"id\":\"recent-files-obsidian\",\"type\":\"plugin\",\"name\":\"recent-files-obsidian\",\"status\":\"discovered_new\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":50,\"popularity\":9,\"freshness\":20,\"total\":89}},{\"id\":\"smart-connections\",\"type\":\"plugin\",\"name\":\"smart-connections\",\"status\":\"up_to_date\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":50,\"popularity\":9,\"freshness\":20,\"total\":89}},{\"id\":\"table-editor-obsidian\",\"type\":\"plugin\",\"name\":\"table-editor-obsidian\",\"status\":\"up_to_date\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":50,\"popularity\":9,\"freshness\":20,\"total\":89}},{\"id\":\"tag-wrangler\",\"type\":\"plugin\",\"name\":\"tag-wrangler\",\"status\":\"up_to_date\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":50,\"popularity\":9,\"freshness\":20,\"total\":89}},{\"id\":\"templater-obsidian\",\"type\":\"plugin\",\"name\":\"templater-obsidian\",\"status\":\"discovered_new\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":25,\"popularity\":9,\"freshness\":20,\"total\":52}},{\"id\":\"Things\",\"type\":\"theme\",\"name\":\"Things\",\"status\":\"discovered_new\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":25,\"popularity\":9,\"freshness\":20,\"total\":52}}]"
+  },
+  {
+    "id": "1775287094297",
+    "time": 1775287094297,
+    "trigger": "manual",
+    "summary": {
+      "total": 2,
+      "success": 0,
+      "error": 0,
+      "skipped": 2,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775287091570",
+    "time": 1775287091570,
+    "trigger": "startup",
+    "summary": {
+      "total": 2,
+      "success": 0,
+      "error": 0,
+      "skipped": 2,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775287087520",
+    "time": 1775287087520,
+    "trigger": "discovery",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775287021952",
+    "time": 1775287021952,
+    "trigger": "manual",
+    "summary": {
+      "total": 2,
+      "success": 0,
+      "error": 0,
+      "skipped": 2,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775287019971",
+    "time": 1775287019971,
+    "trigger": "discovery",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775286934801",
+    "time": 1775286934801,
+    "trigger": "manual",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775286857927",
+    "time": 1775286857927,
+    "trigger": "manual",
+    "summary": {
+      "total": 2,
+      "success": 0,
+      "error": 0,
+      "skipped": 2,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775286856017",
+    "time": 1775286856017,
+    "trigger": "discovery",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775286743659",
+    "time": 1775286743659,
+    "trigger": "manual",
+    "summary": {
+      "total": 2,
+      "success": 0,
+      "error": 0,
+      "skipped": 2,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775286737242",
+    "time": 1775286737242,
+    "trigger": "discovery",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775286612941",
+    "time": 1775286612941,
+    "trigger": "discovery",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775286417870",
+    "time": 1775286417870,
+    "trigger": "manual",
+    "summary": {
+      "total": 22,
+      "success": 0,
+      "error": 0,
+      "skipped": 22,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775286376871",
+    "time": 1775286376872,
+    "trigger": "manual",
+    "summary": {
+      "total": 22,
+      "success": 0,
+      "error": 0,
+      "skipped": 22,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775286359769",
+    "time": 1775286359769,
+    "trigger": "manual",
+    "summary": {
+      "total": 22,
+      "success": 0,
+      "error": 0,
+      "skipped": 22,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775286353138",
+    "time": 1775286353138,
+    "trigger": "manual",
+    "summary": {
+      "total": 22,
+      "success": 0,
+      "error": 0,
+      "skipped": 22,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775286299154",
+    "time": 1775286299154,
+    "trigger": "manual",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775286248476",
+    "time": 1775286248476,
+    "trigger": "startup",
+    "summary": {
+      "total": 5,
+      "success": 0,
+      "error": 0,
+      "skipped": 5,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775286169172",
+    "time": 1775286169172,
+    "trigger": "discovery",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775286051996",
+    "time": 1775286051996,
+    "trigger": "discovery",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775285928669",
+    "time": 1775285928669,
+    "trigger": "discovery",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775285735831",
+    "time": 1775285735831,
+    "trigger": "discovery",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775285607923",
+    "time": 1775285607923,
+    "trigger": "discovery",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775285488138",
+    "time": 1775285488138,
+    "trigger": "manual",
+    "summary": {
+      "total": 19,
+      "success": 0,
+      "error": 17,
+      "skipped": 2,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[{\"id\":\"calendar\",\"type\":\"plugin\",\"name\":\"calendar\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"2.0.0\",\"scoreBreakdown\":{\"version\":50,\"popularity\":89,\"freshness\":79,\"total\":209}},{\"id\":\"copilot\",\"type\":\"plugin\",\"name\":\"copilot\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":50,\"popularity\":89,\"freshness\":78,\"total\":207}},{\"id\":\"immersive-translate\",\"type\":\"plugin\",\"name\":\"immersive-translate\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":100,\"popularity\":89,\"freshness\":78,\"total\":257}},{\"id\":\"obsidian-admonition\",\"type\":\"plugin\",\"name\":\"obsidian-admonition\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"2.0.0\",\"scoreBreakdown\":{\"version\":0,\"popularity\":89,\"freshness\":79,\"total\":159}},{\"id\":\"obsidian-excalidraw-plugin\",\"type\":\"plugin\",\"name\":\"obsidian-excalidraw-plugin\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"2.0.0\",\"scoreBreakdown\":{\"version\":50,\"popularity\":89,\"freshness\":79,\"total\":209}},{\"id\":\"obsidian-icon-folder\",\"type\":\"plugin\",\"name\":\"obsidian-icon-folder\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":100,\"popularity\":89,\"freshness\":78,\"total\":257}},{\"id\":\"obsidian-kanban\",\"type\":\"plugin\",\"name\":\"obsidian-kanban\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"2.0.0\",\"scoreBreakdown\":{\"version\":100,\"popularity\":89,\"freshness\":79,\"total\":259}},{\"id\":\"obsidian-list-callouts\",\"type\":\"plugin\",\"name\":\"obsidian-list-callouts\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":100,\"popularity\":89,\"freshness\":78,\"total\":257}},{\"id\":\"obsidian-meta-bind-plugin\",\"type\":\"plugin\",\"name\":\"obsidian-meta-bind-plugin\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":100,\"popularity\":89,\"freshness\":78,\"total\":257}},{\"id\":\"obsidian-style-settings\",\"type\":\"plugin\",\"name\":\"obsidian-style-settings\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"2.0.0\",\"scoreBreakdown\":{\"version\":100,\"popularity\":89,\"freshness\":79,\"total\":259}},{\"id\":\"obsidian-tasks-plugin\",\"type\":\"plugin\",\"name\":\"obsidian-tasks-plugin\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"2.0.0\",\"scoreBreakdown\":{\"version\":50,\"popularity\":89,\"freshness\":79,\"total\":209}},{\"id\":\"obsidian42-brat\",\"type\":\"plugin\",\"name\":\"obsidian42-brat\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":50,\"popularity\":89,\"freshness\":78,\"total\":207}},{\"id\":\"omnisearch\",\"type\":\"plugin\",\"name\":\"omnisearch\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"2.0.0\",\"scoreBreakdown\":{\"version\":50,\"popularity\":89,\"freshness\":79,\"total\":209}},{\"id\":\"recent-files-obsidian\",\"type\":\"plugin\",\"name\":\"recent-files-obsidian\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":100,\"popularity\":89,\"freshness\":78,\"total\":257}},{\"id\":\"smart-connections\",\"type\":\"plugin\",\"name\":\"smart-connections\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":100,\"popularity\":89,\"freshness\":78,\"total\":257}},{\"id\":\"table-editor-obsidian\",\"type\":\"plugin\",\"name\":\"table-editor-obsidian\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"2.0.0\",\"scoreBreakdown\":{\"version\":100,\"popularity\":89,\"freshness\":79,\"total\":259}},{\"id\":\"tag-wrangler\",\"type\":\"plugin\",\"name\":\"tag-wrangler\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"2.0.0\",\"scoreBreakdown\":{\"version\":100,\"popularity\":89,\"freshness\":79,\"total\":259}}]"
+  },
+  {
+    "id": "1775285478035",
+    "time": 1775285478035,
+    "trigger": "discovery",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775285249772",
+    "time": 1775285249772,
+    "trigger": "manual",
+    "summary": {
+      "total": 19,
+      "success": 0,
+      "error": 17,
+      "skipped": 2,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[{\"id\":\"calendar\",\"type\":\"plugin\",\"name\":\"calendar\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"2.0.0\",\"scoreBreakdown\":{\"version\":50,\"popularity\":89,\"freshness\":79,\"total\":209}},{\"id\":\"copilot\",\"type\":\"plugin\",\"name\":\"copilot\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":50,\"popularity\":89,\"freshness\":78,\"total\":207}},{\"id\":\"immersive-translate\",\"type\":\"plugin\",\"name\":\"immersive-translate\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":100,\"popularity\":89,\"freshness\":78,\"total\":257}},{\"id\":\"obsidian-admonition\",\"type\":\"plugin\",\"name\":\"obsidian-admonition\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"2.0.0\",\"scoreBreakdown\":{\"version\":0,\"popularity\":89,\"freshness\":79,\"total\":159}},{\"id\":\"obsidian-excalidraw-plugin\",\"type\":\"plugin\",\"name\":\"obsidian-excalidraw-plugin\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"2.0.0\",\"scoreBreakdown\":{\"version\":50,\"popularity\":89,\"freshness\":79,\"total\":209}},{\"id\":\"obsidian-icon-folder\",\"type\":\"plugin\",\"name\":\"obsidian-icon-folder\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":100,\"popularity\":89,\"freshness\":78,\"total\":257}},{\"id\":\"obsidian-kanban\",\"type\":\"plugin\",\"name\":\"obsidian-kanban\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"2.0.0\",\"scoreBreakdown\":{\"version\":100,\"popularity\":89,\"freshness\":79,\"total\":259}},{\"id\":\"obsidian-list-callouts\",\"type\":\"plugin\",\"name\":\"obsidian-list-callouts\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":100,\"popularity\":89,\"freshness\":78,\"total\":257}},{\"id\":\"obsidian-meta-bind-plugin\",\"type\":\"plugin\",\"name\":\"obsidian-meta-bind-plugin\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":100,\"popularity\":89,\"freshness\":78,\"total\":257}},{\"id\":\"obsidian-style-settings\",\"type\":\"plugin\",\"name\":\"obsidian-style-settings\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"2.0.0\",\"scoreBreakdown\":{\"version\":100,\"popularity\":89,\"freshness\":79,\"total\":259}},{\"id\":\"obsidian-tasks-plugin\",\"type\":\"plugin\",\"name\":\"obsidian-tasks-plugin\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"2.0.0\",\"scoreBreakdown\":{\"version\":50,\"popularity\":89,\"freshness\":79,\"total\":209}},{\"id\":\"obsidian42-brat\",\"type\":\"plugin\",\"name\":\"obsidian42-brat\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":50,\"popularity\":89,\"freshness\":78,\"total\":207}},{\"id\":\"omnisearch\",\"type\":\"plugin\",\"name\":\"omnisearch\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"2.0.0\",\"scoreBreakdown\":{\"version\":50,\"popularity\":89,\"freshness\":79,\"total\":209}},{\"id\":\"recent-files-obsidian\",\"type\":\"plugin\",\"name\":\"recent-files-obsidian\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":100,\"popularity\":89,\"freshness\":78,\"total\":257}},{\"id\":\"smart-connections\",\"type\":\"plugin\",\"name\":\"smart-connections\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"1.0.0\",\"scoreBreakdown\":{\"version\":100,\"popularity\":89,\"freshness\":78,\"total\":257}},{\"id\":\"table-editor-obsidian\",\"type\":\"plugin\",\"name\":\"table-editor-obsidian\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"2.0.0\",\"scoreBreakdown\":{\"version\":100,\"popularity\":89,\"freshness\":79,\"total\":259}},{\"id\":\"tag-wrangler\",\"type\":\"plugin\",\"name\":\"tag-wrangler\",\"status\":\"error\",\"message\":\"Batch apply failed\",\"sourceRepo\":\"yunrr/obsidian-i18n-resources\",\"targetVersion\":\"2.0.0\",\"scoreBreakdown\":{\"version\":100,\"popularity\":89,\"freshness\":79,\"total\":259}}]"
+  },
+  {
+    "id": "1775285160162",
+    "time": 1775285160162,
+    "trigger": "discovery",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775285069211",
+    "time": 1775285069211,
+    "trigger": "discovery",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775285025623",
+    "time": 1775285025623,
+    "trigger": "manual",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775284924587",
+    "time": 1775284924587,
+    "trigger": "discovery",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775284678251",
+    "time": 1775284678251,
+    "trigger": "discovery",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775284554637",
+    "time": 1775284554637,
+    "trigger": "discovery",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775284499267",
+    "time": 1775284499267,
+    "trigger": "manual",
+    "summary": {
+      "total": 22,
+      "success": 0,
+      "error": 0,
+      "skipped": 22,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775284477127",
+    "time": 1775284477127,
+    "trigger": "manual",
+    "summary": {
+      "total": 2,
+      "success": 0,
+      "error": 0,
+      "skipped": 2,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775284468387",
+    "time": 1775284468387,
+    "trigger": "startup",
+    "summary": {
+      "total": 22,
+      "success": 0,
+      "error": 0,
+      "skipped": 22,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775284451561",
+    "time": 1775284451561,
+    "trigger": "manual",
+    "summary": {
+      "total": 22,
+      "success": 0,
+      "error": 0,
+      "skipped": 22,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775284444375",
+    "time": 1775284444375,
+    "trigger": "manual",
+    "summary": {
+      "total": 2,
+      "success": 0,
+      "error": 0,
+      "skipped": 2,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775284426819",
+    "time": 1775284426819,
+    "trigger": "discovery",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775284345026",
+    "time": 1775284345026,
+    "trigger": "startup",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775284306317",
+    "time": 1775284306317,
+    "trigger": "discovery",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  },
+  {
+    "id": "1775284242186",
+    "time": 1775284242186,
+    "trigger": "manual",
+    "summary": {
+      "total": 0,
+      "success": 0,
+      "error": 0,
+      "skipped": 0,
+      "discovered": 0,
+      "upToDate": 0
+    },
+    "details": "[]"
+  }
+]

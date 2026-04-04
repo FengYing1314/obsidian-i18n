@@ -129,12 +129,17 @@ export interface I18nSettings {
     pluginViewMode: 'list' | 'grid'; // 插件管理器视图模式
     themeViewMode: 'list' | 'grid'; // 主题管理器视图模式
     autoSave: boolean;        // 编辑器是否开启自动保存
+
     // ==============================
     // 自动化设置 (AutoManager)
     // ==============================
-    autoSilentMode: boolean;   // 自动模式是否开启静默匹配（不弹出通知）
-    autoApply: boolean;        // 自动化匹配后是否自动执行应用 (物理替换文件)
+    autoDiscovery: boolean;     // [自动化] 是否启用后台探测与通知
+    autoMatchStrategy: 'comprehensive' | 'version_first' | 'popularity' | 'latest_update'; // [自动化] 匹配策略
+    autoApply: boolean;         // [自动化] 是否静默应用文件
+    autoCheckInterval: number;  // [自动化] 自动检查间隔 (单位：小时, 0 为关闭)
     autoTrustedRepos: string[]; // 受信任的自动翻译仓库列表
+    autoExcludeList: string[]; // 自动化排除名单 (插件 ID)
+    autoScanMode: 'incremental' | 'full'; // [自动化] 探测范围模式
     lastAutoCheckTime: number; // 上次自动检查的时间戳
 }
 
@@ -286,8 +291,12 @@ export const DEFAULT_SETTINGS: I18nSettings = {
     // ==============================
     // 自动化设置 (AutoManager)
     // ==============================
-    autoSilentMode: false,     // 默认不进入完成静默模式（方便用户感知）
-    autoApply: true,           // 默认开启自动应用
+    autoDiscovery: false,       // 默认开启后台自动探测与通知
+    autoMatchStrategy: 'comprehensive',
+    autoApply: false,          // 安全起见，默认关闭自动应用
+    autoCheckInterval: 24,     // 默认 24 小时检查一次
     autoTrustedRepos: [],      // 默认受信任源为空列表
+    autoExcludeList: [],       // 默认排除名单为空
+    autoScanMode: 'incremental',
     lastAutoCheckTime: 0,
 }

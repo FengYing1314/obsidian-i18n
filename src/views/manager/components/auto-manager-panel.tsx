@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAutoStore, AutoTaskStatus, AutoTaskItem } from '../auto-store';
+import { useAutoStore, AutoTaskItem, AutoScoreBreakdown } from '../auto-store';
 import {
     Loader2, CheckCircle2, AlertCircle, RefreshCw, Play, Package,
     Palette, Zap, LayoutList, Settings2, Globe, Plus, Trash2,
-    Monitor, MousePointer2, Info, ChevronRight
+    Monitor, Info, Activity, Gauge, Terminal, Shield, ListFilter,
+    Filter, RotateCcw
 } from 'lucide-react';
-import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Input } from '~/shadcn';
+import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Input, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, Checkbox } from '~/shadcn';
 import { cn } from '~/shadcn/lib/utils';
 import I18N from 'src/main';
-import { moment } from 'obsidian';
 
 interface AutoManagerPanelProps {
     i18n: I18N;
@@ -20,458 +20,478 @@ export const AutoManagerPanel: React.FC<AutoManagerPanelProps> = ({ i18n }) => {
     const {
         status, progress, tasks, summary, clearAll,
         trustedRepos, addTrustedRepo, removeTrustedRepo,
-        autoApply, autoSilentMode, filterStatus, setFilterStatus, setConfigs
+        autoDiscovery, autoApply, autoMatchStrategy, autoCheckInterval, autoScanMode,
+        filterStatus, setFilterStatus, setConfigs
     } = useAutoStore();
 
-    const [mode, setMode] = useState<'incremental' | 'full'>('incremental');
     const [newRepo, setNewRepo] = useState('');
     const [isAdding, setIsAdding] = useState(false);
 
     const handleStart = async () => {
         if (status === 'running') return;
-        clearAll();
-        // 设置状态为运行中，避免重复触发
-        useAutoStore.getState().setStatus('running');
         await i18n.autoManager.runSmartAuto({
-            silent: true,
-            isIncremental: mode === 'incremental'
+            isIncremental: autoScanMode === 'incremental'
         });
     };
 
     const handleAddRepo = async () => {
-        const repoStr = newRepo.trim();
-        if (!repoStr || !repoStr.includes('/')) {
-            i18n.notice.warning('格式错误：请输入 owner/repo 格式');
-            return;
-        }
-        if (trustedRepos.includes(repoStr)) {
-            setNewRepo('');
-            return;
-        }
-
+        if (!newRepo.includes('/') || isAdding) return;
         setIsAdding(true);
-        const isValid = await i18n.autoManager.verifyRepo(repoStr);
-        setIsAdding(false);
-
-        if (!isValid) {
-            i18n.notice.error('添加失败：未在社区找到该仓库，且其不包含有效的 metadata.json');
-            return;
+        const isValid = await i18n.autoManager.verifyRepo(newRepo);
+        if (isValid) {
+            addTrustedRepo(newRepo);
+            i18n.settings.autoTrustedRepos = Array.from(new Set([...i18n.settings.autoTrustedRepos, newRepo]));
+            await i18n.saveSettings();
+            setNewRepo('');
+        } else {
+            i18n.notice.error(t('Manager.Common.Errors.InvalidRepo' as any));
         }
-
-        const repos = [...trustedRepos, repoStr];
-        i18n.settings.autoTrustedRepos = repos;
-        await i18n.saveSettings();
-        addTrustedRepo(repoStr);
-        setNewRepo('');
-        i18n.notice.success('添加受信任仓库成功');
+        setIsAdding(false);
     };
 
     const handleRemoveRepo = async (repo: string) => {
-        const repos = trustedRepos.filter(r => r !== repo);
-        i18n.settings.autoTrustedRepos = repos;
-        await i18n.saveSettings();
         removeTrustedRepo(repo);
+        i18n.settings.autoTrustedRepos = i18n.settings.autoTrustedRepos.filter(r => r !== repo);
+        await i18n.saveSettings();
     };
 
-    const toggleConfig = async (key: 'autoApply' | 'autoSilentMode') => {
-        // @ts-ignore
-        const newVal = !i18n.settings[key];
-        // @ts-ignore
-        i18n.settings[key] = newVal;
+    const toggleConfig = async (key: 'autoDiscovery' | 'autoApply') => {
+        const newVal = !((i18n.settings as any)[key]);
+        (i18n.settings as any)[key] = newVal;
         await i18n.saveSettings();
         setConfigs({ [key]: newVal });
     };
 
+    const coverage = tasks.length > 0 ? Math.round((summary.upToDate / tasks.length) * 100) : 0;
+
     return (
-        <div className="flex h-full bg-background overflow-hidden animate-in fade-in duration-500">
-            {/* 左侧主要内容区 */}
-            <div className="flex-1 flex flex-col h-full overflow-hidden p-6 gap-6">
-                {/* 顶部标题与主要操作 */}
-                <div className="flex items-center justify-between shrink-0">
-                    <div>
-                        <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-                            <div className="w-2 h-8 bg-amber-500 rounded-full mr-1" />
-                            {t('Manager.Auto.TabName')}
-                        </h2>
-                        <p className="text-muted-foreground mt-1 text-sm">
-                            {t('Manager.Auto.Desc')}
-                        </p>
-                        {i18n.settings.lastAutoCheckTime > 0 && (
-                            <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1.5 font-medium">
-                                <RefreshCw className="w-3.5 h-3.5" />
-                                {t('Manager.Auto.Stats.LastCheckTime', { time: moment(i18n.settings.lastAutoCheckTime).fromNow() })}
-                            </p>
-                        )}
-                    </div>
-
-                    <div className="flex items-center gap-3 bg-muted/30 p-1.5 rounded-xl border border-border/50">
-                        <Select value={mode} onValueChange={(val: any) => setMode(val)} disabled={status === 'running'}>
-                            <SelectTrigger size="sm" className="w-[130px] border-none bg-transparent shadow-none hover:bg-background/50">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="incremental">
-                                    <span className="flex items-center gap-2 text-xs font-medium">
-                                        <Zap className="w-3.5 h-3.5 text-amber-500" />
-                                        {t('Manager.Auto.Modes.Incremental')}
-                                    </span>
-                                </SelectItem>
-                                <SelectItem value="full">
-                                    <span className="flex items-center gap-2 text-xs font-medium">
-                                        <LayoutList className="w-3.5 h-3.5 text-blue-500" />
-                                        {t('Manager.Auto.Modes.Full')}
-                                    </span>
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
-
-                        <div className="w-px h-4 bg-border/50 mx-1" />
-
-                        <Button
-                            onClick={handleStart}
-                            disabled={status === 'running'}
-                            size="sm"
-                            className={cn(
-                                "rounded-lg px-4 font-semibold transition-all shadow-lg",
-                                status === 'running' ? "bg-muted" : "bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/20"
-                            )}
-                        >
-                            {status === 'running' ? (
-                                <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t('Manager.Auto.Status.Running')}</>
-                            ) : (
-                                <><Play className="w-4 h-4 mr-2 fill-current" /> {t('Manager.Auto.Actions.StartAuto')}</>
-                            )}
-                        </Button>
-                    </div>
-                </div>
-
-                {/* 统计看板 */}
-                <div className="grid grid-cols-4 gap-4 shrink-0">
-                    <StatsCard
-                        label={t('Manager.Auto.Stats.TotalInstalled')}
-                        value={summary.total || tasks.length}
-                        icon={<Package className="w-4 h-4 text-blue-500" />}
-                    />
-                    <StatsCard
-                        label={t('Manager.Auto.Stats.AppliedCount')}
-                        value={summary.applied}
-                        icon={<CheckCircle2 className="w-4 h-4 text-emerald-500" />}
-                        subLabel={t('Manager.Auto.Stats.Plugins') + '/' + t('Manager.Auto.Stats.Themes')}
-                    />
-                    <StatsCard
-                        label={t('Manager.Auto.Stats.CurrentSuccess')}
-                        value={summary.success}
-                        icon={<Zap className="w-4 h-4 text-amber-500" />}
-                        color="text-emerald-500"
-                    />
-                    <StatsCard
-                        label={t('Manager.Auto.Stats.CurrentSkipped')}
-                        value={summary.skipped + summary.error}
-                        icon={<AlertCircle className="w-4 h-4 text-muted-foreground" />}
-                    />
-                </div>
-
-                {/* 进度与任务列表 */}
-                <div className="flex-1 flex flex-col gap-4 overflow-hidden min-h-0 bg-muted/5 rounded-2xl border border-border/40 p-1">
-                    {status === 'running' && progress.total > 0 && (
-                        <div className="px-4 pt-4 pb-2 animate-in slide-in-from-top duration-300">
-                            <div className="flex justify-between text-[11px] mb-2 font-medium">
-                                <span className="text-blue-500 flex items-center gap-1">
-                                    <Loader2 className="w-3 h-3 animate-spin" />
-                                    {t('Manager.Auto.Status.Running')}...
-                                </span>
-                                <span>{progress.current} / {progress.total}</span>
-                            </div>
-                            <div className="h-2 bg-muted rounded-full overflow-hidden">
-                                <div
-                                    className="h-full bg-blue-500 transition-all duration-300 shadow-[0_0_10px_rgba(59,130,246,0.5)]"
-                                    style={{ width: `${Math.round((progress.current / progress.total) * 100)}%` }}
+        <div className="flex flex-col h-full bg-background overflow-hidden text-foreground">
+            {/* Top Bar - Standardized height matching other managers (py-2 + h-9) */}
+            <div className="flex items-center justify-between py-2 px-4 border-b shrink-0 bg-background shadow-xs">
+                <div className="flex items-center gap-5">
+                    {/* Coverage - Consistent alignment */}
+                    <div className="flex items-center gap-3 pr-5 border-r border-border/40 h-9">
+                        <div className="relative w-8 h-8 flex items-center justify-center shrink-0">
+                            <svg className="w-full h-full transform -rotate-90">
+                                <circle cx="16" cy="16" r="13" stroke="currentColor" strokeWidth="2.5" fill="transparent" className="text-muted/10" />
+                                <circle
+                                    cx="16" cy="16" r="13" stroke="currentColor" strokeWidth="2.5" fill="transparent"
+                                    strokeDasharray={81.6}
+                                    strokeDashoffset={81.6 * (1 - coverage / 100)}
+                                    className="text-emerald-500 transition-all duration-1000 ease-out"
+                                    strokeLinecap="butt"
                                 />
-                            </div>
+                            </svg>
+                            <span className="absolute inset-0 flex items-center justify-center text-[9px] font-black tracking-tighter">{coverage}%</span>
                         </div>
-                    )}
-
-                    {tasks.length > 0 && (
-                        <div className="flex items-center gap-1.5 px-4 pt-2 pb-1 overflow-x-auto custom-scrollbar shrink-0">
-                            {[
-                                { id: 'all', label: t('Manager.Common.Filters.All'), count: tasks.length },
-                                { id: 'success', label: t('Manager.Common.Status.Labels.success'), count: tasks.filter(t => t.status === 'success').length },
-                                { id: 'error', label: t('Manager.Common.Status.Labels.error'), count: tasks.filter(t => t.status === 'error').length },
-                                { id: 'skipped', label: t('Manager.Common.Status.Labels.skipped'), count: tasks.filter(t => t.status === 'skipped').length },
-                                { id: 'found', label: t('Manager.Common.Status.Labels.found'), count: tasks.filter(t => t.status === 'found').length }
-                            ].map(filter => (
-                                <button
-                                    key={filter.id}
-                                    onClick={() => setFilterStatus(filter.id as any)}
-                                    className={cn(
-                                        "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap",
-                                        filterStatus === filter.id 
-                                            ? "bg-amber-500 text-white shadow-sm" 
-                                            : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                                    )}
-                                >
-                                    {filter.label} <span className="opacity-70 ml-1">({filter.count})</span>
-                                </button>
-                            ))}
+                        <div className="flex flex-col justify-center">
+                            <span className="text-[9px] font-bold text-muted-foreground/50 uppercase leading-none tracking-tight">{t('Manager.Auto.Stats.Health' as any)}</span>
+                            <span className="text-[12px] font-black leading-tight mt-0.5">{t('Manager.Auto.Stats.VaultStatus' as any)}</span>
                         </div>
-                    )}
-
-                    <div className="flex-1 overflow-y-auto px-4 py-2 custom-scrollbar">
-                        {tasks.length === 0 ? (
-                            <div className="h-full flex flex-col items-center justify-center text-muted-foreground opacity-30 py-12">
-                                <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-                                    <LayoutList className="w-8 h-8" />
-                                </div>
-                                <p className="text-sm font-medium">{t('Manager.Auto.Status.NoLogs')}</p>
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pb-6">
-                                {[...tasks]
-                                .filter(t => filterStatus === 'all' || t.status === filterStatus)
-                                .sort((a, b) => {
-                                    const statusOrder = { processing: 6, error: 5, found: 4, success: 3, pending: 2, skipped: 1 };
-                                    return statusOrder[b.status] - statusOrder[a.status];
-                                }).map(task => <TaskCard key={task.id} task={task} i18n={i18n} />)}
-                            </div>
-                        )}
                     </div>
+
+                    {/* Stats Pills - Consistent with Plugin Manager h-9 height */}
+                    <div className="flex items-center gap-2 h-9">
+                        <CompactStat label={t('Manager.Common.Status.Labels.up_to_date' as any)} value={summary.upToDate} color="text-blue-500" bg="bg-blue-500/5" icon={<CheckCircle2 className="w-4 h-4" />} />
+                        <CompactStat label={t('Manager.Common.Status.Labels.discovered' as any)} value={summary.success} color="text-amber-500" bg="bg-amber-500/5" icon={<RefreshCw className="w-4 h-4" />} />
+                        <CompactStat label={t('Manager.Common.Status.Labels.error' as any)} value={summary.error} color="text-rose-500" bg="bg-rose-500/5" icon={<AlertCircle className="w-4 h-4" />} />
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-2 h-9">
+                    <Button
+                        size="sm" variant="ghost"
+                        className="h-9 px-3 rounded-none font-bold text-[13px] text-muted-foreground/80 hover:bg-muted/50 border border-transparent hover:border-border/40"
+                        onClick={clearAll} disabled={status === 'running'}
+                    >
+                        <RotateCcw className="w-4 h-4 mr-2 opacity-60" />
+                        {t('Common.Actions.Clear' as any) || "清空结果"}
+                    </Button>
+                    <Button
+                        size="sm"
+                        className={cn(
+                            "h-9 px-5 rounded-none font-black text-[13px] transition-all shadow-sm",
+                            status === 'running' ? "bg-muted cursor-not-allowed border border-border/40" : "bg-primary text-primary-foreground hover:bg-primary/90"
+                        )}
+                        onClick={handleStart} disabled={status === 'running'}
+                    >
+                        {status === 'running' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Play className="w-4 h-4 mr-2 fill-current" />}
+                        {t('Manager.Auto.Actions.StartAuto' as any)}
+                    </Button>
                 </div>
             </div>
 
-            {/* 右侧设置与资源管理侧边栏 */}
-            <div className="w-80 border-l border-border flex flex-col h-full bg-muted/10 shrink-0">
-                <div className="p-6 flex flex-col gap-8 h-full overflow-y-auto custom-scrollbar">
-                    {/* 受信任仓库管理 */}
-                    <section>
-                        <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
-                            <Globe className="w-3.5 h-3.5 text-amber-500" />
-                            {t('Manager.Auto.Repos.Title')}
-                        </h3>
-                        <div className="flex gap-2 mb-4">
-                            <Input
-                                placeholder={t('Manager.Auto.Repos.AddPlaceholder')}
-                                className="h-8 text-xs bg-background shadow-none border-border/60 focus:ring-1 focus:ring-amber-500/20"
-                                value={newRepo}
-                                onChange={(e) => setNewRepo(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && !isAdding && handleAddRepo()}
-                                disabled={isAdding}
-                            />
-                            <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0 hover:bg-amber-500/10 hover:text-amber-600 border border-border/40" onClick={handleAddRepo} disabled={isAdding}>
-                                {isAdding ? <Loader2 className="w-4 h-4 animate-spin opacity-50" /> : <Plus className="w-4 h-4" />}
-                            </Button>
+            <div className="flex-1 flex overflow-hidden">
+                <div className="flex-1 flex flex-col overflow-hidden">
+                    {/* Running Progress Bar */}
+                    {status === 'running' && progress.total > 0 && (
+                        <div className="bg-primary/5 px-4 py-1.5 border-b border-primary/20 flex items-center justify-between shrink-0">
+                            <span className="text-[10px] font-bold text-primary tracking-widest uppercase flex items-center gap-2">
+                                <Activity className="w-3 h-3 animate-pulse" />
+                                {t('Manager.Auto.Status.Analyzing' as any)}
+                            </span>
+                            <div className="flex items-center gap-3 w-1/3">
+                                <div className="flex-1 h-1 bg-muted rounded-full overflow-hidden">
+                                    <div className="h-full bg-primary transition-all duration-300" style={{ width: `${Math.round((progress.current / progress.total) * 100)}%` }} />
+                                </div>
+                                <span className="text-[10px] font-mono text-muted-foreground/60">{progress.current}/{progress.total}</span>
+                            </div>
                         </div>
-                        <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1 -mr-1 custom-scrollbar">
-                            {trustedRepos.length === 0 ? (
-                                <p className="text-[11px] text-muted-foreground italic px-2 py-4 text-center border border-dashed rounded-xl bg-background/50">
-                                    {t('Manager.Auto.Repos.Empty')}
-                                </p>
-                            ) : (
-                                trustedRepos.map((repo) => (
-                                    <div key={repo} className="flex items-center justify-between group p-2 rounded-lg bg-background border border-border/40 hover:border-amber-500/30 hover:shadow-sm transition-all">
-                                        <span className="text-xs font-mono text-muted-foreground truncate flex-1 pr-2" title={repo}>
-                                            {repo}
-                                        </span>
-                                        <button
-                                            onClick={() => handleRemoveRepo(repo)}
-                                            className="opacity-0 group-hover:opacity-100 p-1 hover:text-destructive transition-all"
-                                        >
-                                            <Trash2 className="w-3.5 h-3.5" />
-                                        </button>
-                                    </div>
-                                ))
+                    )}
+
+                    {/* Main Content Area - List Mode */}
+                    <div className="flex-1 overflow-y-auto px-4 py-2 custom-scrollbar bg-background">
+                        {tasks.length === 0 ? (
+                            <div className="h-full flex flex-col items-center justify-center text-muted-foreground/30 py-24">
+                                <Terminal className="w-12 h-12 mb-4 opacity-20" />
+                                <p className="text-[12px] font-bold uppercase tracking-[0.2em]">{t('Manager.Auto.Status.NoLogs' as any)}</p>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col gap-1 pb-10">
+                                {[...tasks]
+                                    .filter(t => filterStatus === 'all' ? t.status !== 'pending' : t.status === filterStatus)
+                                    .sort((a, b) => {
+                                        const order: any = { processing: 10, discovered_update: 9, discovered_new: 8, error: 7, success: 6, up_to_date: 5 };
+                                        return (order[b.status] || 0) - (order[a.status] || 0);
+                                    })
+                                    .map(task => <TaskItem key={task.id} task={task} i18n={i18n} />)}
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Sidebar - Matching Industrial Style */}
+                <div className="w-72 border-l border-border/80 flex flex-col h-full bg-muted/10 shrink-0">
+                    <div className="p-5 flex flex-col gap-8 h-full overflow-y-auto custom-scrollbar">
+
+                        {/* Task Filtering - Moved from Header */}
+                        <section className="space-y-4">
+                            <h3 className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-widest flex items-center gap-2">
+                                <Filter className="w-3 h-3" />
+                                {t('Manager.Auto.Filters.Title' as any)}
+                            </h3>
+                            <div className="flex flex-col gap-1">
+                                {['all', 'discovered_update', 'discovered_new', 'up_to_date', 'success', 'error'].map(id => (
+                                    <button
+                                        key={id} onClick={() => setFilterStatus(id as any)}
+                                        className={cn(
+                                            "px-3 py-2 text-[12px] font-bold transition-all text-left border rounded-none flex justify-between items-center",
+                                            filterStatus === id ? "bg-background border-primary/40 text-primary shadow-sm" : "bg-transparent border-transparent text-muted-foreground hover:bg-muted/50"
+                                        )}
+                                    >
+                                        <span>{id === 'all' ? t('Manager.Common.Filters.All' as any) : t(`Manager.Common.Status.Labels.${id}` as any)}</span>
+                                        <span className="opacity-40 font-mono text-[10px]">({tasks.filter(t => id === 'all' ? t.status !== 'pending' : t.status === id).length})</span>
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* One-click Review Button */}
+                            {tasks.filter(t => t.status.startsWith('discovered')).length > 0 && (
+                                <Button
+                                    size="sm"
+                                    className="w-full h-10 mt-2 rounded-none font-black text-[12px] bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/10 transition-all active:scale-95"
+                                    onClick={async () => {
+                                        const ids = tasks.filter(t => t.status.startsWith('discovered')).map(t => t.id);
+                                        await i18n.autoManager.applyBatchDiscovered(ids);
+                                    }}
+                                >
+                                    <Zap className="w-4 h-4 mr-2 fill-current" />
+                                    {t('Manager.Auto.Actions.OneClickReview' as any)} ({tasks.filter(t => t.status.startsWith('discovered')).length})
+                                </Button>
                             )}
-                        </div>
-                    </section>
+                        </section>
 
-                    {/* 自动化配置快速开关 */}
-                    <section>
-                        <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
-                            <Settings2 className="w-3.5 h-3.5 text-blue-500" />
-                            {t('Manager.Auto.QuickSettings.Title')}
-                        </h3>
-                        <div className="space-y-2.5">
-                            <ConfigToggle
-                                icon={<Zap className="w-4 h-4" />}
-                                label={t('Manager.Auto.QuickSettings.AutoApply')}
-                                active={autoApply}
-                                onToggle={() => toggleConfig('autoApply')}
-                            />
-                            <ConfigToggle
-                                icon={<Monitor className="w-4 h-4" />}
-                                label={t('Manager.Auto.QuickSettings.SilentMode')}
-                                active={autoSilentMode}
-                                onToggle={() => toggleConfig('autoSilentMode')}
-                            />
-                        </div>
-                    </section>
+                        {/* Scoping */}
+                        <section className="space-y-3">
+                            <h3 className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-widest flex items-center gap-2">
+                                <LayoutList className="w-3 h-3" />
+                                {t('Manager.Auto.Scoping.Title' as any)}
+                            </h3>
+                            <div className="border border-border/40 p-0.5 bg-background shadow-xs flex gap-0.5">
+                                <button
+                                    className={cn(
+                                        "flex-1 py-2 text-[10px] font-bold rounded-none transition-all",
+                                        autoScanMode === 'incremental' ? "bg-muted text-foreground shadow-sm" : "hover:bg-muted/50 text-muted-foreground/70"
+                                    )}
+                                    onClick={async () => {
+                                        i18n.settings.autoScanMode = 'incremental';
+                                        await i18n.saveSettings();
+                                        setConfigs({ autoScanMode: 'incremental' });
+                                    }}
+                                >
+                                    {t('Manager.Auto.Modes.Incremental' as any)}
+                                </button>
+                                <button
+                                    className={cn(
+                                        "flex-1 py-2 text-[10px] font-bold rounded-none transition-all",
+                                        autoScanMode === 'full' ? "bg-muted text-foreground shadow-sm" : "hover:bg-muted/50 text-muted-foreground/70"
+                                    )}
+                                    onClick={async () => {
+                                        i18n.settings.autoScanMode = 'full';
+                                        await i18n.saveSettings();
+                                        setConfigs({ autoScanMode: 'full' });
+                                    }}
+                                >
+                                    {t('Manager.Auto.Modes.Full' as any)}
+                                </button>
+                            </div>
+                        </section>
 
-                    {/* 缓存管理 */}
-                    <section>
-                        <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
-                            <RefreshCw className="w-3.5 h-3.5 text-purple-500" />
-                            缓存管理
-                        </h3>
-                        <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="w-full text-xs h-8 justify-start px-3 bg-background/50 hover:bg-muted" 
-                            onClick={() => {
-                                i18n.autoManager.invalidateCache();
-                                i18n.notice.success('注册表与统计数据缓存已清理');
-                            }}
-                        >
-                            <Trash2 className="w-3.5 h-3.5 mr-2 opacity-70" />
-                            清除注册表缓存
-                        </Button>
-                    </section>
+                        <section className="space-y-3">
+                            <h3 className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-widest flex items-center gap-2">
+                                <Gauge className="w-3 h-3" />
+                                {t('Manager.Common.Status.Labels.MatchStrategy' as any)}
+                            </h3>
+                            <Select
+                                value={autoMatchStrategy}
+                                onValueChange={async (val: any) => {
+                                    i18n.settings.autoMatchStrategy = val;
+                                    await i18n.saveSettings();
+                                    setConfigs({ autoMatchStrategy: val });
+                                }}
+                            >
+                                <SelectTrigger className="h-8 text-xs bg-background border-border/40 rounded-none px-3 shadow-xs">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="rounded-none border-border/80 shadow-2xl">
+                                    <SelectItem value="comprehensive" className="text-xs">{t('Manager.Common.Status.Labels.MatchStrategies.comprehensive' as any)}</SelectItem>
+                                    <SelectItem value="version_first" className="text-xs">{t('Manager.Common.Status.Labels.MatchStrategies.version_first' as any)}</SelectItem>
+                                    <SelectItem value="popularity" className="text-xs">{t('Manager.Common.Status.Labels.MatchStrategies.popularity' as any)}</SelectItem>
+                                    <SelectItem value="latest_update" className="text-xs">{t('Manager.Common.Status.Labels.MatchStrategies.latest_update' as any)}</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </section>
 
-                    {/* 信息与页脚 */}
-                    <section className="mt-auto pt-8 border-t border-border/60">
-                        <div className="bg-amber-500/5 rounded-xl p-4 border border-amber-500/10">
-                            <h4 className="text-[11px] font-bold text-amber-700 dark:text-amber-500 mb-2 flex items-center gap-2">
-                                <Info className="w-3.5 h-3.5" />
-                                {t('Manager.Auto.Tips.Title')}
-                            </h4>
-                            <p className="text-[10px] leading-relaxed text-muted-foreground opacity-80" dangerouslySetInnerHTML={{ __html: t('Manager.Auto.Tips.Desc') }} />
-                        </div>
-                    </section>
+                        <section className="space-y-3">
+                            <h3 className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-widest flex items-center gap-2">
+                                <Settings2 className="w-3 h-3" />
+                                {t('Manager.Auto.QuickSettings.Title' as any)}
+                            </h3>
+                            <div className="space-y-1.5">
+                                <ConfigToggle label={t('Manager.Auto.QuickSettings.DiscoveryNotice' as any)} active={autoDiscovery} onToggle={() => toggleConfig('autoDiscovery')} />
+                                <ConfigToggle label={t('Manager.Auto.QuickSettings.AutoApply' as any)} active={autoApply} onToggle={() => toggleConfig('autoApply')} />
+                            </div>
+                        </section>
+
+                        <section className="space-y-3">
+                            <h3 className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-widest flex items-center gap-2">
+                                <Activity className="w-3 h-3" />
+                                {t('Manager.Auto.QuickSettings.CheckInterval' as any)}
+                            </h3>
+                            <div className="px-3 py-2 bg-background border border-border/40 shadow-xs">
+                                <div className="flex items-center justify-between gap-2">
+                                    <Input
+                                        type="number" value={autoCheckInterval}
+                                        className="h-7 text-[12px] font-mono bg-transparent border-none p-0 focus-visible:ring-0 w-16"
+                                        onChange={async (e) => {
+                                            const val = parseInt(e.target.value) || 0;
+                                            i18n.settings.autoCheckInterval = val;
+                                            await i18n.saveSettings();
+                                            setConfigs({ autoCheckInterval: val });
+                                        }}
+                                    />
+                                    <span className="text-[9px] font-black text-muted-foreground/50">{t('Manager.Auto.QuickSettings.Hours' as any)}</span>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section className="space-y-3 border-t pt-6">
+                            <h3 className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-widest flex items-center gap-2">
+                                <Globe className="w-3 h-3" />
+                                {t('Manager.Auto.Repos.Title' as any)}
+                            </h3>
+                            <div className="flex gap-1 mb-3">
+                                <Input
+                                    placeholder="owner/repo"
+                                    value={newRepo}
+                                    onChange={e => setNewRepo(e.target.value)}
+                                    className="h-8 text-xs font-mono bg-background border-border/40 rounded-none shadow-xs"
+                                    disabled={isAdding}
+                                />
+                                <Button
+                                    size="icon" variant="outline"
+                                    className="h-8 w-8 shrink-0 rounded-none border-border/40 bg-background hover:bg-muted"
+                                    onClick={handleAddRepo}
+                                    disabled={isAdding}
+                                >
+                                    {isAdding ? <Loader2 className="w-3 h-3 animate-spin" /> : <Plus className="w-3 h-3" />}
+                                </Button>
+                            </div>
+                            <div className="space-y-1 max-h-60 overflow-y-auto custom-scrollbar">
+                                {trustedRepos.map(r => (
+                                    <div key={r} className="flex items-center justify-between group p-2 bg-muted/20 border border-transparent hover:border-border/40 text-[10px] font-mono text-muted-foreground rounded-none">
+                                        <span className="truncate">{r}</span>
+                                        <button onClick={() => handleRemoveRepo(r)} className="opacity-0 group-hover:opacity-100 hover:text-rose-500 transition-opacity"><Trash2 className="w-3 h-3" /></button>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    </div>
                 </div>
             </div>
         </div>
     );
 };
 
-// 统计卡片组件
-const StatsCard = ({ label, value, icon, color = "text-foreground", subLabel }: { label: string, value: number, icon: React.ReactNode, color?: string, subLabel?: string }) => (
-    <div className="bg-card border border-border/60 rounded-xl p-4 shadow-sm hover:shadow-md transition-all hover:border-amber-500/20 group relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-            {icon}
+const CompactStat = ({ label, value, color, bg, icon }: { label: string, value: number, color: string, bg: string, icon: React.ReactNode }) => (
+    <div className={cn("flex items-center gap-2 px-2.5 py-1 border border-border/20 rounded-none h-9 bg-muted/10 shadow-xs transition-colors hover:bg-muted/20", color)}>
+        <div className={cn("p-1 rounded-none", bg)}>{icon}</div>
+        <div className="flex items-center gap-1.5 flex-nowrap">
+            <span className="text-[11.5px] font-black tabular-nums">{value}</span>
+            <span className="text-[10px] font-bold text-muted-foreground opacity-60 whitespace-nowrap">{label}</span>
         </div>
-        <div className="text-[11px] font-bold text-muted-foreground uppercase tracking-tight mb-1">{label}</div>
-        <div className={cn("text-2xl font-bold tracking-tighter", color)}>{value}</div>
-        {subLabel && <div className="text-[10px] text-muted-foreground mt-1 opacity-60 font-medium">{subLabel}</div>}
     </div>
 );
 
-// 配置开关项组件
-const ConfigToggle = ({ icon, label, active, onToggle }: { icon: React.ReactNode, label: string, active: boolean, onToggle: () => void }) => (
+const ConfigToggle = ({ label, active, onToggle }: { label: string, active: boolean, onToggle: () => void }) => (
     <div
         className={cn(
-            "flex items-center justify-between p-3 rounded-xl border transition-all cursor-pointer group shadow-sm",
-            active ? "bg-background border-amber-500/20 ring-1 ring-amber-500/10" : "bg-background/40 border-border/40 hover:border-border"
+            "flex items-center justify-between px-3 py-2 border transition-all cursor-pointer group",
+            active ? "bg-background border-border shadow-xs" : "bg-transparent border-transparent opacity-60 hover:opacity-100"
         )}
         onClick={onToggle}
     >
-        <div className="flex items-center gap-3">
-            <div className={cn("shrink-0 transition-colors p-1 rounded-lg", active ? "bg-amber-500/10 text-amber-600" : "bg-muted text-muted-foreground")}>
-                {icon}
-            </div>
-            <span className={cn("text-xs font-semibold transition-colors", active ? "text-foreground" : "text-muted-foreground")}>
-                {label}
-            </span>
-        </div>
-        <div className={cn(
-            "w-8 h-4.5 rounded-full relative transition-colors p-0.5",
-            active ? "bg-amber-500" : "bg-muted-foreground/30"
-        )}>
-            <div className={cn(
-                "w-3.5 h-3.5 bg-white rounded-full transition-transform shadow-sm",
-                active ? "translate-x-3.5" : "translate-x-0"
-            )} />
+        <span className="text-[12px] font-bold tracking-tight">{label}</span>
+        <div className={cn("w-7 h-4 rounded-full relative transition-colors bg-muted/50")}>
+            <div className={cn("absolute top-0.5 w-3 h-3 rounded-full transition-all shadow-sm", active ? "bg-primary left-3.5" : "bg-muted-foreground/40 left-0.5")} />
         </div>
     </div>
 );
 
-// 任务卡片组件
-const TaskCard = ({ task, i18n }: { task: AutoTaskItem; i18n: I18N }) => {
+const TaskItem = ({ task, i18n }: { task: AutoTaskItem, i18n: I18N }) => {
     const { t } = useTranslation();
-    const getStatusTheme = (status: AutoTaskStatus) => {
-        switch (status) {
-            case 'pending': return { bg: 'bg-muted/10', text: 'text-muted-foreground', border: 'border-border/30', icon: <RefreshCw className="w-3 h-3 opacity-40" /> };
-            case 'processing': return { bg: 'bg-blue-500/5', text: 'text-blue-600 font-bold', border: 'border-blue-500/20', icon: <Loader2 className="w-3 h-3 animate-spin" /> };
-            case 'success': return { bg: 'bg-emerald-500/5', text: 'text-emerald-600 font-bold', border: 'border-emerald-500/20', icon: <CheckCircle2 className="w-3 h-3" /> };
-            case 'found': return { bg: 'bg-amber-500/5', text: 'text-amber-600 font-bold', border: 'border-amber-500/20', icon: <Zap className="w-3 h-3" /> };
-            case 'skipped': return { bg: 'bg-amber-500/5', text: 'text-muted-foreground font-bold', border: 'border-border/20', icon: <AlertCircle className="w-3 h-3" /> };
-            case 'error': return { bg: 'bg-destructive/5', text: 'text-destructive font-bold', border: 'border-destructive/20', icon: <AlertCircle className="w-3 h-3" /> };
-            default: return { bg: 'bg-muted/10', text: 'text-muted-foreground', border: 'border-border/30', icon: <RefreshCw className="w-3 h-3 opacity-40" /> };
-        }
-    };
+    const isDiscovered = task.status === 'discovered_new' || task.status === 'discovered_update';
 
-    const theme = getStatusTheme(task.status);
+    // Status mapping for Accent Bar
+    let statusColor = "bg-muted-foreground/30";
+    let statusTextColor = "text-muted-foreground";
+    if (task.status === 'success') { statusColor = "bg-emerald-500"; statusTextColor = "text-emerald-600"; }
+    else if (task.status === 'error') { statusColor = "bg-rose-500"; statusTextColor = "text-rose-600"; }
+    else if (task.status === 'processing') { statusColor = "bg-primary"; statusTextColor = "text-primary"; }
+    else if (isDiscovered) { statusColor = "bg-amber-500"; statusTextColor = "text-amber-600"; }
+    else if (task.status === 'up_to_date') { statusColor = "bg-blue-500"; statusTextColor = "text-blue-600"; }
 
     return (
         <div className={cn(
-            "rounded-xl border p-3 flex flex-col gap-2.5 transition-all duration-300 group",
-            theme.bg, theme.border,
-            task.status === 'processing' && "ring-2 ring-blue-500/20 shadow-md scale-[1.02]"
+            "group relative border rounded-none bg-card/75 text-card-foreground shadow-xs hover:shadow-md hover:bg-muted/10 transition-all duration-300 px-4 py-1.5 w-full border-border/50 flex items-center gap-4 overflow-hidden backdrop-blur-md h-[46px]",
+            task.status === 'processing' && "bg-primary/[0.02]"
         )}>
-            <div className="flex items-center justify-between min-w-0">
-                <div className="flex items-center gap-2.5 min-w-0">
-                    <div className={cn("p-1.5 rounded-lg shrink-0 bg-background border border-border/30 shadow-xs", theme.text)}>
-                        {task.type === 'plugin' ? <Package className="w-4 h-4" /> : <Palette className="w-4 h-4" />}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                        <div className="font-bold text-[13px] truncate" title={task.name || task.id}>
-                            {task.name || task.id}
-                        </div>
-                        <div className="text-[10px] opacity-50 font-mono truncate">{task.id}</div>
-                    </div>
+            {/* Status Accent */}
+            <div className={cn("absolute left-0 top-0 bottom-0 w-[3px]", statusColor, task.status === 'processing' && "animate-pulse")} />
+
+            {/* Type Icon */}
+            <div className="flex items-center justify-center shrink-0 w-8">
+                <div className={cn(
+                    "w-7 h-7 rounded-none flex items-center justify-center border border-border/40 bg-background shadow-xs",
+                    task.type === 'theme' ? "text-indigo-500" : "text-amber-500"
+                )}>
+                    {task.type === 'theme' ? <Palette className="w-3.5 h-3.5" /> : <Package className="w-3.5 h-3.5" />}
                 </div>
-                {task.status === 'found' && (
-                    <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-7 w-7 rounded-lg hover:bg-emerald-500 hover:text-white"
-                        onClick={async () => {
-                            if (task.type === 'plugin') {
-                                await i18n.injectorManager.applyToPlugin(task.id);
-                            } else {
-                                await i18n.injectorManager.applyToTheme(task.id);
-                            }
-                            // 更新本地 Store 状态
-                            useAutoStore.getState().updateTaskStatus(task.id, 'success');
-                        }}
-                    >
-                        <Play className="w-3.5 h-3.5 fill-current" />
-                    </Button>
+            </div>
+
+            {/* Name, Version & Repo - Uniform single-line layout */}
+            <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                <h4 className="text-[13.5px] font-bold truncate tracking-tight text-foreground/90 group-hover:text-primary transition-colors shrink-0 max-w-[40%]">
+                    {task.name || task.id}
+                </h4>
+
+                {task.targetVersion && (
+                    <span className="text-[10px] text-primary/80 font-bold bg-primary/5 border border-primary/10 px-1.5 py-0.5 rounded-none shrink-0">
+                        v{task.targetVersion}
+                    </span>
                 )}
-                {task.status === 'error' && (
-                    <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-7 w-7 rounded-lg hover:bg-amber-500 hover:text-white"
-                        title={t('Manager.Common.Actions.Retry', '重试')}
-                        onClick={async () => {
-                            if (!i18n.autoManager.retryTask) return;
-                            await i18n.autoManager.retryTask(task.id, task.type);
-                        }}
-                    >
-                        <RefreshCw className="w-3.5 h-3.5" />
-                    </Button>
+
+                {task.sourceRepo && (
+                    <span className="text-[10px] text-muted-foreground/50 truncate font-medium flex items-center gap-1 opacity-60">
+                        <Globe className="w-3 h-3" />
+                        {task.sourceRepo.split('/').pop()}
+                    </span>
+                )}
+
+                {/* Status Badge in line */}
+                <div className={cn(
+                    "ml-auto px-2.5 py-0.5 text-[9px] uppercase tracking-[0.1em] font-extrabold rounded-none bg-background border border-border shadow-xs flex items-center gap-1.5 shrink-0 justify-center min-w-[75px]",
+                    statusTextColor
+                )}>
+                    <span className={cn("w-1.5 h-1.5 rounded-full shadow-sm", statusColor, task.status === 'processing' ? "animate-pulse" : "")}></span>
+                    {t(`Manager.Common.Status.Labels.${task.status}` as any)}
+                </div>
+            </div>
+
+            {/* Quality Score Gauge */}
+            <div className="flex items-center justify-center shrink-0 w-20">
+                {task.scoreBreakdown && (
+                    <TooltipProvider>
+                        <Tooltip delayDuration={300}>
+                            <TooltipTrigger asChild>
+                                <div className="flex items-center gap-2 cursor-help py-1 px-2 border border-transparent hover:border-border/40 group/score transition-all">
+                                    <span className="text-[11px] font-black text-amber-500 tabular-nums">{task.scoreBreakdown.total}</span>
+                                    <div className="flex gap-0.5">
+                                        {[1, 2, 3].map(i => (
+                                            <div key={i} className={cn("w-1.5 h-1.5 rounded-none", i <= Math.round(task.scoreBreakdown!.total / 33) ? "bg-amber-500" : "bg-muted")} />
+                                        ))}
+                                    </div>
+                                </div>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="p-0 bg-background border border-border shadow-2xl rounded-none z-[999]">
+                                <div className="p-3 space-y-2.5 min-w-[160px]">
+                                    <div className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.2em] mb-1">{t('Manager.Auto.Discovery.ScoreBreakdown.Title' as any)}</div>
+                                    <ScoreDetail label={t('Manager.Auto.Discovery.ScoreBreakdown.Version' as any)} score={task.scoreBreakdown.version} max={50} icon={<Monitor className="w-3 h-3" />} />
+                                    <ScoreDetail label={t('Manager.Auto.Discovery.ScoreBreakdown.Popularity' as any)} score={task.scoreBreakdown.popularity} max={30} icon={<Activity className="w-3 h-3" />} />
+                                    <ScoreDetail label={t('Manager.Auto.Discovery.ScoreBreakdown.Freshness' as any)} score={task.scoreBreakdown.freshness} max={20} icon={<RefreshCw className="w-3 h-3" />} />
+                                </div>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 )}
             </div>
 
-            <div className="flex items-center justify-between pt-1 border-t border-border/30">
-                <div className={cn("flex items-center gap-1.5 text-[11px] uppercase tracking-wider", theme.text)}>
-                    {theme.icon}
-                    {/* @ts-ignore */}
-                    {t('Manager.Common.Status.Labels.' + task.status)}
-                </div>
-                {task.message ? (
-                    <div className="text-[10px] text-destructive/70 font-medium px-1.5 py-0.5 bg-destructive/5 rounded border border-destructive/10 max-w-[150px] truncate" title={task.message}>
-                        {task.message}
-                    </div>
-                ) : task.source ? (
-                    <div className="text-[9px] font-mono text-muted-foreground/60 font-semibold px-1.5 py-0.5 bg-muted/30 rounded border border-border/20 truncate max-w-[140px]" title={task.source}>
-                        {task.source.split('/')[1] || task.source}
-                    </div>
+            <div className="shrink-0 flex items-center justify-end w-32">
+                {isDiscovered ? (
+                    <Button
+                        variant="outline" size="sm"
+                        className="h-8 px-4 text-[11px] font-black bg-primary text-primary-foreground border-none rounded-none hover:bg-primary/90 transition-all active:scale-95"
+                        onClick={() => i18n.autoManager.retryTask(task.id, task.type)}
+                    >
+                        {t('Manager.Auto.Discovery.ReviewAction' as any)}
+                    </Button>
                 ) : (
-                    <div className="text-[10px] font-bold text-muted-foreground/40 italic">
-                        {/* @ts-ignore */}
-                        {t('Manager.Common.Status.Labels.' + task.type)}
+                    <div className="w-8 h-8 rounded-full border-2 border-border/10 flex items-center justify-center opacity-20">
+                        <CheckCircle2 className="w-4 h-4" />
                     </div>
                 )}
+            </div>
+
+            {/* Message Placeholder - Subtle and absolute positioned to avoid affecting height */}
+            <div className="absolute left-1/2 -translate-x-1/2 bottom-0.5 overflow-hidden max-w-[200px]">
+                <span className="text-[8px] text-muted-foreground/20 italic truncate block">
+                    {task.message && task.message !== "-" ? task.message : ""}
+                </span>
             </div>
         </div>
     );
 };
+
+const ScoreDetail = ({ label, score, max, icon }: { label: string, score: number, max: number, icon: React.ReactNode }) => {
+    const safeScore = score || 0;
+    return (
+        <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+                <span className="text-muted-foreground/50">{icon}</span>
+                <span className="text-foreground/70 font-bold text-[11px]">{label}</span>
+            </div>
+            <div className="flex items-center gap-2">
+                <div className="w-10 h-1 bg-muted/40 rounded-none overflow-hidden">
+                    <div
+                        className="h-full bg-amber-500/40"
+                        style={{ width: `${Math.min((safeScore / max) * 100, 100)}%` }}
+                    />
+                </div>
+                <span className="font-mono text-[11px] font-black min-w-[20px] text-right">{safeScore}</span>
+            </div>
+        </div>
+    );
+};
+
+// Mock set for the UI
+const selectedIds_mock = new Set<string>();
