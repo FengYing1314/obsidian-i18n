@@ -1,0 +1,55 @@
+---
+title: "Import community translations into i18n"
+sidebarTitle: "Import Translations"
+description: "Use the default cloud repository, the Cloud view, or a local Manager archive to bring translations into the current vault."
+---
+
+The current implementation exposes three import paths:
+
+- the Manager plugin / theme lists, backed by `defaultCloudRepo`
+- the dedicated Cloud view
+- the Manager **管理** import action for archive files
+
+## Download from the default cloud repository
+
+<Steps>
+  <Step title="Configure the default repository">
+    Set **综合设置 → 云端仓库** to an `owner/repo` value.
+  </Step>
+  <Step title="Open the Manager">
+    Go to **插件** or **主题**.
+  </Step>
+  <Step title="Download a cloud version">
+    Download entries exposed from that repository's `metadata.json`.
+  </Step>
+</Steps>
+
+## Download from the Cloud view
+
+<Steps>
+  <Step title="Open the Cloud view">
+    Open the Manager first, then click the cloud button in the top toolbar.
+  </Step>
+  <Step title="Choose a source">
+    Use **社区目录** for registered repositories or **探索资源** for repository-address browsing.
+  </Step>
+  <Step title="Download">
+    Downloaded entries are written into the local SourceManager and marked as `cloud` origin.
+  </Step>
+</Steps>
+
+## Import a local file
+
+<Steps>
+  <Step title="Open 管理">
+    Go to the Manager tab labeled **管理**.
+  </Step>
+  <Step title="Click Import">
+    Use the toolbar import action.
+  </Step>
+  <Step title="Choose a file">
+    The current file chooser accepts `.i18n.gz`, `.gz`, and `.json`.
+  </Step>
+</Steps>
+
+The current export action produces `.i18n.gz`. The `.json` entry point exists mainly for older Manager export formats. For moving translations between vaults, the Manager-exported `.i18n.gz` file is the stable path.

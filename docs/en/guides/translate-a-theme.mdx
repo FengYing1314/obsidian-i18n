@@ -1,0 +1,40 @@
+---
+title: "How to translate an Obsidian theme with i18n"
+sidebarTitle: "Translate a Theme"
+description: "Extract theme settings text, translate it, and write it back to `theme.css` through the theme editor."
+---
+
+Theme translation uses a different extractor from plugin translation. The current theme extractor only reads `theme.css` `/* @settings */` blocks and only extracts these field names:
+
+- `name`
+- `title`
+- `description`
+- `label`
+- `markdown`
+
+## Theme translation flow
+
+<Steps>
+  <Step title="Open the Manager">
+    Click the globe icon to open the i18n Manager.
+  </Step>
+  <Step title="Switch to Themes">
+    Open the **主题** tab.
+  </Step>
+  <Step title="Choose the target theme">
+    Open the theme in the theme editor.
+  </Step>
+  <Step title="Run Extract">
+    Click **Extract**. The plugin reads `theme.css` and `manifest.json`, then extracts translatable fields from `@settings` blocks.
+  </Step>
+  <Step title="Translate">
+    Use the Theme AI panel or edit rows manually.
+  </Step>
+  <Step title="Apply or restore">
+    Click **Apply** to write the result into `theme.css`, or **Restore** to roll it back.
+  </Step>
+</Steps>
+
+<Note>
+  If the theme has no `@settings` block, or the block does not contain the supported field names, the current extractor does not create rows.
+</Note>

@@ -1,0 +1,43 @@
+---
+title: "Apply and restore translations non-destructively"
+sidebarTitle: "Apply & Restore"
+description: "Write active translations into plugin files, keep backups, and roll back immediately when something goes wrong."
+---
+
+Obsidian i18n keeps translations separate from the plugins and themes they target. When you click **Apply**, the plugin creates backups first and then writes the active translation into the target files. When you click **Restore**, it writes those backups back.
+
+## Apply a translation
+
+<Steps>
+  <Step title="Open the Manager">
+    Click the globe icon to open the Obsidian i18n Manager.
+  </Step>
+  <Step title="Choose the target plugin">
+    In **插件**, find the installed plugin whose active translation you want to apply.
+  </Step>
+  <Step title="Click Apply">
+    Click **Apply**. For plugins, the current implementation writes the translated content and then performs a disable / enable reload cycle.
+  </Step>
+</Steps>
+
+After a successful apply, state tracking stores the target plugin version and translation version as applied.
+
+## Restore the original state
+
+Click **Restore** to recover the original files from `.obsidian/plugins/i18n/backups/`.
+
+<Warning>
+  If plugin reload fails after Apply, the current implementation immediately restores the backup and tries to re-enable the original plugin. Start troubleshooting from the edited translation rows before attempting another apply.
+</Warning>
+
+## Automatic re-apply after target updates
+
+When **Smart Update** (`automaticUpdate`) is enabled, startup checks compare applied target versions and re-run apply for active translations whose target version changed.
+
+## Where translation data lives
+
+Obsidian i18n stores its own data outside the target plugin folder:
+
+- `.obsidian/plugins/i18n/translations/`
+- `.obsidian/plugins/i18n/metadata.json`
+- `.obsidian/plugins/i18n/backups/`

@@ -1,0 +1,65 @@
+---
+title: "Visual AST editor for safe plugin translation"
+sidebarTitle: "AST Editor"
+description: "Edit plugin translations in a structured table without touching source code. Supports inline editing, search, and untranslated filtering."
+---
+
+The AST editor displays AST rows extracted from a plugin's `main.js`. You edit translation data managed by Obsidian i18n, not the target plugin's source file directly.
+
+## How AST extraction works
+
+AST stands for Abstract Syntax Tree. The current implementation parses the target plugin's compiled `main.js` and applies `astAssignments`, `astFunctions`, `astKeys`, `astRejectRe`, and `astValidRe` to decide which strings become AST rows.
+
+<Note>
+  AST extraction requires a real `main.js` file in the target plugin directory. If that file is missing, AST extraction will not produce rows.
+</Note>
+
+## Extract strings
+
+<Steps>
+  <Step title="Open the Manager">
+    Click the globe icon to open the Obsidian i18n Manager.
+  </Step>
+  <Step title="Open the Plugins tab">
+    Switch to **插件** and choose the installed plugin you want to translate.
+  </Step>
+  <Step title="Run Extract">
+    Click **Extract**. The engine parses the plugin's `main.js` and writes AST rows into the editor.
+  </Step>
+</Steps>
+
+After extraction, each table row represents one AST item. The UI shows node type, variable name, source text, and target text.
+
+## Edit translations
+
+Click any **Target** cell to edit it. The editor still exposes an explicit save button at the top; if **综合设置 → 自动保存** is enabled, `AutoSaveManager` also saves the current file automatically.
+
+You can:
+
+- move across cells with the keyboard
+- click directly into rows to edit
+- filter the table down to untranslated rows only
+
+<Tip>
+  The **Untranslated** filter only keeps rows whose `target` is empty or still equal to `source`.
+</Tip>
+
+## Search and filter
+
+The editor search bar matches across:
+
+| Dimension | What it matches |
+|-----------|-----------------|
+| node type | `StringLiteral`, `TemplateLiteral`, and similar AST categories |
+| variable name | identifiers attached to the row |
+| source text | original text |
+| target text | translated text |
+
+<AccordionGroup>
+  <Accordion title="What is a node type?">
+    It is the AST category assigned to the string by the parser, such as a plain string literal, a template literal, or JSX text.
+  </Accordion>
+  <Accordion title="What is a variable name?">
+    The variable name comes from the AST row itself and gives extra context about how the source string is used.
+  </Accordion>
+</AccordionGroup>

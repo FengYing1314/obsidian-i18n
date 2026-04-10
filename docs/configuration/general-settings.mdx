@@ -1,0 +1,81 @@
+---
+title: "配置 Obsidian i18n 的综合设置"
+sidebarTitle: "综合设置"
+description: "说明综合设置标签页当前真实存在的开关、输入项和默认值。"
+---
+
+本页只说明 **设置 → 社区插件 → I18N → 综合设置** 当前真正存在的项目。自动化不在这里配置；自动化入口在管理中心的 **自动化** 标签。AI 服务商、方案、测试连接和 Prompt 入口在 **语言模型**、**AST 配置**、**RE 配置** 标签。
+
+<Note>
+  **语言概念说明**
+
+  - `language` 是译文包使用的语言码，例如 `zh-cn`、`zh-tw`、`ja`、`fr`。
+  - 文档站语言由 Mintlify 的 `zh-Hans` / `en` 配置控制。
+  - 两者不是同一个配置项。
+</Note>
+
+## 检查更新
+
+<AccordionGroup>
+  <Accordion title="检查更新（checkUpdates）">
+    **默认值：** `true`
+
+    启用后，Obsidian i18n 会在启动时执行自身更新检查。
+  </Accordion>
+  <Accordion title="智能更新（automaticUpdate）">
+    **默认值：** `false`
+
+    启用后，插件启动时会检查已应用译文的插件和主题版本是否变化；如果版本变化，会对当前激活译文重新执行应用。
+  </Accordion>
+</AccordionGroup>
+
+## 基础配置
+
+<AccordionGroup>
+  <Accordion title="目标语言（language）">
+    **默认值：** `zh-cn`
+
+    这个值会写入新生成译文的 `metadata.language`，也会作为 AI 翻译和云端匹配的默认目标语言。
+  </Accordion>
+  <Accordion title="自动保存（autoSave）">
+    **默认值：** `true`
+
+    插件编辑器中的 `AutoSaveManager` 会在启用时自动保存修改；关闭后可继续使用编辑器顶部的保存按钮手动保存。
+  </Accordion>
+  <Accordion title="作者署名（author）">
+    **默认值：** 空字符串
+
+    新生成的插件译文和主题译文会把这个值写入 `metadata.author`。
+  </Accordion>
+</AccordionGroup>
+
+## 云端与网络
+
+<AccordionGroup>
+  <Accordion title="云端仓库（defaultCloudRepo）">
+    **默认值：** 空字符串
+
+    这个值使用 `owner/repo` 形式，管理中心的插件和主题列表会从该仓库读取 `metadata.json`，显示可下载的云端版本。
+  </Accordion>
+  <Accordion title="加速节点（githubProxyUrl）">
+    **默认值：** `https://ghp.ci/`
+
+    代码里这个值只用于包装 `raw.githubusercontent.com` 资源地址，不会代理 GitHub Token 相关 API 请求。
+
+    当前界面提供的是固定下拉选项，不是自定义文本框。若已保存的值不在当前下拉选项里，界面会回退显示为 **直连**，直到你重新选择。
+  </Accordion>
+</AccordionGroup>
+
+当前下拉可选项是：
+
+- `直连`
+- `https://ghproxy.net/`
+- `https://gh-proxy.com/`
+- `https://cdn.jsdelivr.net/gh/`
+- `https://fastly.jsdelivr.net/gh/`
+- `https://gcore.jsdelivr.net/gh/`
+- `https://cdn.statically.io/gh/`
+
+## 重置配置
+
+点击 **重置配置** 会把设置对象整体恢复为 `DEFAULT_SETTINGS`，然后重新渲染设置页。这个动作会清空已保存的 API Key、提取规则和其他自定义配置。

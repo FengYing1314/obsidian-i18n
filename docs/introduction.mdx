@@ -1,0 +1,37 @@
+---
+title: "Obsidian i18n：无需写代码也能翻译插件"
+description: "通过可视化编辑器、AI 翻译和应用/还原流程，把 Obsidian 桌面端插件与主题翻译成目标语言。"
+---
+
+Obsidian i18n 是一款桌面端 Obsidian 插件，用来把社区插件和主题翻译成目标语言。你不需要直接修改目标插件源码，也不需要手动维护译文文件结构。插件会把提取、翻译、应用、还原、Cloud 下载和 GitHub 发布整合成一套独立流程。
+
+## 它解决了什么问题
+
+当某个社区插件没有提供你的目标语言时，你只能直接使用原始界面，或者自己维护一套本地化方案。Obsidian i18n 把这套本地化流程做成了桌面端插件，并为译文应用提供备份与还原机制。
+
+## 你可以用它做什么
+
+- **提取可翻译字符串**：基于 AST 和 Regex 规则，从已安装插件中提取面向用户的文本。
+- **批量使用 AI 翻译**：当前源码支持 16 个 LLM 服务商或兼容接口。
+- **在表格里逐条修订**：点击单元格即可编辑，离开焦点后自动保存。
+- **应用或还原译文**：把译文注入目标插件运行文件，或恢复到应用前状态。
+- **管理本地归档与 Cloud 仓库**：在 `管理` 标签导出本地归档，在 Cloud 视图下载社区译文或发布到 GitHub 仓库。
+
+<CardGroup cols={2}>
+  <Card title="安装" icon="download" href="/installation">
+    查看 BRAT 和手动解压两种安装方法。
+  </Card>
+  <Card title="快速开始" icon="rocket" href="/quickstart">
+    走完第一份插件译文的完整流程。
+  </Card>
+  <Card title="可视化 AST 编辑器" icon="table-cells" href="/features/ast-editor">
+    直接处理提取结果，而不是编辑目标插件源码。
+  </Card>
+  <Card title="AI 翻译" icon="robot" href="/features/ai-translation">
+    查看 provider profile、费用预估、缓存和提示词入口。
+  </Card>
+</CardGroup>
+
+<Note>
+  Obsidian i18n 仅支持桌面端 Obsidian，不支持 Obsidian Mobile（iOS / Android）。
+</Note>

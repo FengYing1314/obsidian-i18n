@@ -1,0 +1,77 @@
+{
+  "projectType": "general",
+  "projectName": "Obsidian i18n",
+  "projectDescription": "An Obsidian plugin that lets you translate any community plugin or theme into your language using AI-powered LLM translation and a visual AST editor — no coding required.",
+  "theme": "almond",
+  "primaryColor": "#94cb04",
+  "lightColor": "#545454",
+  "darkColor": null,
+  "navigation": {
+    "groups": [
+      {
+        "group": "Get Started",
+        "pages": [
+          "introduction",
+          "installation",
+          "quickstart"
+        ]
+      },
+      {
+        "group": "Core Features",
+        "pages": [
+          "features/ast-editor",
+          "features/ai-translation",
+          "features/apply-restore",
+          "features/cloud-sharing"
+        ]
+      },
+      {
+        "group": "Configuration",
+        "pages": [
+          "configuration/ai-providers",
+          "configuration/general-settings",
+          "configuration/automation",
+          "configuration/advanced"
+        ]
+      },
+      {
+        "group": "Guides",
+        "pages": [
+          "guides/translate-a-plugin",
+          "guides/translate-a-theme",
+          "guides/share-translations",
+          "guides/import-community-translations"
+        ]
+      },
+      {
+        "group": "Help",
+        "pages": [
+          "help/faq",
+          "help/troubleshooting"
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Visual AST editor for safe, inline translation without touching source code",
+    "High-concurrency AI translation engine with support for 16+ LLM providers",
+    "Token & cost estimation before every translation batch",
+    "Local translation memory cache for zero-cost repeat translations",
+    "Non-destructive apply/restore system with automatic backups",
+    "Export and import translation packs for community sharing",
+    "Automatic update detection — re-applies saved translations when a plugin updates",
+    "Theme translation support alongside plugin translation",
+    "Cloud repository integration for discovering community translation packs",
+    "Immersive translation mode (IMT) for live UI overlay"
+  ],
+  "publicApiSurface": [
+    "Plugin settings: I18nSettings interface",
+    "Translation schema: PluginTranslationV1 (metadata + AST + regex dicts)",
+    "LLM provider profiles: LLMProfile (url, key, model, pricing)",
+    "Supported AI providers: OpenAI-compatible, Gemini, Ollama, DeepSeek, Zhipu, Moonshot, Aliyun, Baidu, ByteDance, Groq, SiliconFlow, OpenRouter, DeepInfra, Mistral, MiniMax, StepFun",
+    "Obsidian commands: i18n-translate (open panel), i18n-auto-manager (open automation tab)",
+    "Translation pack export/import: JSON file format",
+    "Cloud repo integration: configurable GitHub/Gitee repository URLs",
+    "Auto-manager settings: discovery, match strategy, auto-apply, check interval, trusted repos"
+  ]
+}

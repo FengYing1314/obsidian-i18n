@@ -1,0 +1,67 @@
+---
+title: "如何用 i18n 翻译一个 Obsidian 插件"
+sidebarTitle: "翻译插件"
+description: "从提取、AI 翻译、人工审阅到应用，走完一次插件翻译的真实工作流。"
+---
+
+本指南展示如何从零开始翻译一个已经安装到 Obsidian 中的社区插件。
+
+<Note>
+  **开始前请确认**
+
+  - 你已经安装并启用了 Obsidian i18n
+  - 至少配置好一个 AI 服务商 profile
+</Note>
+
+## 端到端翻译流程
+
+<Steps>
+  <Step title="打开 i18n 管理中心">
+    点击侧边栏地球图标，或在命令面板中执行打开 i18n 面板的命令。
+  </Step>
+  <Step title="找到目标插件">
+    在 `插件` 标签中按名称或 ID 搜索目标插件。
+  </Step>
+  <Step title="进入编辑器">
+    点击该插件，打开 AST 编辑器。
+  </Step>
+  <Step title="提取可翻译字符串">
+    点击 **提取 / Extract**。插件会分析目标插件的编译后 JavaScript，并把命中的文本填入表格。
+  </Step>
+  <Step title="查看提取结果">
+    AST 表格会显示节点类型、变量名、原文和译文列。
+  </Step>
+  <Step title="打开 AI 面板">
+    在编辑器中进入 AI 翻译区域。
+  </Step>
+  <Step title="确认全局参数">
+    AI 面板会读取 `llmBatchSize`、`llmConcurrencyLimit`、`llmTimeout`、`llmLanguage` 和 `llmStyle`。
+  </Step>
+  <Step title="查看费用预估">
+    在点击翻译前，先确认 Token 和费用预估。
+  </Step>
+  <Step title="执行翻译">
+    点击 **翻译 / Translate**，等待进度完成。
+  </Step>
+  <Step title="人工审阅结果">
+    检查 `${variable}`、`\n` 等占位符与转义字符，再修正术语。
+  </Step>
+  <Step title="应用译文">
+    点击 **应用 / Apply**。若界面异常，先执行 **还原 / Restore**。
+  </Step>
+</Steps>
+
+<Tip>
+  **未翻译** 筛选器只显示译文为空的条目。
+</Tip>
+
+## 接下来可以做什么
+
+<CardGroup cols={2}>
+  <Card title="导出本地归档或发布到 GitHub" icon="share" href="/guides/share-translations">
+    查看 `.i18n.gz` 导出和 Cloud 发布的区别。
+  </Card>
+  <Card title="理解应用与还原" icon="rotate-left" href="/features/apply-restore">
+    继续查看备份、注入和还原流程。
+  </Card>
+</CardGroup>

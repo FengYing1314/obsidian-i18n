@@ -1,0 +1,40 @@
+---
+title: "Obsidian i18n 常见问题"
+sidebarTitle: "FAQ"
+description: "回答桌面端支持、AI 使用、应用回滚、文件位置和分享方式等常见问题。"
+---
+
+<AccordionGroup>
+  <Accordion title="Obsidian i18n 支持移动端吗？">
+    不支持。Obsidian i18n 依赖桌面端文件系统访问能力来读取和注入插件内容，因此只能在 macOS、Windows、Linux 上运行。
+  </Accordion>
+
+  <Accordion title="没有 AI Key 也能用吗？">
+    可以。你可以完全手动在 AST 编辑器、Regex 编辑器或主题编辑器中填写译文。
+  </Accordion>
+
+  <Accordion title="翻译会把目标插件弄坏吗？">
+    插件应用前会先创建备份。若插件重载失败，当前实现会自动恢复备份并恢复原始插件状态。主题翻译同样会先创建备份，并支持 **还原 / Restore**。
+  </Accordion>
+
+  <Accordion title="我翻译过的插件更新版本后怎么办？">
+    如果开启了 **智能更新**（`automaticUpdate`），插件启动时会检查已应用目标的版本变化，并对当前激活译文重新执行应用。
+  </Accordion>
+
+  <Accordion title="怎么提前知道 AI 翻译要花多少钱？">
+    AST、Regex 和主题编辑器的 AI 面板都会在发送请求前显示 Token 和费用预估。
+  </Accordion>
+
+  <Accordion title="译文文件保存在哪里？">
+    当前实现把译文文件保存到：
+
+    - `.obsidian/plugins/i18n/translations/<source-id>.json`
+    - `.obsidian/plugins/i18n/metadata.json`
+
+    备份文件保存在 `.obsidian/plugins/i18n/backups/`。
+  </Accordion>
+
+  <Accordion title="怎么把译文分享给别人？">
+    可以在管理中心 **管理** 标签导出 `.i18n.gz` 归档，也可以在 Cloud 视图把本地源发布到 GitHub 仓库。
+  </Accordion>
+</AccordionGroup>

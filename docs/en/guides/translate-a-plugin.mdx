@@ -1,0 +1,48 @@
+---
+title: "How to translate an Obsidian plugin with i18n"
+sidebarTitle: "Translate a Plugin"
+description: "Extract strings, batch-translate them, review them, and apply the result to an installed plugin."
+---
+
+This guide walks through the current plugin translation flow for an installed Obsidian plugin. Plugin extraction reads the target plugin's `main.js`.
+
+<Note>
+  **Prerequisites**
+
+  - Obsidian i18n is installed and enabled
+  - the target plugin is installed in the current vault
+  - the target plugin directory contains `main.js`
+  - if you want AI translation, at least one provider profile is configured
+</Note>
+
+## End-to-end flow
+
+<Steps>
+  <Step title="Open the Manager">
+    Click the globe icon, or run the command that opens the i18n panel.
+  </Step>
+  <Step title="Find the target plugin">
+    Use the **插件** tab and locate the installed plugin by name or ID.
+  </Step>
+  <Step title="Run Extract">
+    Click **Extract**. The plugin reads `main.js` and generates a local translation source with AST and Regex sections.
+  </Step>
+  <Step title="Inspect AST and Regex rows">
+    AST rows carry node type and variable-name context. Regex rows come from Regex matches against source text.
+  </Step>
+  <Step title="Open the AI panel">
+    Use the AST or Regex AI panel.
+  </Step>
+  <Step title="Set language, batch size, concurrency, and timeout">
+    These panels write back to `language`, `llmBatchSize`, `llmConcurrencyLimit`, and `llmTimeout`. Defaults are `zh-cn`, `10`, `3`, and `60000`.
+  </Step>
+  <Step title="Translate">
+    By default, only rows whose `target` is empty, whitespace-only, or equal to `source` are sent. Existing translated rows are resent only when overwrite is enabled.
+  </Step>
+  <Step title="Review the output">
+    Check placeholders such as `${variable}` and escape sequences such as `\n` before applying.
+  </Step>
+  <Step title="Apply">
+    Click **Apply**. If the result is wrong, click **Restore** before applying again.
+  </Step>
+</Steps>

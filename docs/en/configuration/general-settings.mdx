@@ -1,0 +1,74 @@
+---
+title: "Configure Obsidian i18n General settings"
+sidebarTitle: "General"
+description: "Document only the controls that actually exist in the `综合设置` tab and separate them from `语言模型` and automation controls."
+---
+
+This page only documents the controls that currently exist in **Settings → Community Plugins → I18N → 综合设置**. Automation is not configured here; it lives in the Manager's **自动化** tab. Provider profiles, connectivity testing, and prompt editors live under **语言模型**, **AST 配置**, and **RE 配置**.
+
+<Note>
+  **Language note**
+
+  - `language` is the plugin translation locale, such as `zh-cn`, `ja`, or `fr`.
+  - The Mintlify docs site language is configured separately through `zh-Hans` and `en`.
+</Note>
+
+## Update checks
+
+<AccordionGroup>
+  <Accordion title="checkUpdates: check Obsidian i18n updates on startup">
+    **Default:** `true`
+  </Accordion>
+  <Accordion title="automaticUpdate: re-apply active translations after target version changes">
+    **Default:** `false`
+  </Accordion>
+</AccordionGroup>
+
+## Basic configuration
+
+<AccordionGroup>
+  <Accordion title="language: target locale">
+    **Default:** `zh-cn`
+
+    This value is written into newly generated translation metadata and reused by AI workflows and cloud matching.
+  </Accordion>
+  <Accordion title="autoSave: editor auto-save">
+    **Default:** `true`
+
+    When enabled, the editor `AutoSaveManager` saves changes automatically. When disabled, you can still use the explicit save button.
+  </Accordion>
+  <Accordion title="author: author attribution">
+    **Default:** empty string
+
+    Newly generated plugin and theme translations write this value into `metadata.author`.
+  </Accordion>
+</AccordionGroup>
+
+## Cloud and network
+
+<AccordionGroup>
+  <Accordion title="defaultCloudRepo: default cloud repository">
+    **Default:** empty string
+
+    This uses `owner/repo` format. The Manager plugin and theme lists read `metadata.json` from this repository to show available cloud versions.
+  </Accordion>
+  <Accordion title="githubProxyUrl: GitHub raw-resource proxy">
+    **Default:** `https://ghp.ci/`
+
+    In the current UI this is a fixed dropdown, not a free-text field. The code only wraps `raw.githubusercontent.com` resource URLs with this proxy.
+  </Accordion>
+</AccordionGroup>
+
+Current dropdown options are:
+
+- direct access
+- `https://ghproxy.net/`
+- `https://gh-proxy.com/`
+- `https://cdn.jsdelivr.net/gh/`
+- `https://fastly.jsdelivr.net/gh/`
+- `https://gcore.jsdelivr.net/gh/`
+- `https://cdn.statically.io/gh/`
+
+## Reset
+
+The bottom of the `综合设置` tab contains the reset action that restores settings to `DEFAULT_SETTINGS` and re-renders the settings view.

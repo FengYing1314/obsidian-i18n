@@ -1,0 +1,69 @@
+---
+title: "导出并分享 Obsidian i18n 译文包"
+sidebarTitle: "分享译文"
+description: "把本地译文导出为管理归档，或通过 Cloud 视图发布到 GitHub 仓库。"
+---
+
+当前实现里，“本地导出”和“云端发布”是两套不同流程：
+
+- **本地导出**：在管理中心 **管理** 标签里导出选中的译文源，得到一个 `.i18n.gz` 归档。
+- **云端发布**：在 Cloud 视图里把某个本地译文源上传到 GitHub 仓库，并同步更新 `metadata.json`。
+
+## 导出本地归档
+
+<Steps>
+  <Step title="打开管理中心">
+    点击地球图标，进入 Obsidian i18n 管理中心。
+  </Step>
+  <Step title="切换到管理标签">
+    打开顶部的 **管理** 标签。
+  </Step>
+  <Step title="勾选要导出的译文源">
+    选择一个或多个译文源。
+  </Step>
+  <Step title="点击导出">
+    点击工具栏里的 **导出**。浏览器会下载一个文件名为 `i18n-translations-export-{timestamp}.i18n.gz` 的归档。
+  </Step>
+</Steps>
+
+这个归档里保存的是所选源的元数据和 JSON 内容，不是“一个源一个下载文件”的分散导出。
+
+## 查看单个源的原始 JSON 文件
+
+如果你需要单独查看某个源当前保存的 JSON 文件：
+
+1. 进入 **管理** 标签。
+2. 打开该行右侧菜单。
+3. 点击 **打开文件夹**。
+
+当前源文件实际保存在 Obsidian i18n 目录下的 `translations/<source-id>.json`。
+
+## 发布到 GitHub Cloud 仓库
+
+<Steps>
+  <Step title="配置共建生态">
+    进入 **设置 → 社区插件 → I18N → 共建生态**，填写 GitHub Token 和仓库名。
+  </Step>
+  <Step title="打开 Cloud 视图">
+    先打开管理中心，再点击顶部工具栏里的云图标。
+  </Step>
+  <Step title="进入管理中心">
+    在 Cloud 视图顶部切换到 **管理中心**。
+  </Step>
+  <Step title="进入发布流程">
+    点击发布入口，视图会切换到发布状态。
+  </Step>
+  <Step title="选择源并提交">
+    选择插件或主题、对应的本地译文源，填写标题、版本和描述后提交。
+  </Step>
+</Steps>
+
+发布流程会：
+
+- 上传本地源文件到 `plugins/{source-id}.json` 或 `themes/{source-id}.json`
+- 读取并更新仓库根目录的 `metadata.json`
+- 把本地源的 `origin` 更新为 `cloud`
+
+<Note>
+  当前发布实现只描述 GitHub 工作流。
+</Note>

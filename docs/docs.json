@@ -1,0 +1,115 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "name": "Obsidian i18n",
+  "theme": "almond",
+  "colors": {
+    "primary": "#94cb04",
+    "light": "#545454"
+  },
+  "favicon": "/images/favicon.png",
+  "navbar": {
+    "primary": {
+      "type": "github",
+      "href": "https://github.com/eondrcode/obsidian-i18n"
+    }
+  },
+  "navigation": {
+    "languages": [
+      {
+        "language": "zh-Hans",
+        "default": true,
+        "groups": [
+          {
+            "group": "开始使用",
+            "pages": [
+              "introduction",
+              "installation",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "核心功能",
+            "pages": [
+              "features/ast-editor",
+              "features/ai-translation",
+              "features/apply-restore",
+              "features/cloud-sharing"
+            ]
+          },
+          {
+            "group": "配置说明",
+            "pages": [
+              "configuration/ai-providers",
+              "configuration/general-settings",
+              "configuration/automation",
+              "configuration/advanced"
+            ]
+          },
+          {
+            "group": "使用指南",
+            "pages": [
+              "guides/translate-a-plugin",
+              "guides/translate-a-theme",
+              "guides/share-translations",
+              "guides/import-community-translations"
+            ]
+          },
+          {
+            "group": "帮助与排错",
+            "pages": [
+              "help/faq",
+              "help/troubleshooting"
+            ]
+          }
+        ]
+      },
+      {
+        "language": "en",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "en/introduction",
+              "en/installation",
+              "en/quickstart"
+            ]
+          },
+          {
+            "group": "Core Features",
+            "pages": [
+              "en/features/ast-editor",
+              "en/features/ai-translation",
+              "en/features/apply-restore",
+              "en/features/cloud-sharing"
+            ]
+          },
+          {
+            "group": "Configuration",
+            "pages": [
+              "en/configuration/ai-providers",
+              "en/configuration/general-settings",
+              "en/configuration/automation",
+              "en/configuration/advanced"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "en/guides/translate-a-plugin",
+              "en/guides/translate-a-theme",
+              "en/guides/share-translations",
+              "en/guides/import-community-translations"
+            ]
+          },
+          {
+            "group": "Help",
+            "pages": [
+              "en/help/faq",
+              "en/help/troubleshooting"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,61 @@
+---
+title: "Export and share Obsidian i18n translations"
+sidebarTitle: "Share Translations"
+description: "Export local sources as a Manager archive, or publish them to a GitHub repository through the Cloud view."
+---
+
+The current implementation separates local export from Cloud publishing:
+
+- **local export** happens in the Manager **管理** tab and produces one `.i18n.gz` archive
+- **Cloud publishing** happens in the Cloud view and uploads one local source into a GitHub repository
+
+## Export a local archive
+
+<Steps>
+  <Step title="Open the Manager">
+    Click the globe icon to open the Obsidian i18n Manager.
+  </Step>
+  <Step title="Open 管理">
+    Switch to the top tab labeled **管理**.
+  </Step>
+  <Step title="Select translation sources">
+    Select one or more rows.
+  </Step>
+  <Step title="Click Export">
+    Click **Export**. The browser downloads `i18n-translations-export-{timestamp}.i18n.gz`.
+  </Step>
+</Steps>
+
+This is a single archive containing source metadata and JSON content for all selected rows.
+
+## Inspect one source's raw JSON file
+
+If you need one source's current JSON file:
+
+1. open **管理**
+2. open the row action menu
+3. click **Open Folder**
+
+The current source file lives under `translations/<source-id>.json` inside the Obsidian i18n plugin directory.
+
+## Publish to a GitHub repository
+
+<Steps>
+  <Step title="Configure Share settings">
+    Open **设置 → 社区插件 → I18N → 共建生态** and enter a GitHub token and repository name.
+  </Step>
+  <Step title="Open the Cloud view">
+    Open the Manager, then click the cloud button in the top toolbar.
+  </Step>
+  <Step title="Open 管理中心">
+    Switch to **管理中心**.
+  </Step>
+  <Step title="Enter publish mode">
+    Use the publish entry point from the management page.
+  </Step>
+  <Step title="Submit the source">
+    Choose plugin or theme, select a local source, then fill title, version, and description.
+  </Step>
+</Steps>
+
+Publishing uploads the local source file to `plugins/{source-id}.json` or `themes/{source-id}.json`, updates `metadata.json`, and marks the local source as `cloud` origin.

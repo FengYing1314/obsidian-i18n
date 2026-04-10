@@ -1,0 +1,59 @@
+---
+title: "把社区译文包导入 i18n"
+sidebarTitle: "导入译文"
+description: "通过默认云端仓库、Cloud 视图或本地管理归档，把现成译文导入到当前 vault。"
+---
+
+当前实现有三种导入路径：
+
+- **管理中心插件 / 主题列表**：从 `defaultCloudRepo` 指向的默认仓库下载。
+- **Cloud 视图**：从 **社区目录** 或 **探索资源** 下载。
+- **管理标签导入**：导入管理归档文件。
+
+## 从默认云端仓库下载
+
+<Steps>
+  <Step title="配置默认仓库">
+    在 **综合设置 → 云端仓库** 中填写 `owner/repo`。
+  </Step>
+  <Step title="打开管理中心">
+    进入 **插件** 或 **主题** 标签。
+  </Step>
+  <Step title="下载云端版本">
+    在列表项中选择云端版本并执行下载。下载内容来自该仓库的 `metadata.json` 和对应的 `plugins/*.json` 或 `themes/*.json` 文件。
+  </Step>
+</Steps>
+
+## 从 Cloud 视图下载
+
+<Steps>
+  <Step title="打开 Cloud 视图">
+    先进入管理中心，再点击顶部工具栏里的云图标。
+  </Step>
+  <Step title="选择来源">
+    在 **社区目录** 浏览已登记仓库，或在 **探索资源** 中按仓库地址浏览。
+  </Step>
+  <Step title="执行下载">
+    下载后的译文会写入本地 SourceManager，并标记为 `cloud` 来源。
+  </Step>
+</Steps>
+
+## 从本地文件导入
+
+<Steps>
+  <Step title="打开管理标签">
+    进入管理中心顶部的 **管理** 标签。
+  </Step>
+  <Step title="点击导入">
+    点击工具栏里的 **导入**。
+  </Step>
+  <Step title="选择文件">
+    文件选择器当前接受 `.i18n.gz`、`.gz`、`.json`。
+  </Step>
+</Steps>
+
+当前 **导出** 按钮生成的是 `.i18n.gz`。`.json` 入口主要用于兼容旧版管理导出格式；如果你要在两个 vault 之间稳定迁移译文，优先使用管理导出的 `.i18n.gz` 文件。
+
+<Info>
+  如果 GitHub 原始资源访问不稳定，可以在 **综合设置 → 加速节点** 中切换 `githubProxyUrl`。这只影响原始资源下载，不影响本地归档导入。
+</Info>

@@ -1,0 +1,82 @@
+---
+title: "Automation: discovery and auto-apply"
+sidebarTitle: "Automation"
+description: "Document the real Manager automation entry, defaults, match scoring, and auto-apply boundaries."
+---
+
+Automation is not configured in `综合设置`. The current entry point is the Manager view's **自动化** tab, rendered by `AutoManagerPanel`.
+
+<Note>
+  When `autoDiscovery` is enabled, the plugin runs discovery on startup and also checks every 30 minutes whether `autoCheckInterval` has elapsed.
+</Note>
+
+## Defaults
+
+| Field | Default | Meaning |
+|------|---------|---------|
+| `autoDiscovery` | `false` | background discovery enabled or disabled |
+| `autoMatchStrategy` | `comprehensive` | scoring strategy |
+| `autoApply` | `false` | apply immediately after a match or stop at review |
+| `autoCheckInterval` | `24` | interval in hours; `0` disables scheduled checks |
+| `autoTrustedRepos` | `[]` | trusted repositories |
+| `autoExcludeList` | `[]` | excluded plugin IDs |
+| `autoScanMode` | `incremental` | scan mode |
+
+## Turn it on
+
+<Steps>
+  <Step title="Open the Manager">
+    Click the globe icon to open the Obsidian i18n Manager.
+  </Step>
+  <Step title="Open Automation">
+    Switch to the **自动化** tab.
+  </Step>
+  <Step title="Enable background discovery">
+    Turn on the background discovery toggle. This enables `autoDiscovery`.
+  </Step>
+  <Step title="Set the interval">
+    Enter the check interval in hours. `0` disables scheduled checks.
+  </Step>
+  <Step title="Choose scan scope">
+    `autoScanMode` supports `incremental` and `full`.
+  </Step>
+</Steps>
+
+## Match scoring
+
+When multiple cloud translations exist for the same target, `autoMatchStrategy` rescoring picks the highest score. The current implementation builds the base score from:
+
+- **version compatibility**: up to 50 points
+- **popularity**: up to 30 points
+- **freshness**: up to 20 points
+
+For plugins, raw version compatibility is:
+
+- exact `supported_versions` match: 100
+- same major version: 50
+- anything else: 0
+
+For themes, version compatibility is fixed at 50.
+
+<AccordionGroup>
+  <Accordion title="comprehensive (default)">
+    total = version + popularity + freshness
+  </Accordion>
+  <Accordion title="version_first">
+    total = `1.5 × version + 0.5 × popularity + 0.5 × freshness`, capped at 100
+  </Accordion>
+  <Accordion title="popularity">
+    total = `0.5 × version + 1.5 × popularity + 0.5 × freshness`, capped at 100
+  </Accordion>
+  <Accordion title="latest_update">
+    total = `0.5 × version + 0.5 × popularity + 1.5 × freshness`, capped at 100
+  </Accordion>
+</AccordionGroup>
+
+## Auto-apply
+
+By default the discovery flow keeps matches in a reviewable task list. When `autoApply` is enabled, successful matches continue into the download and apply path instead of stopping at review.
+
+<Warning>
+  Automation only reads registries from repositories listed in `autoTrustedRepos`, and repository values must use `owner/repo` format.
+</Warning>

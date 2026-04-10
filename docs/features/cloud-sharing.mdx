@@ -1,0 +1,79 @@
+---
+title: "云端译文库与社区共享"
+sidebarTitle: "云端共享"
+description: "说明当前 Cloud 视图、默认云端仓库、下载入口和 GitHub 发布流程。"
+---
+
+Obsidian i18n 目前有两类云端入口：
+
+- **管理中心的插件 / 主题列表**：读取 `defaultCloudRepo` 指向仓库的 `metadata.json`，显示可直接下载的云端版本。
+- **Cloud 视图**：通过管理中心顶部工具栏里的云图标打开，用来浏览社区目录、探索仓库资源和管理自己的发布仓库。
+
+## 浏览社区译文
+
+Cloud 视图当前可见的顶部标签只有三个：
+
+- **社区目录**
+- **探索资源**
+- **管理中心**
+
+除此之外，视图内部还有 `upload`、`history`、`backup` 三个二级工作状态，它们由 **管理中心** 页面中的按钮切换出来。
+
+<Note>
+  **社区目录** 用于浏览已登记的社区仓库；**探索资源** 用于按仓库地址浏览资源；**管理中心** 用于管理你自己的 GitHub 仓库。
+</Note>
+
+## 默认云端仓库
+
+在 **综合设置 → 云端仓库** 里填写 `owner/repo` 后，管理中心插件 / 主题列表会从这个仓库读取 `metadata.json`，并把匹配项显示为可下载的云端版本。
+
+## 从 Cloud 视图下载
+
+<Steps>
+  <Step title="打开 Cloud 视图">
+    先进入管理中心，再点击顶部工具栏里的云图标。
+  </Step>
+  <Step title="选择入口">
+    根据场景进入 **社区目录** 或 **探索资源**。
+  </Step>
+  <Step title="执行下载">
+    选中目标条目后执行下载。下载完成后，译文会保存到本地 SourceManager，并标记为 `cloud` 来源。
+  </Step>
+  <Step title="应用译文">
+    下载后的译文会出现在管理中心，可以继续编辑、设为激活源并应用。
+  </Step>
+</Steps>
+
+## 发布到 Cloud 仓库
+
+<Steps>
+  <Step title="配置 GitHub Token 与仓库">
+    进入 **设置 → 社区插件 → I18N → 共建生态**，填写 GitHub Token 和仓库名。
+  </Step>
+  <Step title="进入管理中心">
+    打开 Cloud 视图里的 **管理中心**。
+  </Step>
+  <Step title="进入发布流程">
+    在 **管理中心** 里点击发布入口，视图会切换到发布状态。
+  </Step>
+  <Step title="填写发布表单">
+    选择插件或主题、要发布的本地译文源，以及标题、版本、描述。
+  </Step>
+  <Step title="上传到仓库">
+    发布会把本地源文件上传到：
+
+    - `plugins/{source-id}.json`
+    - `themes/{source-id}.json`
+
+    同时更新仓库根目录的 `metadata.json`。
+  </Step>
+</Steps>
+
+<Tip>
+  当前发布实现只调用 GitHub API。
+</Tip>
+
+## 需要登录的范围
+
+- 未配置 GitHub Token 时，Cloud 视图仍然可以停留在 **社区目录** 和 **探索资源**。
+- 发布、删除、历史回滚、全量备份 / 恢复都依赖 GitHub Token 和个人仓库配置。

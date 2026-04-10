@@ -1,0 +1,73 @@
+---
+title: "AI 批量翻译与费用预估"
+sidebarTitle: "AI 翻译"
+description: "使用当前源码支持的 16 个 LLM 服务商或兼容接口批量翻译，并在发送前查看费用预估与缓存命中。"
+---
+
+AI 翻译引擎会把提取结果发送给大语言模型，再把返回结果写回编辑器。当前源码内置 16 个服务商或兼容接口配置。
+
+## 支持的服务商
+
+| 服务商 | 说明 |
+|--------|------|
+| OpenAI-compatible（自定义） | 任意兼容 OpenAI API 的平台、代理或自托管模型 |
+| Gemini | Google Gemini |
+| Ollama | 本地运行模型 |
+| DeepSeek | 默认模型：`deepseek-chat` |
+| 智谱 AI（GLM） | 默认模型：`glm-4-flash` |
+| Moonshot（Kimi） | 默认模型：`moonshot-v1-8k` |
+| 阿里云通义 | 默认模型：`qwen-plus` |
+| 百度千帆 | 默认模型：`ernie-4.0-8k-preview` |
+| 字节跳动豆包 / Ark | 默认模型：`doubao-pro-4k` |
+| Groq | 默认模型：`llama-3.3-70b-versatile` |
+| SiliconFlow | 默认模型：`deepseek-ai/DeepSeek-V3` |
+| OpenRouter | 默认模型：`anthropic/claude-3.5-sonnet` |
+| DeepInfra | 默认模型：`meta-llama/Llama-3.3-70B-Instruct` |
+| Mistral AI | 默认模型：`mistral-small-latest` |
+| MiniMax | 默认模型：`abab6.5-chat` |
+| StepFun | 默认模型：`step-1-8k` |
+
+同一个服务商可以创建多套 provider profile。每套 profile 独立保存 URL、API Key、模型和价格字段。
+
+<Note>
+  Ollama 的默认地址是 `http://localhost:11434`，不需要 API Key。
+</Note>
+
+## 费用预估
+
+AI 面板在正式发送请求前会显示：
+
+- **预计 Token 数**
+- **预计费用**
+- **输入 / 输出单价**
+
+价格来自当前 provider profile 的 `priceInput` 和 `priceOutput`。
+
+## 并发与批次大小
+
+AI 面板会读取并写入这些全局字段：
+
+- `llmBatchSize`
+- `llmConcurrencyLimit`
+- `llmTimeout`
+- `llmLanguage`
+- `llmStyle`
+
+当返回 `429 Too Many Requests` 时，先降低 `llmConcurrencyLimit`，再降低 `llmBatchSize`。
+
+## 本地缓存
+
+Obsidian i18n 会为已经成功翻译过的字符串建立本地缓存。再次翻译相同原文时：
+
+- 命中缓存：直接复用，不发送 API 请求
+- 未命中缓存：进入模型调用流程
+
+## 自定义提示词
+
+插件内置三类默认 Prompt 模板：
+
+- AST 翻译
+- Regex 翻译
+- 主题翻译
+
+这些模板在 **设置 → 社区插件 → I18N → 语言模型** 中覆盖。
