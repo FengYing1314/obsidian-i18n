@@ -1,0 +1,88 @@
+---
+title: "Advanced configuration"
+sidebarTitle: "Advanced"
+description: "Map AST rules, RE rules, IMT, and Cloud-related persisted fields to their real entry points."
+---
+
+"Advanced" is a documentation grouping, not a single plugin tab. The current entry points are split across:
+
+- `AST 配置`
+- `RE 配置`
+- `沉浸翻译`
+- `综合设置`
+- the Cloud view itself
+
+## AST extraction rules
+
+The AST extractor parses plugin JavaScript, then uses whitelists and filters to decide which strings enter extraction results.
+
+<AccordionGroup>
+  <Accordion title="astAssignments: assignment whitelist">
+    When a variable name matches this list, the assigned string is kept.
+  </Accordion>
+  <Accordion title="astFunctions: function argument whitelist">
+    When a function name matches this list, its string argument is kept.
+  </Accordion>
+  <Accordion title="astKeys: object key whitelist">
+    When an object key matches this list, its value is kept.
+  </Accordion>
+  <Accordion title="astRejectRe: reject rules">
+    Strings matching these regular expressions are discarded.
+  </Accordion>
+  <Accordion title="astValidRe: allow rules">
+    A string must match at least one of these rules to be kept.
+  </Accordion>
+</AccordionGroup>
+
+## Regex extraction rules
+
+Regex extraction runs directly on source text.
+
+<AccordionGroup>
+  <Accordion title="reDatas: capture rules">
+    The extractor reads candidate strings from the capture groups in these regular expressions.
+  </Accordion>
+  <Accordion title="reFlags: regex flags">
+    **Default:** `gs`
+  </Accordion>
+  <Accordion title="reLength: maximum length">
+    **Default:** `300`
+  </Accordion>
+  <Accordion title="reRejectRe: reject rules">
+    Reject expressions applied to Regex extraction results.
+  </Accordion>
+  <Accordion title="reValidRe: allow rules">
+    Allow expressions applied to Regex extraction results.
+  </Accordion>
+</AccordionGroup>
+
+## Cloud and network related fields
+
+<AccordionGroup>
+  <Accordion title="githubProxyUrl: GitHub proxy">
+    **Default:** `https://ghp.ci/`
+
+    The current UI renders this as a fixed dropdown in `综合设置`.
+  </Accordion>
+  <Accordion title="defaultCloudRepo: default cloud repository">
+    **Default:** empty string
+
+    The current UI renders this as a text input in `综合设置`.
+  </Accordion>
+  <Accordion title="cloudRepos: saved repository list">
+    This field is persisted in settings data and is read and written by the Cloud view while browsing repositories. It is not rendered as a standalone settings input.
+  </Accordion>
+</AccordionGroup>
+
+## Immersive translation (IMT)
+
+<AccordionGroup>
+  <Accordion title="modeImt: enable immersive translation">
+    **Default:** `false`
+
+    When enabled, the plugin applies real-time translation to matched UI elements.
+  </Accordion>
+  <Accordion title="imtPagerule: selector rules">
+    This field defines the include and exclude selectors for immersive translation.
+  </Accordion>
+</AccordionGroup>

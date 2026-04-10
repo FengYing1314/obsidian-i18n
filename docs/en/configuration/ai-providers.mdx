@@ -1,0 +1,78 @@
+---
+title: "Configure AI providers"
+sidebarTitle: "AI Providers"
+description: "Use the `语言模型` tab for provider profiles, connection testing, and `llmResponseFormat`."
+---
+
+In the current source, AI provider configuration lives in **Settings → Community Plugins → I18N → `语言模型`**. This page is responsible for provider profiles, connectivity testing, and `llmResponseFormat`.
+
+## Supported providers
+
+| # | Provider | Platform |
+|---|----------|----------|
+| 1 | OpenAI-compatible (custom) | [platform.openai.com](https://platform.openai.com/) |
+| 2 | Gemini | [aistudio.google.com](https://aistudio.google.com/) |
+| 3 | Ollama (local) | [ollama.com](https://ollama.com/) |
+| 4 | DeepSeek | [platform.deepseek.com](https://platform.deepseek.com/) |
+| 5 | Zhipu AI (GLM) | [open.bigmodel.cn](https://open.bigmodel.cn/) |
+| 6 | Moonshot (Kimi) | [platform.moonshot.cn](https://platform.moonshot.cn/) |
+| 7 | Aliyun (Qwen / Tongyi) | [dashscope.console.aliyun.com](https://dashscope.console.aliyun.com/) |
+| 8 | Baidu (ERNIE / Qianfan) | [console.bce.baidu.com/qianfan](https://console.bce.baidu.com/qianfan/) |
+| 9 | ByteDance (Doubao / Ark) | [console.volcengine.com/ark](https://console.volcengine.com/ark/) |
+| 10 | Groq | [console.groq.com](https://console.groq.com/) |
+| 11 | SiliconFlow | [siliconflow.cn](https://siliconflow.cn/) |
+| 12 | OpenRouter | [openrouter.ai](https://openrouter.ai/) |
+| 13 | DeepInfra | [deepinfra.com](https://deepinfra.com/) |
+| 14 | Mistral AI | [console.mistral.ai](https://console.mistral.ai/) |
+| 15 | MiniMax | [platform.minimaxi.com](https://platform.minimaxi.com/) |
+| 16 | StepFun | [platform.stepfun.com](https://platform.stepfun.com/) |
+
+## Add a provider profile
+
+<Steps>
+  <Step title="Open the `语言模型` tab">
+    Go to **Settings → Community Plugins → I18N → `语言模型`**.
+  </Step>
+  <Step title="Choose a provider">
+    Select the target platform from the provider dropdown.
+  </Step>
+  <Step title="Create or switch a profile">
+    The current UI supports adding, switching, and deleting profiles.
+  </Step>
+  <Step title="Fill in connection fields">
+    When you create a profile, the plugin writes that provider's default URL and default model. Then you fill in the API key, model name, and price fields.
+  </Step>
+  <Step title="Run connection testing">
+    Click the test button to run connectivity diagnostics.
+  </Step>
+</Steps>
+
+## Fields on this page
+
+<AccordionGroup>
+  <Accordion title="URL / API Key / Model">
+    These belong to the active provider profile and are stored independently per profile.
+  </Accordion>
+
+  <Accordion title="priceInput / priceOutput">
+    These fields drive cost estimation and are stored as CNY per million tokens.
+  </Accordion>
+
+  <Accordion title="llmResponseFormat">
+    This global field is edited on the `语言模型` page. Its current default is `text`.
+  </Accordion>
+</AccordionGroup>
+
+## Fields edited elsewhere
+
+These global translation fields are read and written from the AST / Regex / Theme AI panels:
+
+- `llmLanguage`
+- `llmStyle`
+- `llmBatchSize`
+- `llmConcurrencyLimit`
+- `llmTimeout`
+
+<Note>
+  Ollama defaults to `http://localhost:11434`.
+</Note>

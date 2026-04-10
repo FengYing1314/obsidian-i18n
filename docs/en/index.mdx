@@ -1,0 +1,64 @@
+---
+title: "Obsidian i18n: plugin and theme translation for desktop Obsidian"
+description: "Use a visual editor, AI translation, apply/restore flows, Cloud downloads, and GitHub publishing to manage reusable translations."
+---
+
+Obsidian i18n is a desktop plugin for [Obsidian](https://obsidian.md). It extracts translatable text from plugins and themes, then manages that text through AST editing, AI translation, apply/restore flows, Cloud downloads, and GitHub publishing.
+
+<Note>
+  **Terminology**
+
+  - **Obsidian i18n** is the product name.
+  - **I18N** is the actual display name in Obsidian's installed plugin list.
+  - Locale codes such as `zh-cn`, `ja`, and `fr` belong to plugin translations.
+  - The Mintlify docs site uses `zh-Hans` and `en` separately.
+</Note>
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/installation">
+    Use BRAT or manual ZIP extraction.
+  </Card>
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Extract, translate, review, and apply your first plugin translation.
+  </Card>
+  <Card title="AI Translation" icon="robot" href="/features/ai-translation">
+    Use the 16 providers or compatible interfaces defined in the current source.
+  </Card>
+  <Card title="Configuration" icon="gear" href="/configuration/ai-providers">
+    See the real entry points for `语言模型`, `综合设置`, `自动化`, and advanced rules.
+  </Card>
+</CardGroup>
+
+## Workflow overview
+
+<Steps>
+  <Step title="Install the plugin">
+    Add Obsidian i18n to the current vault through BRAT or the release ZIP.
+  </Step>
+  <Step title="Connect an AI provider">
+    Configure a provider profile in **Settings → Community Plugins → I18N → `语言模型`**.
+  </Step>
+  <Step title="Extract and translate">
+    Open the Manager, use the `插件` or `主题` tabs, extract strings, then translate them with AI or by hand.
+  </Step>
+  <Step title="Apply, restore, and share">
+    Use **Apply** and **Restore** from the Manager; export local archives from `管理`, or publish to GitHub from the Cloud view.
+  </Step>
+</Steps>
+
+## Key capabilities
+
+<CardGroup cols={2}>
+  <Card title="Visual AST Editor" icon="table-cells" href="/features/ast-editor">
+    Edit extracted plugin strings in a structured table without touching target plugin source files.
+  </Card>
+  <Card title="Cost Estimation" icon="coins" href="/features/ai-translation">
+    Review token and cost estimates before sending requests.
+  </Card>
+  <Card title="Apply & Restore" icon="rotate-left" href="/features/apply-restore">
+    Manage translation activation through backup, injection, and restore flows.
+  </Card>
+  <Card title="Cloud Sharing" icon="cloud" href="/features/cloud-sharing">
+    Download from Cloud repositories or publish local translations to GitHub.
+  </Card>
+</CardGroup>

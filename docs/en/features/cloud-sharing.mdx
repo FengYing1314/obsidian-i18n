@@ -1,0 +1,70 @@
+---
+title: "Cloud library and community translation sharing"
+sidebarTitle: "Cloud Sharing"
+description: "Document the current Cloud view, default cloud repository, download entry points, and GitHub publishing flow."
+---
+
+Obsidian i18n currently exposes two cloud-facing entry points:
+
+- the Manager plugin / theme lists, which read `metadata.json` from `defaultCloudRepo`
+- the dedicated Cloud view, opened from the Manager toolbar cloud button
+
+## Cloud view structure
+
+The current visible top tabs in the Cloud view are:
+
+- **社区目录**
+- **探索资源**
+- **管理中心**
+
+The view also contains internal operational states named `upload`, `history`, and `backup`, which are entered from **管理中心** actions.
+
+<Note>
+  **社区目录** is for registered community repositories. **探索资源** is for repository-address browsing. **管理中心** is for your own GitHub repository management.
+</Note>
+
+## Default cloud repository
+
+When **综合设置 → 云端仓库** is set to an `owner/repo` value, the Manager plugin and theme lists read `metadata.json` from that repository and expose matching cloud versions for direct download.
+
+## Download from the Cloud view
+
+<Steps>
+  <Step title="Open the Cloud view">
+    Open the Manager first, then click the cloud button in the top toolbar.
+  </Step>
+  <Step title="Choose a source">
+    Use **社区目录** or **探索资源**.
+  </Step>
+  <Step title="Download">
+    Downloaded entries are saved into the local SourceManager and marked with `cloud` origin.
+  </Step>
+</Steps>
+
+## Publish to a Cloud repository
+
+<Steps>
+  <Step title="Configure GitHub token and repository">
+    Open **设置 → 社区插件 → I18N → 共建生态** and enter your GitHub token and repository name.
+  </Step>
+  <Step title="Open 管理中心 in the Cloud view">
+    Switch to **管理中心**.
+  </Step>
+  <Step title="Enter publish mode">
+    Use the publish entry point from the management page.
+  </Step>
+  <Step title="Submit the source">
+    Select plugin or theme, choose a local source, then fill title, version, and description.
+  </Step>
+</Steps>
+
+Publishing uploads the local source file to:
+
+- `plugins/{source-id}.json`
+- `themes/{source-id}.json`
+
+and updates the repository root `metadata.json`.
+
+<Tip>
+  The current publishing flow uses the GitHub API.
+</Tip>

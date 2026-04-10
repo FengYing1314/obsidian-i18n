@@ -1,0 +1,94 @@
+---
+title: "自动化发现与自动应用"
+sidebarTitle: "自动化"
+description: "说明管理中心自动化标签页的真实入口、默认值、评分规则和自动应用边界。"
+---
+
+自动化配置不在 **综合设置**。当前实现的入口是 **管理中心 → 自动化** 标签页，对应 `AutoManagerPanel`。
+
+<Note>
+  启用 `autoDiscovery` 后，插件会在启动时执行一次发现流程；此外还会每 30 分钟检查一次，判断是否达到 `autoCheckInterval` 指定的扫描间隔。
+</Note>
+
+## 默认值
+
+| 字段 | 默认值 | 说明 |
+|------|--------|------|
+| `autoDiscovery` | `false` | 是否启用后台发现 |
+| `autoMatchStrategy` | `comprehensive` | 匹配评分策略 |
+| `autoApply` | `false` | 是否在匹配后直接应用 |
+| `autoCheckInterval` | `24` | 自动检查间隔，单位小时；`0` 表示关闭定时检查 |
+| `autoTrustedRepos` | `[]` | 受信任仓库列表 |
+| `autoExcludeList` | `[]` | 排除的插件 ID 列表 |
+| `autoScanMode` | `incremental` | 扫描模式 |
+
+## 开启自动化
+
+<Steps>
+  <Step title="打开管理中心">
+    点击侧边栏地球图标，进入 Obsidian i18n 管理中心。
+  </Step>
+  <Step title="切换到自动化">
+    在顶部标签中打开 **自动化**。
+  </Step>
+  <Step title="开启后台探测与通知">
+    打开 **后台探测与通知**。这会启用 `autoDiscovery`。
+  </Step>
+  <Step title="设置探测周期">
+    在 **探测周期** 中填写小时数；填 `0` 会关闭定时检查。
+  </Step>
+  <Step title="选择探测范围">
+    `autoScanMode` 支持 `incremental` 和 `full` 两种模式。
+  </Step>
+</Steps>
+
+## 匹配策略
+
+当同一个插件存在多份候选译文包时，`autoMatchStrategy` 会对候选项重新打分并取最高分。当前实现的基础分由三部分组成：
+
+- **版本兼容**：最高 50 分
+- **社区认可度**：最高 30 分
+- **最近更新时间**：最高 20 分
+
+对插件来说，版本兼容的原始判定是：
+
+- 云端 `supported_versions` 与本地版本完全一致：100
+- 主版本号一致：50
+- 其余情况：0
+
+对主题来说，版本兼容固定记为 50 分。
+
+<AccordionGroup>
+  <Accordion title="comprehensive（默认）">
+    总分 = 版本分 + 受欢迎分 + 新鲜度分。
+  </Accordion>
+  <Accordion title="version_first">
+    总分 = `1.5 × 版本分 + 0.5 × 受欢迎分 + 0.5 × 新鲜度分`，最终封顶 100。
+  </Accordion>
+  <Accordion title="popularity">
+    总分 = `0.5 × 版本分 + 1.5 × 受欢迎分 + 0.5 × 新鲜度分`，最终封顶 100。
+  </Accordion>
+  <Accordion title="latest_update">
+    总分 = `0.5 × 版本分 + 0.5 × 受欢迎分 + 1.5 × 新鲜度分`，最终封顶 100。
+  </Accordion>
+</AccordionGroup>
+
+## 自动应用
+
+默认情况下，发现流程会把结果保留在待审阅任务里。启用 `autoApply` 后，匹配成功的项目会继续走下载 / 应用流程，而不是停在审阅状态。
+
+<Warning>
+  `autoApply` 默认关闭。自动化只会从 `autoTrustedRepos` 里读取翻译清单；仓库格式必须是 `owner/repo`。
+</Warning>
+
+## 受信任仓库与排除列表
+
+<AccordionGroup>
+  <Accordion title="autoTrustedRepos：受信任仓库">
+    自动化扫描只会检查这些仓库里的翻译 Registry。空列表意味着没有任何仓库会参与自动应用。
+  </Accordion>
+
+  <Accordion title="autoExcludeList：排除的插件 ID">
+    出现在这个列表里的插件会跳过自动发现、自动匹配和自动应用。
+  </Accordion>
+</AccordionGroup>

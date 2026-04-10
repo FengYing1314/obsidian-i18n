@@ -1,0 +1,73 @@
+---
+title: "How to install Obsidian i18n"
+sidebarTitle: "Installation"
+description: "Install with BRAT from GitHub, or extract the release ZIP manually into the correct plugin directory."
+---
+
+This documentation covers two installation paths:
+
+- use BRAT to install from GitHub and follow repository updates
+- download the release ZIP and extract it manually into the plugin directory
+
+<Note>
+  **Naming**
+
+  - **Obsidian i18n** is the product name used in the docs.
+  - **I18N** is the actual display name in Obsidian's installed plugin list.
+</Note>
+
+<Warning>
+  Obsidian i18n is desktop-only. It does not run on Obsidian Mobile for iOS or Android.
+</Warning>
+
+<Tabs>
+  <Tab title="BRAT">
+    [BRAT](https://github.com/TfTHacker/obsidian42-brat) installs the plugin from GitHub and can pull later updates from the repository.
+
+    <Steps>
+      <Step title="Install BRAT">
+        Open Obsidian's community plugin browser, search for **Obsidian42 - BRAT**, install it, and enable it.
+      </Step>
+      <Step title="Open BRAT settings">
+        Open the BRAT configuration panel.
+      </Step>
+      <Step title="Add the Obsidian i18n repository">
+        Click **Add Beta plugin** and paste:
+
+        ```text
+        https://github.com/eondrcode/obsidian-i18n
+        ```
+      </Step>
+      <Step title="Enable the plugin manually">
+        After BRAT finishes downloading, open the installed community plugin list, find **I18N**, and turn it on manually.
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title="Manual install">
+    <Steps>
+      <Step title="Download the release ZIP">
+        Open the [Releases page](https://github.com/eondrcode/obsidian-i18n/releases) and download `obsidian-i18n.zip`.
+      </Step>
+      <Step title="Extract it into the plugin directory">
+        Locate the current vault's `.obsidian/plugins/` directory. The final structure must be:
+
+        ```text
+        .obsidian/
+        └── plugins/
+            └── i18n/
+                ├── main.js
+                ├── manifest.json
+                └── styles.css
+        ```
+
+        The folder name must be `i18n` because it matches the real plugin `manifest.id`.
+      </Step>
+      <Step title="Restart Obsidian">
+        Close and reopen Obsidian so it rescans the plugin directory.
+      </Step>
+      <Step title="Enable the plugin">
+        Find **I18N** in the installed plugin list and turn it on.
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>

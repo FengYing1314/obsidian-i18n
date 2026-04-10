@@ -1,0 +1,37 @@
+---
+title: "Quick start: translate your first Obsidian plugin"
+sidebarTitle: "Quick start"
+description: "Extract, translate, review, and apply your first plugin translation through the current UI flow."
+---
+
+This guide walks through a full plugin translation from extraction to application.
+
+<Steps>
+  <Step title="Open the i18n panel">
+    Click the globe icon in the ribbon, or run the command that opens the i18n panel from the command palette.
+  </Step>
+  <Step title="Configure an AI provider">
+    Open **Settings → Community Plugins → I18N → `语言模型`** and create a provider profile.
+
+    See [AI providers](/configuration/ai-providers) for details.
+  </Step>
+  <Step title="Select a plugin">
+    In the Manager, find the plugin you want to translate and open it.
+  </Step>
+  <Step title="Extract strings">
+    Click **Extract**. AST extraction scans the plugin's compiled bundle and collects user-facing text without modifying source files.
+  </Step>
+  <Step title="Translate with AI">
+    Click **Translate**. The plugin sends extracted strings to the configured provider in batches.
+  </Step>
+  <Step title="Review results">
+    Edit translation cells inline. Changes save automatically.
+  </Step>
+  <Step title="Apply the translation">
+    Click **Apply**. If the result is wrong, click **Restore** first, then troubleshoot.
+  </Step>
+</Steps>
+
+<Note>
+  `language` and `llmLanguage` belong to the plugin translation workflow. They are separate from the Mintlify docs site language switcher.
+</Note>

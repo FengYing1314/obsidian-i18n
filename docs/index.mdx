@@ -1,0 +1,64 @@
+---
+title: "Obsidian i18n：AI 驱动的插件与主题翻译"
+description: "用可视化编辑器、AI 翻译和应用/还原流程，为 Obsidian 桌面端插件与主题建立可复用的本地译文。"
+---
+
+Obsidian i18n 是一款用于 [Obsidian](https://obsidian.md) 的桌面插件。它把插件与主题里的可翻译文本提取出来，再通过 AST 编辑器、AI 翻译、应用与还原、Cloud 下载与 GitHub 发布等流程，把译文管理成独立的本地译文源。
+
+<Note>
+  **术语说明**
+
+  - **Obsidian i18n** 是产品名称。
+  - **I18N** 是 Obsidian 已安装插件列表中的实际显示名称。
+  - `zh-cn`、`ja`、`fr` 这类值是插件译文语言码。
+  - Mintlify 文档站语言由 `zh-Hans` 和 `en` 控制，和插件译文语言码不是同一套配置。
+</Note>
+
+<CardGroup cols={2}>
+  <Card title="安装" icon="download" href="/installation">
+    支持 BRAT 安装和手动解压两条路径。
+  </Card>
+  <Card title="快速开始" icon="rocket" href="/quickstart">
+    从提取、翻译、审阅到应用，完成第一份插件译文。
+  </Card>
+  <Card title="AI 翻译" icon="robot" href="/features/ai-translation">
+    使用当前源码支持的 16 个 LLM 服务商或兼容接口批量翻译。
+  </Card>
+  <Card title="配置说明" icon="gear" href="/configuration/ai-providers">
+    查看 `语言模型`、`综合设置`、`自动化` 和高级规则的真实入口。
+  </Card>
+</CardGroup>
+
+## 工作流概览
+
+<Steps>
+  <Step title="安装插件">
+    通过 BRAT 或发行版 ZIP，把 Obsidian i18n 安装到当前 vault。
+  </Step>
+  <Step title="连接 AI 服务">
+    在 **设置 → 社区插件 → I18N → 语言模型** 中配置 provider profile。
+  </Step>
+  <Step title="提取并翻译">
+    打开管理中心，在 `插件` 或 `主题` 标签中提取字符串，再执行 AI 或手动翻译。
+  </Step>
+  <Step title="应用、还原与共享">
+    在管理中心执行 **应用 / Apply** 与 **还原 / Restore**；在 `管理` 标签导出本地归档，或在 Cloud 视图发布到 GitHub 仓库。
+  </Step>
+</Steps>
+
+## 核心能力
+
+<CardGroup cols={2}>
+  <Card title="可视化 AST 编辑器" icon="table-cells" href="/features/ast-editor">
+    在结构化表格里逐条编辑插件译文，不直接改动目标插件源码。
+  </Card>
+  <Card title="费用预估" icon="coins" href="/features/ai-translation">
+    在正式发送请求前查看 Token 与费用预估。
+  </Card>
+  <Card title="应用与还原" icon="rotate-left" href="/features/apply-restore">
+    通过备份、注入和还原流程管理译文生效状态。
+  </Card>
+  <Card title="云端共享" icon="cloud" href="/features/cloud-sharing">
+    从 Cloud 仓库下载译文，或把本地译文发布到 GitHub 仓库。
+  </Card>
+</CardGroup>

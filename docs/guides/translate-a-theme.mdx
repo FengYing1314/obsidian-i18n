@@ -1,0 +1,36 @@
+---
+title: "如何用 i18n 翻译一个 Obsidian 主题"
+sidebarTitle: "翻译主题"
+description: "使用主题编辑器提取 `theme.css` 中的可翻译内容，并执行 AI 或手动修订。"
+---
+
+除了插件翻译，Obsidian i18n 也支持主题翻译。
+
+## 主题翻译流程
+
+<Steps>
+  <Step title="打开管理中心">
+    点击侧边栏地球图标，进入 `i18n 管理中心`。
+  </Step>
+  <Step title="切换到主题标签">
+    在顶部切换到 `主题`。
+  </Step>
+  <Step title="选择目标主题">
+    打开目标主题的主题编辑器。
+  </Step>
+  <Step title="提取可翻译内容">
+    点击 **提取 / Extract**。主题编辑器会读取 `theme.css` 并生成可翻译条目。
+  </Step>
+  <Step title="使用 AI 或手动翻译">
+    你可以在 AI 面板中批量翻译，也可以直接手工编辑。
+  </Step>
+  <Step title="应用译文">
+    点击 **应用 / Apply** 生效；需要回退时点击 **还原 / Restore**。
+  </Step>
+</Steps>
+
+<Note>
+  如果提取结果为空，先检查主题目录中是否存在 `theme.css`，以及该文件里是否包含可提取的设置文本。
+</Note>
+
+`llmThemePrompt` 在 **设置 → 社区插件 → I18N → 语言模型** 中覆盖。

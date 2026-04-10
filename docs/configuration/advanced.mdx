@@ -1,0 +1,88 @@
+---
+title: "高级配置：提取规则、代理与沉浸翻译"
+sidebarTitle: "高级配置"
+description: "按真实入口说明 AST 配置、RE 配置、沉浸翻译，以及 Cloud 相关持久化字段。"
+---
+
+这里的“高级配置”是文档分组，不是插件中的单独标签页。当前相关入口分散在：
+
+- `AST 配置`
+- `RE 配置`
+- `沉浸翻译`
+- `综合设置`
+- Cloud 视图本身
+
+## AST 提取规则
+
+AST 提取器会解析插件 JavaScript，再根据白名单和过滤规则决定哪些字符串进入提取结果。
+
+<AccordionGroup>
+  <Accordion title="astAssignments：变量赋值白名单">
+    变量名命中这个列表时，对应赋值字符串会进入提取结果。
+  </Accordion>
+  <Accordion title="astFunctions：函数参数白名单">
+    函数名命中这个列表时，对应参数字符串会进入提取结果。
+  </Accordion>
+  <Accordion title="astKeys：对象键名白名单">
+    对象键名命中这个列表时，对应值会进入提取结果。
+  </Accordion>
+  <Accordion title="astRejectRe：排除规则">
+    命中这些正则的字符串会被直接丢弃。
+  </Accordion>
+  <Accordion title="astValidRe：保留规则">
+    字符串至少命中一条保留规则时才会被保留。
+  </Accordion>
+</AccordionGroup>
+
+## Regex 提取规则
+
+Regex 提取器直接在源文本上做匹配。
+
+<AccordionGroup>
+  <Accordion title="reDatas：捕获规则">
+    提取器按这些正则的捕获组读取候选字符串。
+  </Accordion>
+  <Accordion title="reFlags：正则标志">
+    **默认值：** `gs`
+  </Accordion>
+  <Accordion title="reLength：最大长度">
+    **默认值：** `300`
+  </Accordion>
+  <Accordion title="reRejectRe：排除规则">
+    作用于 Regex 提取结果的排除正则。
+  </Accordion>
+  <Accordion title="reValidRe：保留规则">
+    作用于 Regex 提取结果的保留正则。
+  </Accordion>
+</AccordionGroup>
+
+## Cloud 与网络相关字段
+
+<AccordionGroup>
+  <Accordion title="githubProxyUrl：GitHub 代理">
+    **默认值：** `https://ghp.ci/`
+
+    当前 UI 位于 `综合设置`，并以预置下拉选项形式渲染。
+  </Accordion>
+  <Accordion title="defaultCloudRepo：默认云端仓库">
+    **默认值：** 空字符串
+
+    当前 UI 位于 `综合设置` 的文本输入项。
+  </Accordion>
+  <Accordion title="cloudRepos：已保存仓库列表">
+    这个字段保存在配置数据里，由 Cloud 视图在浏览仓库时读写，不在设置页中单独渲染输入控件。
+  </Accordion>
+</AccordionGroup>
+
+## 沉浸翻译（IMT）
+
+<AccordionGroup>
+  <Accordion title="modeImt：启用沉浸翻译">
+    **默认值：** `false`
+
+    开启后，插件会对命中的 UI 元素执行实时翻译。
+  </Accordion>
+  <Accordion title="imtPagerule：选择器规则">
+    这个字段定义沉浸翻译的命中与排除选择器。
+  </Accordion>
+</AccordionGroup>

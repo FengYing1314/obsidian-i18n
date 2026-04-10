@@ -1,0 +1,69 @@
+---
+title: "Troubleshoot connection, extraction, and install issues"
+sidebarTitle: "Troubleshooting"
+description: "Verified handling steps for AI connectivity failures, extraction issues, apply rollbacks, and installation problems."
+---
+
+## AI connectivity
+
+These cases map to connection testing in **Settings → Community Plugins → I18N → `语言模型`**.
+
+### 401 Unauthorized
+
+The current profile key is invalid or includes whitespace. Re-enter it and test again.
+
+### 404 Not Found
+
+The current endpoint URL is wrong. Check whether the base URL matches the provider's API root.
+
+### 429 Too Many Requests
+
+The provider is rate-limiting the current account or profile. Lower `llmConcurrencyLimit` and try again.
+
+### Timeout
+
+Raise `llmTimeout` from the editor AI panel or switch to a faster model / provider.
+
+### Network / SSL error
+
+If the problem is GitHub raw-resource access, switch **综合设置 → 加速节点**. If the problem is AI connectivity, verify that the current endpoint URL is reachable.
+
+## Extraction returns nothing
+
+### Plugin extraction returns no rows
+
+Plugin extraction requires a real `main.js` file in the target plugin directory. If `main.js` is missing, AST extraction cannot produce rows.
+
+### Theme extraction returns no rows
+
+The current theme extractor only reads `theme.css` `/* @settings */` blocks and only supports `name`, `title`, `description`, `label`, and `markdown`.
+
+## Translation content issues
+
+### Placeholders such as `${name}` disappeared
+
+Search for the affected row and restore the missing placeholders before applying again.
+
+### Apply reports a plugin reload failure
+
+The current apply flow auto-rolls back on reload failure. Return to the editor, inspect the recently edited rows, and then re-apply.
+
+## Installation and import
+
+### The plugin does not appear after BRAT install
+
+BRAT downloads files but does not auto-enable the plugin. Find **I18N** in the installed plugin list and toggle it on manually.
+
+### Manual install does not load
+
+Verify this exact path exists:
+
+```text
+.obsidian/plugins/i18n/main.js
+```
+
+`manifest.json` and `styles.css` also need to exist, and the folder name must be `i18n`.
+
+### Local import fails
+
+The Manager **管理** import action is primarily intended for Manager-exported `.i18n.gz` files. If you select a `.json`, verify that it came from an older Manager export format.

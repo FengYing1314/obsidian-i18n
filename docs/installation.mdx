@@ -1,0 +1,73 @@
+---
+title: "如何安装 Obsidian i18n 插件"
+sidebarTitle: "安装"
+description: "使用 BRAT 从 GitHub 安装，或手动解压发行版 ZIP 到正确的插件目录。"
+---
+
+当前文档覆盖两条安装路径：
+
+- 使用 BRAT 从 GitHub 安装并跟随仓库更新
+- 手动下载发行版 ZIP 并解压到插件目录
+
+<Note>
+  **界面命名说明**
+
+  - 文档中的产品名统一写 **Obsidian i18n**。
+  - 在 Obsidian 已安装插件列表中，你看到的实际名称是 **I18N**。
+</Note>
+
+<Warning>
+  Obsidian i18n 仅支持桌面端 Obsidian，不支持 Obsidian Mobile（iOS / Android）。
+</Warning>
+
+<Tabs>
+  <Tab title="BRAT">
+    [BRAT](https://github.com/TfTHacker/obsidian42-brat) 可以直接从 GitHub 安装插件，并在后续更新时重新拉取仓库发布内容。
+
+    <Steps>
+      <Step title="安装 BRAT">
+        打开 Obsidian 的社区插件浏览器，搜索 **Obsidian42 - BRAT**，完成安装并启用。
+      </Step>
+      <Step title="打开 BRAT 设置">
+        进入 BRAT 配置面板。
+      </Step>
+      <Step title="添加 Obsidian i18n 仓库">
+        点击 **Add Beta plugin**，粘贴仓库地址：
+
+        ```text
+        https://github.com/eondrcode/obsidian-i18n
+        ```
+      </Step>
+      <Step title="手动启用插件">
+        BRAT 下载完成后，到已安装社区插件列表里找到 **I18N**，手动打开开关。
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title="手动安装">
+    <Steps>
+      <Step title="下载发行版 ZIP">
+        打开 [Releases 页面](https://github.com/eondrcode/obsidian-i18n/releases)，下载 `obsidian-i18n.zip`。
+      </Step>
+      <Step title="解压到插件目录">
+        找到当前 vault 的 `.obsidian/plugins/` 目录，把 ZIP 解压到这里。最终目录结构必须是：
+
+        ```text
+        .obsidian/
+        └── plugins/
+            └── i18n/
+                ├── main.js
+                ├── manifest.json
+                └── styles.css
+        ```
+
+        文件夹名必须是 `i18n`，因为它对应插件真实的 `manifest.id`。
+      </Step>
+      <Step title="重启 Obsidian">
+        关闭并重新打开 Obsidian，让它重新扫描插件目录。
+      </Step>
+      <Step title="启用插件">
+        前往已安装社区插件列表，找到 **I18N** 并手动启用。
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>

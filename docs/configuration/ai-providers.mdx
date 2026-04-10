@@ -1,0 +1,78 @@
+---
+title: "连接 AI 服务商以启用自动翻译"
+sidebarTitle: "AI 服务商"
+description: "在 `语言模型` 标签页中配置 provider profile，并区分连接设置与全局翻译参数。"
+---
+
+当前源码的 AI 服务商配置入口在 **设置 → 社区插件 → I18N → 语言模型**。这一页负责 provider profile、本地连接测试和 `llmResponseFormat`。
+
+## 支持的服务商
+
+| # | 服务商 | 平台 |
+|---|--------|------|
+| 1 | OpenAI-compatible（自定义） | [platform.openai.com](https://platform.openai.com/) |
+| 2 | Gemini | [aistudio.google.com](https://aistudio.google.com/) |
+| 3 | Ollama（本地） | [ollama.com](https://ollama.com/) |
+| 4 | DeepSeek | [platform.deepseek.com](https://platform.deepseek.com/) |
+| 5 | 智谱 AI（GLM） | [open.bigmodel.cn](https://open.bigmodel.cn/) |
+| 6 | Moonshot（Kimi） | [platform.moonshot.cn](https://platform.moonshot.cn/) |
+| 7 | 阿里云（Qwen / 通义） | [dashscope.console.aliyun.com](https://dashscope.console.aliyun.com/) |
+| 8 | 百度（ERNIE / 千帆） | [console.bce.baidu.com/qianfan](https://console.bce.baidu.com/qianfan/) |
+| 9 | 字节跳动（Doubao / Ark） | [console.volcengine.com/ark](https://console.volcengine.com/ark/) |
+| 10 | Groq | [console.groq.com](https://console.groq.com/) |
+| 11 | SiliconFlow | [siliconflow.cn](https://siliconflow.cn/) |
+| 12 | OpenRouter | [openrouter.ai](https://openrouter.ai/) |
+| 13 | DeepInfra | [deepinfra.com](https://deepinfra.com/) |
+| 14 | Mistral AI | [console.mistral.ai](https://console.mistral.ai/) |
+| 15 | MiniMax | [platform.minimaxi.com](https://platform.minimaxi.com/) |
+| 16 | StepFun | [platform.stepfun.com](https://platform.stepfun.com/) |
+
+## 添加一个 provider profile
+
+<Steps>
+  <Step title="打开语言模型标签页">
+    进入 **设置 → 社区插件 → I18N → 语言模型**。
+  </Step>
+  <Step title="选择服务商">
+    在 provider 下拉框中选择目标平台。
+  </Step>
+  <Step title="创建或切换 profile">
+    当前 UI 支持新增、切换和删除 profile。
+  </Step>
+  <Step title="填写连接信息">
+    新建 profile 时，插件会写入该服务商的默认 URL 和默认模型；你再补充 API Key、模型名和价格字段。
+  </Step>
+  <Step title="执行测试连接">
+    点击测试按钮，运行连接诊断。
+  </Step>
+</Steps>
+
+## 当前页中的关键字段
+
+<AccordionGroup>
+  <Accordion title="URL / API Key / Model">
+    这些字段属于当前 provider profile，彼此独立保存。
+  </Accordion>
+
+  <Accordion title="priceInput / priceOutput">
+    这两个字段驱动费用预估，单位是人民币 / 每百万 Token。
+  </Accordion>
+
+  <Accordion title="llmResponseFormat">
+    这个全局字段在 `语言模型` 页面编辑，当前默认值是 `text`。
+  </Accordion>
+</AccordionGroup>
+
+## 不在当前页直接编辑的字段
+
+下面这些全局翻译参数由 AST / Regex / Theme 的 AI 面板读写：
+
+- `llmLanguage`
+- `llmStyle`
+- `llmBatchSize`
+- `llmConcurrencyLimit`
+- `llmTimeout`
+
+<Note>
+  Ollama 默认地址是 `http://localhost:11434`。
+</Note>

@@ -1,0 +1,37 @@
+---
+title: "Obsidian i18n: translate plugins without editing code"
+description: "Translate desktop Obsidian plugins and themes through extraction, AI translation, apply/restore flows, and Cloud/GitHub management."
+---
+
+Obsidian i18n is a desktop Obsidian plugin for translating community plugins and themes into a target language. You do not need to edit the target plugin source directly, and you do not need to manage the translation file structure by hand. The plugin combines extraction, translation, apply, restore, Cloud download, and GitHub publish flows in one tool.
+
+## What problem it solves
+
+When a community plugin does not ship your target language, you either use the original interface as-is or maintain a localization flow yourself. Obsidian i18n turns that localization flow into a desktop plugin and pairs translation application with backup and restore.
+
+## What you can do with it
+
+- **Extract translatable strings** with AST and Regex rules from installed plugins.
+- **Batch-translate with AI** using the 16 providers or compatible interfaces defined in the current source.
+- **Review translations in a table** with inline editing and autosave.
+- **Apply or restore translations** through the Manager.
+- **Manage local archives and Cloud repositories** by exporting from `管理`, downloading from Cloud repositories, or publishing to GitHub.
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/installation">
+    See the BRAT and manual ZIP installation paths.
+  </Card>
+  <Card title="Quick start" icon="rocket" href="/quickstart">
+    Walk through a full first translation.
+  </Card>
+  <Card title="Visual AST editor" icon="table-cells" href="/features/ast-editor">
+    Work on extracted strings instead of editing target plugin source code.
+  </Card>
+  <Card title="AI translation" icon="robot" href="/features/ai-translation">
+    Review provider profiles, cost estimation, cache reuse, and prompt entry points.
+  </Card>
+</CardGroup>
+
+<Note>
+  Obsidian i18n is desktop-only. It does not run on Obsidian Mobile for iOS or Android.
+</Note>

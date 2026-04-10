@@ -1,0 +1,40 @@
+---
+title: "Obsidian i18n FAQ"
+sidebarTitle: "FAQ"
+description: "Answer common questions about desktop support, AI usage, rollback behavior, storage paths, and sharing."
+---
+
+<AccordionGroup>
+  <Accordion title="Does Obsidian i18n support mobile?">
+    No. The current implementation depends on desktop filesystem access and runs only on desktop Obsidian for macOS, Windows, and Linux.
+  </Accordion>
+
+  <Accordion title="Can I use it without an AI key?">
+    Yes. You can translate manually in the AST, Regex, or Theme editors.
+  </Accordion>
+
+  <Accordion title="Can Apply break the target plugin?">
+    Apply creates backups first. If plugin reload fails, the current implementation restores the backup and returns the plugin to its original state. Themes also keep backups and support **Restore**.
+  </Accordion>
+
+  <Accordion title="What happens after the target plugin updates?">
+    When `automaticUpdate` is enabled, startup checks compare applied target versions and re-run apply for active translations whose target version changed.
+  </Accordion>
+
+  <Accordion title="How do I see AI translation cost before sending requests?">
+    The AST / Regex / Theme AI panels show token and cost estimates before the real translation request starts.
+  </Accordion>
+
+  <Accordion title="Where are translations stored?">
+    The current implementation stores translation data in:
+
+    - `.obsidian/plugins/i18n/translations/<source-id>.json`
+    - `.obsidian/plugins/i18n/metadata.json`
+
+    Backups live in `.obsidian/plugins/i18n/backups/`.
+  </Accordion>
+
+  <Accordion title="How do I share translations with other people?">
+    Export a local `.i18n.gz` archive from the Manager **管理** tab, or publish a local source to a GitHub repository from the Cloud view.
+  </Accordion>
+</AccordionGroup>

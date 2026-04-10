@@ -1,0 +1,70 @@
+---
+title: "AI batch translation with cost estimation"
+sidebarTitle: "AI Translation"
+description: "Translate AST, Regex, and Theme rows in bulk with the current 16 built-in provider configs and inspect token and cost estimates before sending requests."
+---
+
+The AI panels send the current editor rows to the active provider profile and write returned targets back into the AST, Regex, or Theme tables. Provider definitions come from `LLM_PROVIDERS`, which currently exposes 16 built-in configs.
+
+## Providers
+
+| Provider | Notes |
+|----------|-------|
+| OpenAI-compatible (custom) | use any OpenAI-compatible endpoint |
+| Gemini | default model `gemini-2.0-flash` |
+| Ollama | default URL `http://localhost:11434` |
+| DeepSeek | default model `deepseek-chat` |
+| Zhipu AI (GLM) | default model `glm-4-flash` |
+| Moonshot (Kimi) | default model `moonshot-v1-8k` |
+| Aliyun (Qwen) | default model `qwen-plus` |
+| Baidu (ERNIE) | default model `ernie-4.0-8k-preview` |
+| ByteDance (Doubao / Ark) | default model `doubao-pro-4k` |
+| Groq | default model `llama-3.3-70b-versatile` |
+| SiliconFlow | default model `deepseek-ai/DeepSeek-V3` |
+| OpenRouter | default model `anthropic/claude-3.5-sonnet` |
+| DeepInfra | default model `meta-llama/Llama-3.3-70B-Instruct` |
+| Mistral AI | default model `mistral-small-latest` |
+| MiniMax | default model `abab6.5-chat` |
+| StepFun | default model `step-1-8k` |
+
+## Cost estimate
+
+Before translation starts, the AI panel calls the active provider's `estimateTokens()` implementation and shows:
+
+- estimated token count
+- estimated cost
+- the input/output pricing used by the current profile
+
+If the current profile enables custom pricing, the estimate uses those values.
+
+## Batch size, concurrency, timeout, and language
+
+The AST / Regex / Theme AI panels edit these global settings directly:
+
+- `llmBatchSize`
+- `llmConcurrencyLimit`
+- `llmTimeout`
+- `llmStyle`
+- `language` / `llmLanguage`
+
+Default values are `10`, `3`, and `60000` for batch size, concurrency limit, and timeout.
+
+## What gets translated by default
+
+The current controllers build `targetItems` and only send rows whose `target` is:
+
+- empty
+- whitespace-only
+- equal to `source`
+
+Existing translated rows are only resent when overwrite is enabled in the AI panel.
+
+## Prompt templates
+
+The current implementation stores three prompt templates:
+
+- `llmAstPrompt`
+- `llmRegexPrompt`
+- `llmThemePrompt`
+
+You can edit them from **语言模型**, and for AST / Regex also from **AST 配置** and **RE 配置**.
